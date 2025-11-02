@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
-import 'package:teacher/screens/auth/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key};
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,28 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load profile: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _handleLogout() async {
-    try {
-      await _authService.signOut();
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Logout failed: $e')),
-        );
-      }
     }
   }
 
@@ -61,13 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Lingumoro Teacher'),
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _handleLogout,
-            tooltip: 'Logout',
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -77,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
                   children: [
-                    // Profile header
+                    // Welcome banner
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -90,56 +60,33 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      padding: const EdgeInsets.all(32),
+                      padding: const EdgeInsets.all(24),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.white,
-                            child: Text(
-                              _profile?['full_name']?[0]?.toUpperCase() ?? 'T',
-                              style: TextStyle(
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.teal.shade700,
-                              ),
+                          Text(
+                            'Welcome back,',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.9),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 4),
                           Text(
                             _profile?['full_name'] ?? 'Teacher',
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
-                          const SizedBox(height: 8),
                           if (_profile?['specialization'] != null) ...[
+                            const SizedBox(height: 8),
                             Text(
                               _profile!['specialization'],
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.white70,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                          ],
-                          Text(
-                            _profile?['email'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          if (_profile?['phone'] != null) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              _profile!['phone'],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white70,
+                                color: Colors.white.withOpacity(0.8),
                               ),
                             ),
                           ],

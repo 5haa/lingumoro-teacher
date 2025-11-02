@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/screens/auth/signup_screen.dart';
-import 'package:teacher/screens/home/home_screen.dart';
+import 'package:teacher/screens/main_navigation.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const MainNavigation()),
         );
       }
     } catch (e) {

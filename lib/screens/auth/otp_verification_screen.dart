@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
-import 'package:teacher/screens/home/home_screen.dart';
+import 'package:teacher/screens/main_navigation.dart';
 import 'dart:async';
 
 class OTPVerificationScreen extends StatefulWidget {
@@ -99,7 +99,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const MainNavigation()),
         );
       }
     } catch (e) {
