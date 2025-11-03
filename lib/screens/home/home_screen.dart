@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
+import 'package:teacher/services/language_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,8 +11,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _authService = AuthService();
+  final _languageService = LanguageService();
   Map<String, dynamic>? _profile;
+  List<Map<String, dynamic>> _teacherLanguages = [];
   bool _isLoading = true;
+  bool _isLoadingLanguages = false;
 
   @override
   void initState() {
@@ -26,8 +30,25 @@ class _HomeScreenState extends State<HomeScreen> {
         _profile = profile;
         _isLoading = false;
       });
+      // Load teacher's languages
+      if (profile != null) {
+        _loadTeacherLanguages(profile['id']);
+      }
     } catch (e) {
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadTeacherLanguages(String teacherId) async {
+    setState(() => _isLoadingLanguages = true);
+    try {
+      final languages = await _languageService.getTeacherLanguages(teacherId);
+      setState(() {
+        _teacherLanguages = languages;
+        _isLoadingLanguages = false;
+      });
+    } catch (e) {
+      setState(() => _isLoadingLanguages = false);
     }
   }
 
@@ -90,6 +111,59 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ],
+                          // Display languages taught
+                          if (_teacherLanguages.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: _teacherLanguages.map((langData) {
+                                final lang = langData['language_courses'];
+                                if (lang == null) return const SizedBox.shrink();
+                                
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.5),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (lang['flag_url'] != null)
+                                        Image.network(
+                                          lang['flag_url'],
+                                          width: 20,
+                                          height: 15,
+                                          errorBuilder: (context, error, stackTrace) =>
+                                              const Icon(
+                                            Icons.language,
+                                            size: 16,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        lang['name'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -143,6 +217,178 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ],
                           ),
+
+                          const SizedBox(height: 32),
+
+                          // Languages I Teach Section
+                          const Text(
+                            'Languages I Teach',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          _isLoadingLanguages
+                              ? const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                              : _teacherLanguages.isEmpty
+                                  ? Card(
+                                      elevation: 2,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(24.0),
+                                        child: Center(
+                                          child: Column(
+                                            children: [
+                                              Icon(
+                                                Icons.language,
+                                                size: 48,
+                                                color: Colors.grey[400],
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Text(
+                                                'No languages assigned yet',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.grey[600],
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                'Contact admin to get assigned to language courses',
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: Colors.grey[500],
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : GridView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 12,
+                                        mainAxisSpacing: 12,
+                                        childAspectRatio: 1.5,
+                                      ),
+                                      itemCount: _teacherLanguages.length,
+                                      itemBuilder: (context, index) {
+                                        final langData = _teacherLanguages[index];
+                                        final lang = langData['language_courses'];
+                                        if (lang == null) return const SizedBox.shrink();
+                                        
+                                        return Card(
+                                          elevation: 3,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(16),
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                colors: [
+                                                  Colors.teal.shade400,
+                                                  Colors.teal.shade600,
+                                                ],
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(16.0),
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  // Flag
+                                                  if (lang['flag_url'] != null)
+                                                    Container(
+                                                      width: 50,
+                                                      height: 35,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black.withOpacity(0.2),
+                                                            blurRadius: 4,
+                                                            offset: const Offset(0, 2),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        child: Image.network(
+                                                          lang['flag_url'],
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder: (context, error, stackTrace) =>
+                                                              Container(
+                                                            color: Colors.white,
+                                                            child: const Icon(
+                                                              Icons.language,
+                                                              color: Colors.teal,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  else
+                                                    const Icon(
+                                                      Icons.language,
+                                                      size: 40,
+                                                      color: Colors.white,
+                                                    ),
+                                                  const SizedBox(height: 12),
+                                                  // Language name
+                                                  Text(
+                                                    lang['name'] ?? '',
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  // Proficiency level
+                                                  if (langData['proficiency_level'] != null)
+                                                    Container(
+                                                      padding: const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 3,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white.withOpacity(0.3),
+                                                        borderRadius: BorderRadius.circular(12),
+                                                      ),
+                                                      child: Text(
+                                                        langData['proficiency_level'],
+                                                        style: const TextStyle(
+                                                          fontSize: 11,
+                                                          color: Colors.white,
+                                                          fontWeight: FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
 
                           const SizedBox(height: 32),
 
