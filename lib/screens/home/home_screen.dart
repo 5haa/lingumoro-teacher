@@ -411,6 +411,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 12),
                           _buildActionButton(
+                            'My Sessions',
+                            Icons.video_library,
+                            () {
+                              Navigator.pushNamed(context, '/sessions');
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          _buildActionButton(
                             'My Students',
                             Icons.people,
                             () {},
