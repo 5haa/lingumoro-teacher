@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:teacher/config/supabase_config.dart';
 import 'package:teacher/screens/splash_screen.dart';
+import 'package:teacher/screens/schedule/schedule_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,9 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: const SplashScreen(),
+      routes: {
+        '/schedule': (context) => const ScheduleScreen(),
+      },
     );
   }
 }

@@ -403,9 +403,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 16),
 
                           _buildActionButton(
-                            'Create Course',
-                            Icons.add_circle,
-                            () {},
+                            'My Schedule',
+                            Icons.calendar_today,
+                            () {
+                              Navigator.pushNamed(context, '/schedule');
+                            },
                           ),
                           const SizedBox(height: 12),
                           _buildActionButton(
@@ -415,8 +417,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 12),
                           _buildActionButton(
-                            'Schedule',
-                            Icons.calendar_today,
+                            'Create Course',
+                            Icons.add_circle,
                             () {},
                           ),
                           const SizedBox(height: 12),
