@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
+import 'package:teacher/services/rating_service.dart';
 import 'package:teacher/screens/auth/login_screen.dart';
 import 'package:teacher/screens/profile/edit_profile_screen.dart';
+import 'package:teacher/widgets/rating_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,7 +14,10 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _authService = AuthService();
+  final _ratingService = RatingService();
   Map<String, dynamic>? _profile;
+  Map<String, dynamic>? _ratingStats;
+  List<Map<String, dynamic>> _reviews = [];
   bool _isLoading = true;
 
   @override
@@ -24,8 +29,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadProfile() async {
     try {
       final profile = await _authService.getTeacherProfile();
+      final ratingStats = await _ratingService.getMyRatingStats();
+      final reviews = await _ratingService.getMyRatings();
+      
       setState(() {
         _profile = profile;
+        _ratingStats = ratingStats;
+        _reviews = reviews;
         _isLoading = false;
       });
     } catch (e) {
@@ -126,6 +136,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       }
     }
+  }
+
+  void _showAllReviewsDialog() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'All Reviews',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _reviews.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: RatingReviewCard(review: _reviews[index]),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _handleLogout() async {
@@ -234,6 +298,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                           ],
+                          // Rating badge in header
+                          if (_ratingStats != null && ((_ratingStats!['total_ratings'] as int?) ?? 0) > 0) ...[
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: RatingDisplay(
+                                averageRating: (_ratingStats!['average_rating'] as num?)?.toDouble() ?? 0.0,
+                                totalRatings: (_ratingStats!['total_ratings'] as int?) ?? 0,
+                                compact: true,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -244,6 +327,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Ratings Section
+                          if (_ratingStats != null && ((_ratingStats!['total_ratings'] as int?) ?? 0) > 0) ...[
+                            RatingDisplay(
+                              averageRating: (_ratingStats!['average_rating'] as num?)?.toDouble() ?? 0.0,
+                              totalRatings: (_ratingStats!['total_ratings'] as int?) ?? 0,
+                              starCounts: {
+                                5: (_ratingStats!['five_star_count'] as int?) ?? 0,
+                                4: (_ratingStats!['four_star_count'] as int?) ?? 0,
+                                3: (_ratingStats!['three_star_count'] as int?) ?? 0,
+                                2: (_ratingStats!['two_star_count'] as int?) ?? 0,
+                                1: (_ratingStats!['one_star_count'] as int?) ?? 0,
+                              },
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                          
+                          // Recent Reviews Section
+                          if (_reviews.isNotEmpty) ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Recent Reviews',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    // Show all reviews dialog
+                                    _showAllReviewsDialog();
+                                  },
+                                  child: const Text('View All'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            ...(_reviews.take(3).map((review) => 
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: RatingReviewCard(review: review),
+                              )
+                            )),
+                            const SizedBox(height: 24),
+                          ],
+                          
                           const Text(
                             'Account Information',
                             style: TextStyle(
