@@ -125,6 +125,36 @@ class AuthService {
     }).eq('id', currentUser!.id);
   }
 
+  /// Update teacher profile with all fields
+  Future<void> updateTeacherProfile(Map<String, dynamic> data) async {
+    if (currentUser == null) throw Exception('No user logged in');
+
+    final updateData = <String, dynamic>{
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+
+    // Add only provided fields
+    if (data.containsKey('full_name')) updateData['full_name'] = data['full_name'];
+    if (data.containsKey('phone')) updateData['phone'] = data['phone'];
+    if (data.containsKey('avatar_url')) updateData['avatar_url'] = data['avatar_url'];
+    if (data.containsKey('bio')) updateData['bio'] = data['bio'];
+    if (data.containsKey('specialization')) updateData['specialization'] = data['specialization'];
+    if (data.containsKey('intro_video_url')) updateData['intro_video_url'] = data['intro_video_url'];
+    if (data.containsKey('meeting_link')) updateData['meeting_link'] = data['meeting_link'];
+
+    await _supabase.from('teachers').update(updateData).eq('id', currentUser!.id);
+  }
+
+  /// Update teacher's default meeting link (will automatically update all upcoming sessions)
+  Future<void> updateMeetingLink(String meetingLink) async {
+    if (currentUser == null) throw Exception('No user logged in');
+
+    await _supabase.from('teachers').update({
+      'meeting_link': meetingLink,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('id', currentUser!.id);
+  }
+
   /// Reset password
   Future<void> resetPassword(String email) async {
     await _supabase.auth.resetPasswordForEmail(email);

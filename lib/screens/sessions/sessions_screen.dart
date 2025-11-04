@@ -42,22 +42,41 @@ class _SessionsScreenState extends State<SessionsScreen> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Set Meeting Link'),
+        title: const Text('Override Meeting Link'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 20, color: Colors.blue.shade700),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'By default, all sessions use your profile meeting link. Edit here if you need a different link for this specific session.',
+                      style: TextStyle(fontSize: 12, color: Colors.blue.shade700),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: controller,
               decoration: const InputDecoration(
                 labelText: 'Meeting Link (Google Meet, Zoom, etc.)',
                 hintText: 'https://meet.google.com/...',
                 border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.link),
               ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Students will be able to join once you set this link.',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              keyboardType: TextInputType.url,
             ),
           ],
         ),
@@ -80,7 +99,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Meeting link set successfully!'),
+            content: Text('Meeting link updated for this session!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -373,15 +392,23 @@ class _SessionsScreenState extends State<SessionsScreen> {
                     size: 16,
                   ),
                   const SizedBox(width: 5),
-                  Text(
-                    hasMeetingLink ? 'Meeting link set' : 'No meeting link',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: hasMeetingLink ? Colors.green : Colors.orange,
-                      fontWeight: FontWeight.w500,
+                  Expanded(
+                    child: Text(
+                      hasMeetingLink 
+                          ? 'Meeting link ready (from profile)' 
+                          : 'Set meeting link in profile',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: hasMeetingLink ? Colors.green : Colors.orange,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 15),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
                   const Icon(Icons.stars, color: Colors.amber, size: 16),
                   const SizedBox(width: 5),
                   Text(

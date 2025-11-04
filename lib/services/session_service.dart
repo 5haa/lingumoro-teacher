@@ -39,7 +39,8 @@ class TeacherSessionService {
           .select('''
             *,
             student:students(id, full_name, email),
-            language:language_courses(id, name)
+            language:language_courses(id, name, flag_url),
+            subscription:student_subscriptions(id, points_remaining, status)
           ''')
           .eq('teacher_id', user.id)
           .gte('scheduled_date', today)

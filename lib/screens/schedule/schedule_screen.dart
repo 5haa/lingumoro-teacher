@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/schedule_service.dart';
 import 'package:teacher/services/auth_service.dart';
+import 'package:teacher/screens/schedule/timeslot_management_screen.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -137,6 +138,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         title: const Text('My Schedule'),
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.access_time),
+            tooltip: 'Manage 30-min Timeslots',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TimeslotManagementScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -494,4 +509,6 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
     );
   }
 }
+
+
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/screens/auth/login_screen.dart';
+import 'package:teacher/screens/profile/edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -33,6 +34,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to load profile: $e')),
         );
+      }
+    }
+  }
+
+  Future<void> _showEditMeetingLinkDialog() async {
+    final controller = TextEditingController(text: _profile?['meeting_link'] ?? '');
+    
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Set Default Meeting Link'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'This link will be automatically used for all your upcoming sessions.',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Meeting Link',
+                hintText: 'https://meet.google.com/...',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.link),
+              ),
+              keyboardType: TextInputType.url,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 20, color: Colors.blue.shade700),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Students will be able to join sessions using this link',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue.shade700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal,
+            ),
+            child: const Text('Save', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      try {
+        await _authService.updateMeetingLink(result);
+        await _loadProfile();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Meeting link updated successfully! All upcoming sessions will use this link.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to update meeting link: $e')),
+          );
+        }
       }
     }
   }
@@ -199,6 +290,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 : 'N/A',
                             Icons.calendar_today,
                           ),
+                          const SizedBox(height: 12),
+
+                          // Meeting Link Card
+                          Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            color: Colors.teal.shade50,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.video_call, color: Colors.teal, size: 24),
+                                          const SizedBox(width: 16),
+                                          Text(
+                                            'Default Meeting Link',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey[700],
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.edit, size: 20),
+                                        color: Colors.teal,
+                                        onPressed: _showEditMeetingLinkDialog,
+                                        tooltip: 'Edit Meeting Link',
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _profile?['meeting_link'] != null && 
+                                    _profile!['meeting_link'].toString().isNotEmpty
+                                        ? _profile!['meeting_link']
+                                        : 'Not set - Click edit to add your meeting link',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: _profile?['meeting_link'] != null && 
+                                             _profile!['meeting_link'].toString().isNotEmpty
+                                          ? Colors.grey[800]
+                                          : Colors.grey[600],
+                                      fontStyle: _profile?['meeting_link'] == null ||
+                                                 _profile!['meeting_link'].toString().isEmpty
+                                          ? FontStyle.italic
+                                          : FontStyle.normal,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  if (_profile?['meeting_link'] == null ||
+                                      _profile!['meeting_link'].toString().isEmpty) ...[
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.shade50,
+                                        border: Border.all(color: Colors.orange.shade200),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.warning_amber, size: 18, color: Colors.orange.shade700),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              'Set your meeting link so students can join your sessions',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.orange.shade700,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ),
 
                           const SizedBox(height: 32),
 
@@ -215,8 +396,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _buildActionButton(
                             'Edit Profile',
                             Icons.edit,
-                            () {
-                              // TODO: Implement edit profile
+                            () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditProfileScreen(profile: _profile!),
+                                ),
+                              );
+                              // Reload profile if updated
+                              if (result == true) {
+                                _loadProfile();
+                              }
                             },
                           ),
                           const SizedBox(height: 12),

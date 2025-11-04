@@ -28,12 +28,21 @@ class ScheduleService {
     required String endTime,
   }) async {
     try {
+      // Add the schedule
       await _supabase.from('teacher_schedules').insert({
         'teacher_id': teacherId,
         'day_of_week': dayOfWeek,
         'start_time': startTime,
         'end_time': endTime,
         'is_available': true,
+      });
+
+      // Auto-generate 30-minute timeslots
+      await _supabase.rpc('generate_timeslots_for_range', params: {
+        'p_teacher_id': teacherId,
+        'p_day_of_week': dayOfWeek,
+        'p_start_time': startTime,
+        'p_end_time': endTime,
       });
 
       return true;
@@ -73,4 +82,6 @@ class ScheduleService {
     }
   }
 }
+
+
 
