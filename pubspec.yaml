@@ -49,6 +49,15 @@ dependencies:
   
   # Local storage for app preferences
   shared_preferences: ^2.2.2
+  
+  # File picker for chat attachments
+  file_picker: ^8.1.2
+  
+  # Intl for date formatting
+  intl: ^0.20.0
+  
+  # Path provider for file handling
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:

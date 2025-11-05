@@ -32,15 +32,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final ratingStats = await _ratingService.getMyRatingStats();
       final reviews = await _ratingService.getMyRatings();
       
-      setState(() {
-        _profile = profile;
-        _ratingStats = ratingStats;
-        _reviews = reviews;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
       if (mounted) {
+        setState(() {
+          _profile = profile;
+          _ratingStats = ratingStats;
+          _reviews = reviews;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to load profile: $e')),
         );
