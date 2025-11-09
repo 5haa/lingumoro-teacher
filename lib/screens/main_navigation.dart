@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:teacher/screens/home/home_screen.dart';
 import 'package:teacher/screens/packages/packages_screen.dart';
 import 'package:teacher/screens/classes/classes_screen.dart';
+import 'package:teacher/screens/point_awards_screen.dart';
 import 'package:teacher/screens/chat/chat_screen.dart';
 import 'package:teacher/screens/profile/profile_screen.dart';
 
@@ -19,6 +20,7 @@ class _MainNavigationState extends State<MainNavigation> {
     const HomeScreen(),
     const PackagesScreen(),
     const ClassesScreen(),
+    const PointAwardsScreen(),
     const ChatScreen(),
     const ProfileScreen(),
   ];
@@ -49,6 +51,10 @@ class _MainNavigationState extends State<MainNavigation> {
           BottomNavigationBarItem(
             icon: Icon(Icons.class_),
             label: 'Classes',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'Students',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),
