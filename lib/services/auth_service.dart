@@ -82,10 +82,55 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    return await _supabase.auth.signInWithPassword(
+    final response = await _supabase.auth.signInWithPassword(
       email: email,
       password: password,
     );
+
+    // Check if account is suspended
+    if (response.user != null) {
+      await _checkSuspensionStatus(response.user!.id);
+    }
+
+    return response;
+  }
+
+  /// Check if user account is suspended
+  Future<void> _checkSuspensionStatus(String userId) async {
+    final teacher = await _supabase
+        .from('teachers')
+        .select('is_suspended, suspension_reason')
+        .eq('id', userId)
+        .maybeSingle();
+
+    if (teacher != null && (teacher['is_suspended'] == true)) {
+      // Sign out the user immediately
+      await _supabase.auth.signOut();
+      
+      final reason = teacher['suspension_reason'] ?? 'Your account has been suspended.';
+      throw Exception('Account suspended: $reason');
+    }
+  }
+
+  /// Check suspension status for current user (call on app startup)
+  Future<bool> checkIfSuspended() async {
+    if (currentUser == null) return false;
+
+    try {
+      final teacher = await _supabase
+          .from('teachers')
+          .select('is_suspended, suspension_reason')
+          .eq('id', currentUser!.id)
+          .maybeSingle();
+
+      if (teacher != null && (teacher['is_suspended'] == true)) {
+        await _supabase.auth.signOut();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
   }
 
   /// Sign out
