@@ -58,6 +58,9 @@ dependencies:
   
   # Path provider for file handling
   path_provider: ^2.1.1
+  
+  # Cached network images
+  cached_network_image: ^3.3.1
 
 dev_dependencies:
   flutter_test:

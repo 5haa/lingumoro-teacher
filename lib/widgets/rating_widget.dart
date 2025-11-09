@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:teacher/widgets/student_avatar_widget.dart';
 
 class RatingDisplay extends StatelessWidget {
   final double averageRating;
@@ -204,17 +205,11 @@ class RatingReviewCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 20,
+              StudentAvatarWidget(
+                avatarUrl: avatarUrl,
+                fullName: studentName,
+                size: 40,
                 backgroundColor: Colors.deepPurple.shade100,
-                backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                child: avatarUrl == null
-                    ? Icon(
-                        Icons.person,
-                        color: Colors.deepPurple,
-                        size: 20,
-                      )
-                    : null,
               ),
               const SizedBox(width: 12),
               Expanded(

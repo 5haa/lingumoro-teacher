@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/chat_service.dart';
 import 'package:teacher/screens/chat/chat_conversation_screen.dart';
+import 'package:teacher/widgets/student_avatar_widget.dart';
 import 'package:intl/intl.dart';
 
 class ChatListScreen extends StatefulWidget {
@@ -169,22 +170,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
         final lastMessageAt = conversation['last_message_at'];
 
         return ListTile(
-          leading: CircleAvatar(
-            radius: 28,
-            backgroundImage: student['avatar_url'] != null
-                ? NetworkImage(student['avatar_url'])
-                : null,
+          leading: StudentAvatarWidget(
+            avatarUrl: student['avatar_url'],
+            fullName: student['full_name'],
+            size: 56,
             backgroundColor: Colors.teal[100],
-            child: student['avatar_url'] == null
-                ? Text(
-                    student['full_name']?[0]?.toUpperCase() ?? 'S',
-                    style: TextStyle(
-                      color: Colors.teal[700],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  )
-                : null,
           ),
           title: Row(
             children: [
@@ -296,22 +286,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
         final unreadCount = student['unread_count'] ?? 0;
 
         return ListTile(
-          leading: CircleAvatar(
-            radius: 28,
-            backgroundImage: student['avatar_url'] != null
-                ? NetworkImage(student['avatar_url'])
-                : null,
+          leading: StudentAvatarWidget(
+            avatarUrl: student['avatar_url'],
+            fullName: student['full_name'],
+            size: 56,
             backgroundColor: Colors.teal[100],
-            child: student['avatar_url'] == null
-                ? Text(
-                    student['full_name']?[0]?.toUpperCase() ?? 'S',
-                    style: TextStyle(
-                      color: Colors.teal[700],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  )
-                : null,
           ),
           title: Row(
             children: [
