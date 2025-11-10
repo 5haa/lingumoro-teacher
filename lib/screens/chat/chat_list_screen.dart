@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:teacher/services/chat_service.dart';
+import 'package:teacher/services/presence_service.dart';
 import 'package:teacher/screens/chat/chat_conversation_screen.dart';
 import 'package:teacher/widgets/student_avatar_widget.dart';
 import 'package:intl/intl.dart';
@@ -13,10 +15,15 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   final _chatService = ChatService();
+  final _presenceService = PresenceService();
   List<Map<String, dynamic>> _conversations = [];
   List<Map<String, dynamic>> _availableStudents = [];
   bool _isLoading = true;
   bool _showAvailable = false;
+  Timer? _statusRefreshTimer;
+  
+  // Track online status for each user
+  final Map<String, bool> _onlineStatus = {};
 
   @override
   void initState() {
@@ -28,11 +35,18 @@ class _ChatListScreenState extends State<ChatListScreen> {
     _chatService.onConversationUpdate.listen((update) {
       _loadData();
     });
+    
+    // Periodically refresh online status (every 30 seconds)
+    _statusRefreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _refreshOnlineStatus();
+    });
   }
 
   @override
   void dispose() {
+    _statusRefreshTimer?.cancel();
     _chatService.dispose();
+    _presenceService.dispose();
     super.dispose();
   }
 
@@ -50,6 +64,62 @@ class _ChatListScreenState extends State<ChatListScreen> {
         _availableStudents = students;
         _isLoading = false;
       });
+      
+      // Subscribe to online status for all conversation participants
+      for (var conversation in conversations) {
+        final studentData = conversation['student'];
+        if (studentData != null) {
+          final studentId = (studentData as Map<String, dynamic>)['id'];
+          if (studentId != null) {
+            _subscribeToUserStatus(studentId, 'student');
+          }
+        }
+      }
+      
+      // Subscribe to online status for available students
+      for (var student in students) {
+        final studentId = student['id'];
+        if (studentId != null) {
+          _subscribeToUserStatus(studentId, 'student');
+        }
+      }
+    }
+  }
+  
+  void _subscribeToUserStatus(String userId, String userType) {
+    final key = '$userId-$userType';
+    if (_onlineStatus.containsKey(key)) return; // Already subscribed
+    
+    _presenceService.subscribeToUserStatus(userId, userType).listen((isOnline) {
+      if (mounted) {
+        setState(() {
+          _onlineStatus[key] = isOnline;
+        });
+      }
+    });
+  }
+  
+  /// Refresh online status for all tracked users
+  Future<void> _refreshOnlineStatus() async {
+    if (!mounted) return;
+    
+    for (var key in _onlineStatus.keys.toList()) {
+      final parts = key.split('-');
+      if (parts.length != 2) continue;
+      
+      final userId = parts[0];
+      final userType = parts[1];
+      
+      try {
+        final isOnline = await _presenceService.isUserOnline(userId, userType);
+        if (mounted) {
+          setState(() {
+            _onlineStatus[key] = isOnline;
+          });
+        }
+      } catch (e) {
+        print('Error refreshing status for $key: $e');
+      }
     }
   }
 
@@ -168,13 +238,37 @@ class _ChatListScreenState extends State<ChatListScreen> {
         final unreadCount = conversation['teacher_unread_count'] ?? 0;
         final lastMessage = conversation['last_message'] ?? '';
         final lastMessageAt = conversation['last_message_at'];
+        final userKey = '${student['id']}-student';
+        final isOnline = _onlineStatus[userKey] ?? false;
 
         return ListTile(
-          leading: StudentAvatarWidget(
-            avatarUrl: student['avatar_url'],
-            fullName: student['full_name'],
-            size: 56,
-            backgroundColor: Colors.teal[100],
+          leading: Stack(
+            children: [
+              StudentAvatarWidget(
+                avatarUrl: student['avatar_url'],
+                fullName: student['full_name'],
+                size: 56,
+                backgroundColor: Colors.teal[100],
+              ),
+              // Online status indicator
+              if (isOnline)
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: Colors.greenAccent,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           title: Row(
             children: [
@@ -284,13 +378,37 @@ class _ChatListScreenState extends State<ChatListScreen> {
       itemBuilder: (context, index) {
         final student = _availableStudents[index];
         final unreadCount = student['unread_count'] ?? 0;
+        final userKey = '${student['id']}-student';
+        final isOnline = _onlineStatus[userKey] ?? false;
 
         return ListTile(
-          leading: StudentAvatarWidget(
-            avatarUrl: student['avatar_url'],
-            fullName: student['full_name'],
-            size: 56,
-            backgroundColor: Colors.teal[100],
+          leading: Stack(
+            children: [
+              StudentAvatarWidget(
+                avatarUrl: student['avatar_url'],
+                fullName: student['full_name'],
+                size: 56,
+                backgroundColor: Colors.teal[100],
+              ),
+              // Online status indicator
+              if (isOnline)
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: Colors.greenAccent,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           title: Row(
             children: [
