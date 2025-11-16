@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teacher/config/app_colors.dart';
+import 'package:teacher/widgets/app_drawer.dart';
 import 'home/home_screen.dart';
 import 'classes/classes_screen.dart';
 import 'students/students_screen.dart';
@@ -57,6 +58,7 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AppDrawer(),
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,

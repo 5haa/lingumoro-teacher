@@ -370,10 +370,10 @@ class _HomeScreenState extends State<HomeScreen> {
   
   Widget _buildTopBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          // Profile Avatar
+          // Menu Icon
           Container(
             width: 45,
             height: 45,
@@ -388,16 +388,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            child: ClipOval(
-              child: _profile?['avatar_url'] != null
-                  ? CachedNetworkImage(
-                      imageUrl: _profile!['avatar_url'],
-                      width: 45,
-                      height: 45,
-                      fit: BoxFit.cover,
-                      errorWidget: (context, url, error) => _buildAvatarInitial(),
-                    )
-                  : _buildAvatarInitial(),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              icon: const FaIcon(
+                FontAwesomeIcons.bars,
+                size: 18,
+                color: AppColors.textPrimary,
+              ),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
             ),
           ),
           
