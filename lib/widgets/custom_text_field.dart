@@ -86,7 +86,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 color: AppColors.textHint,
                 fontSize: 16,
               ),
-              prefixIcon: widget.prefixIcon,
+              prefixIcon: widget.prefixIcon != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 12),
+                      child: widget.prefixIcon,
+                    )
+                  : null,
+              prefixIconConstraints: const BoxConstraints(
+                minWidth: 0,
+                minHeight: 0,
+              ),
               suffixIcon: widget.obscureText
                 ? IconButton(
                     icon: Icon(
@@ -117,8 +126,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ),
               filled: true,
               fillColor: AppColors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 24,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: widget.prefixIcon != null ? 0 : 24,
                 vertical: 16,
               ),
             ),

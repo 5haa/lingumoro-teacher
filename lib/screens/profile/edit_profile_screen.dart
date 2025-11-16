@@ -1,9 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/services/storage_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../config/app_colors.dart';
+import '../../widgets/custom_button.dart';
+import '../../widgets/custom_text_field.dart';
+import '../../widgets/custom_back_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> profile;
@@ -20,7 +25,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _storageService = StorageService();
   
   late TextEditingController _fullNameController;
-  late TextEditingController _phoneController;
   late TextEditingController _specializationController;
   late TextEditingController _bioController;
   late TextEditingController _introVideoController;
@@ -35,7 +39,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.profile['full_name'] ?? '');
-    _phoneController = TextEditingController(text: widget.profile['phone'] ?? '');
     _specializationController = TextEditingController(text: widget.profile['specialization'] ?? '');
     _bioController = TextEditingController(text: widget.profile['bio'] ?? '');
     _introVideoController = TextEditingController(text: widget.profile['intro_video_url'] ?? '');
@@ -46,7 +49,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void dispose() {
     _fullNameController.dispose();
-    _phoneController.dispose();
     _specializationController.dispose();
     _bioController.dispose();
     _introVideoController.dispose();
@@ -74,6 +76,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SnackBar(
             content: Text('Error picking image: $e'),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
@@ -83,52 +89,118 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _showImageSourceDialog() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Choose Profile Picture',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.grey.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                leading: const Icon(Icons.photo_library, color: Colors.teal),
-                title: const Text('Choose from Gallery'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.gallery);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt, color: Colors.teal),
-                title: const Text('Take a Photo'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.camera);
-                },
-              ),
-              if (_currentAvatarUrl != null || _newAvatarFile != null)
+                const Text(
+                  'Choose Profile Picture',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 16),
                 ListTile(
-                  leading: const Icon(Icons.delete, color: Colors.red),
-                  title: const Text('Remove Photo'),
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const FaIcon(
+                      FontAwesomeIcons.images,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  title: const Text(
+                    'Choose from Gallery',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   onTap: () {
                     Navigator.pop(context);
-                    setState(() {
-                      _newAvatarFile = null;
-                      _currentAvatarUrl = null;
-                    });
+                    _pickImage(ImageSource.gallery);
                   },
                 ),
-            ],
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const FaIcon(
+                      FontAwesomeIcons.camera,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  title: const Text(
+                    'Take a Photo',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickImage(ImageSource.camera);
+                  },
+                ),
+                if (_currentAvatarUrl != null || _newAvatarFile != null)
+                  ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const FaIcon(
+                        FontAwesomeIcons.trash,
+                        size: 18,
+                        color: Colors.red,
+                      ),
+                    ),
+                    title: const Text(
+                      'Remove Photo',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.red,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _newAvatarFile = null;
+                        _currentAvatarUrl = null;
+                      });
+                    },
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -158,7 +230,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       
       await _authService.updateTeacherProfile({
         'full_name': _fullNameController.text.trim(),
-        'phone': _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
         'specialization': _specializationController.text.trim().isEmpty ? null : _specializationController.text.trim(),
         'bio': _bioController.text.trim().isEmpty ? null : _bioController.text.trim(),
         'intro_video_url': _introVideoController.text.trim().isEmpty ? null : _introVideoController.text.trim(),
@@ -168,12 +239,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully!'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: const Text('Profile updated successfully!'),
+            backgroundColor: AppColors.primary,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
-        Navigator.pop(context, true); // Return true to indicate success
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
@@ -181,6 +256,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SnackBar(
             content: Text('Failed to update profile: $e'),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
@@ -193,281 +272,315 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final fullName = widget.profile['full_name'] ?? 'Teacher';
+    final initials = fullName.isNotEmpty
+        ? fullName.split(' ').map((n) => n[0]).take(2).join().toUpperCase()
+        : 'T';
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
-        actions: [
-          if (!_isLoading)
-            IconButton(
-              icon: const Icon(Icons.check),
-              onPressed: _saveProfile,
-              tooltip: 'Save',
-            ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Profile Picture Section
-            Center(
-              child: Column(
-                children: [
-                  Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: _showImageSourceDialog,
-                        child: CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Colors.grey[200],
-                          child: _isUploadingAvatar
-                              ? const CircularProgressIndicator()
-                              : _newAvatarFile != null
-                                  ? ClipOval(
-                                      child: Image.file(
-                                        _newAvatarFile!,
-                                        width: 120,
-                                        height: 120,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : _currentAvatarUrl != null
-                                      ? ClipOval(
-                                          child: CachedNetworkImage(
-                                            imageUrl: _currentAvatarUrl!,
-                                            width: 120,
-                                            height: 120,
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) => const CircularProgressIndicator(),
-                                            errorWidget: (context, url, error) => Icon(
-                                              Icons.person,
-                                              size: 60,
-                                              color: Colors.grey[400],
-                                            ),
-                                          ),
-                                        )
-                                      : Icon(
-                                          Icons.person,
-                                          size: 60,
-                                          color: Colors.grey[400],
-                                        ),
+      backgroundColor: AppColors.background,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 100),
+                
+                // Avatar Section
+                _buildAvatarSection(initials),
+                
+                const SizedBox(height: 20),
+                
+                // Form Section
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        // Full Name
+                        CustomTextField(
+                          labelText: 'Full Name',
+                          hintText: 'Enter your full name',
+                          controller: _fullNameController,
+                          prefixIcon: const FaIcon(
+                            FontAwesomeIcons.user,
+                            size: 18,
+                            color: AppColors.grey,
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your name';
+                            }
+                            return null;
+                          },
                         ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: _showImageSourceDialog,
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.teal,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 3),
-                            ),
-                            child: const Icon(
-                              Icons.camera_alt,
-                              size: 20,
-                              color: Colors.white,
-                            ),
+                        const SizedBox(height: 20),
+
+                        // Specialization
+                        CustomTextField(
+                          labelText: 'Specialization',
+                          hintText: 'e.g., English Literature, Math',
+                          controller: _specializationController,
+                          prefixIcon: const FaIcon(
+                            FontAwesomeIcons.graduationCap,
+                            size: 18,
+                            color: AppColors.grey,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  TextButton.icon(
-                    onPressed: _showImageSourceDialog,
-                    icon: const Icon(Icons.edit, size: 16),
-                    label: Text(
-                      _currentAvatarUrl == null && _newAvatarFile == null
-                          ? 'Add Profile Picture'
-                          : 'Change Profile Picture',
+                        const SizedBox(height: 20),
+
+                        // Bio
+                        CustomTextField(
+                          labelText: 'Bio',
+                          hintText: 'Tell students about yourself...',
+                          controller: _bioController,
+                          maxLines: 4,
+                          prefixIcon: const FaIcon(
+                            FontAwesomeIcons.info,
+                            size: 18,
+                            color: AppColors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Intro Video URL
+                        CustomTextField(
+                          labelText: 'Introduction Video (YouTube URL)',
+                          hintText: 'https://www.youtube.com/watch?v=...',
+                          controller: _introVideoController,
+                          keyboardType: TextInputType.url,
+                          prefixIcon: const FaIcon(
+                            FontAwesomeIcons.video,
+                            size: 18,
+                            color: AppColors.grey,
+                          ),
+                          validator: (value) {
+                            if (value != null && value.trim().isNotEmpty) {
+                              if (!value.contains('youtube.com') && !value.contains('youtu.be')) {
+                                return 'Please enter a valid YouTube URL';
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Meeting Link
+                        CustomTextField(
+                          labelText: 'Default Meeting Link',
+                          hintText: 'Zoom, Google Meet, etc.',
+                          controller: _meetingLinkController,
+                          keyboardType: TextInputType.url,
+                          prefixIcon: const FaIcon(
+                            FontAwesomeIcons.video,
+                            size: 18,
+                            color: AppColors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+
+                        // Save Button
+                        CustomButton(
+                          text: 'SAVE CHANGES',
+                          onPressed: _isLoading ? () {} : _saveProfile,
+                          isLoading: _isLoading,
+                        ),
+                        const SizedBox(height: 20),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            
-            // Full Name
-            TextFormField(
-              controller: _fullNameController,
-              decoration: InputDecoration(
-                labelText: 'Full Name *',
-                prefixIcon: const Icon(Icons.person, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
                 ),
-                filled: true,
-                fillColor: Colors.grey[50],
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Full name is required';
-                }
-                return null;
-              },
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Phone
-            TextFormField(
-              controller: _phoneController,
-              decoration: InputDecoration(
-                labelText: 'Phone',
-                prefixIcon: const Icon(Icons.phone, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-              ),
-              keyboardType: TextInputType.phone,
+          ),
+          
+          // Back Button
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: const CustomBackButton(),
             ),
-            const SizedBox(height: 16),
-
-            // Specialization
-            TextFormField(
-              controller: _specializationController,
-              decoration: InputDecoration(
-                labelText: 'Specialization',
-                prefixIcon: const Icon(Icons.school, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-                hintText: 'e.g., English Literature, Math',
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Bio
-            TextFormField(
-              controller: _bioController,
-              decoration: InputDecoration(
-                labelText: 'Bio',
-                prefixIcon: const Icon(Icons.info, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-                hintText: 'Tell students about yourself...',
-                alignLabelWithHint: true,
-              ),
-              maxLines: 5,
-              minLines: 3,
-            ),
-            const SizedBox(height: 16),
-
-            // Intro Video URL
-            TextFormField(
-              controller: _introVideoController,
-              decoration: InputDecoration(
-                labelText: 'Introduction Video (YouTube URL)',
-                prefixIcon: const Icon(Icons.video_library, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-                hintText: 'https://www.youtube.com/watch?v=...',
-                helperText: 'Add a YouTube video to introduce yourself to students',
-                helperMaxLines: 2,
-              ),
-              keyboardType: TextInputType.url,
-              validator: (value) {
-                if (value != null && value.trim().isNotEmpty) {
-                  // Basic YouTube URL validation
-                  if (!value.contains('youtube.com') && !value.contains('youtu.be')) {
-                    return 'Please enter a valid YouTube URL';
-                  }
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Meeting Link
-            TextFormField(
-              controller: _meetingLinkController,
-              decoration: InputDecoration(
-                labelText: 'Default Meeting Link',
-                prefixIcon: const Icon(Icons.videocam, color: Colors.teal),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-                hintText: 'Zoom, Google Meet, etc.',
-                helperText: 'Default meeting link for sessions with students',
-              ),
-              keyboardType: TextInputType.url,
-            ),
-            const SizedBox(height: 32),
-
-            // Save Button
-            SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _saveProfile,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Text(
-                        'Save Changes',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
+  Widget _buildAvatarSection(String initials) {
+    return Column(
+      children: [
+        // Avatar Image
+        Center(
+          child: GestureDetector(
+            onTap: _showImageSourceDialog,
+            child: Stack(
+              children: [
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: _isUploadingAvatar
+                        ? Container(
+                            color: AppColors.lightGrey,
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                              ),
+                            ),
+                          )
+                        : _newAvatarFile != null
+                            ? Image.file(
+                                _newAvatarFile!,
+                                fit: BoxFit.cover,
+                                width: 120,
+                                height: 120,
+                              )
+                            : _currentAvatarUrl != null
+                                ? CachedNetworkImage(
+                                    imageUrl: _currentAvatarUrl!,
+                                    fit: BoxFit.cover,
+                                    width: 120,
+                                    height: 120,
+                                    placeholder: (context, url) => Container(
+                                      color: AppColors.lightGrey,
+                                      child: Center(
+                                        child: Text(
+                                          initials,
+                                          style: const TextStyle(
+                                            fontSize: 48,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Container(
+                                      color: AppColors.lightGrey,
+                                      child: Center(
+                                        child: Text(
+                                          initials,
+                                          style: const TextStyle(
+                                            fontSize: 48,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    color: AppColors.lightGrey,
+                                    child: Center(
+                                      child: Text(
+                                        initials,
+                                        style: const TextStyle(
+                                          fontSize: 48,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                  ),
+                ),
+                // Camera Icon Overlay
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: _showImageSourceDialog,
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        gradient: AppColors.greenGradient,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.white, width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        
+        // Add/Change Photo Button
+        GestureDetector(
+          onTap: _showImageSourceDialog,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(25),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_isUploadingAvatar)
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    ),
+                  )
+                else
+                  FaIcon(
+                    _currentAvatarUrl == null && _newAvatarFile == null
+                        ? FontAwesomeIcons.camera
+                        : FontAwesomeIcons.penToSquare,
+                    size: 16,
+                    color: AppColors.primary,
+                  ),
+                const SizedBox(width: 8),
+                Text(
+                  _currentAvatarUrl == null && _newAvatarFile == null
+                      ? 'Add Photo'
+                      : 'Change Photo',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
