@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary green theme colors
-  static const Color primary = Color(0xFF4CAF50);
-  static const Color primaryLight = Color(0xFF81C784);
-  static const Color primaryDark = Color(0xFF388E3C);
+  // Primary blue theme colors
+  static const Color primary = Color(0xFF2196F3); // Material Blue 500
+  static const Color primaryLight = Color(0xFF64B5F6); // Material Blue 300
+  static const Color primaryDark = Color(0xFF1976D2); // Material Blue 700
   
   // Accent colors
-  static const Color accent = Color(0xFF66BB6A);
+  static const Color accent = Color(0xFF42A5F5); // Material Blue 400
   
   // Text colors
   static const Color textPrimary = Color(0xFF000000);
@@ -21,13 +21,13 @@ class AppColors {
   
   // Gradient colors
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF5FC3E4), Color(0xFF6A85E6)],
+    colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
   );
   
   static const LinearGradient greenGradient = LinearGradient(
-    colors: [Color(0xFF4CAF50), Color(0xFF388E3C)],
+    colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
   );
