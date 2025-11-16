@@ -13,40 +13,66 @@ class PointAwardService {
         return [];
       }
 
+      print('Fetching students for teacher: ${currentUser!.id}');
+
       // Get students who have active or completed subscriptions with this teacher
+      // Use the same query format as chat_service which works
       final subscriptions = await _supabase
           .from('student_subscriptions')
-          .select('*, students(id, full_name, email, avatar_url, level, points)')
+          .select('''
+            student_id,
+            student:student_id (
+              id,
+              full_name,
+              email,
+              avatar_url,
+              level,
+              points
+            )
+          ''')
           .eq('teacher_id', currentUser!.id)
           .inFilter('status', ['active', 'completed']);
+
+      print('Found ${subscriptions.length} subscriptions');
 
       // Extract unique students and calculate awarded points
       final Map<String, Map<String, dynamic>> studentsMap = {};
       
       for (final subscription in subscriptions) {
-        final student = subscription['students'];
-        if (student != null && !studentsMap.containsKey(student['id'])) {
-          // Get total points awarded by this teacher to this student
-          final awards = await _supabase
-              .from('teacher_point_awards')
-              .select('points_awarded')
-              .eq('teacher_id', currentUser!.id)
-              .eq('student_id', student['id']);
-          
-          int totalAwarded = 0;
-          for (final award in awards) {
-            totalAwarded += (award['points_awarded'] as int?) ?? 0;
+        final student = subscription['student'] as Map<String, dynamic>?;
+        if (student != null) {
+          final studentId = student['id'] as String?;
+          if (studentId != null && !studentsMap.containsKey(studentId)) {
+            // Get total points awarded by this teacher to this student
+            try {
+              final awards = await _supabase
+                  .from('teacher_point_awards')
+                  .select('points_awarded')
+                  .eq('teacher_id', currentUser!.id)
+                  .eq('student_id', studentId);
+              
+              int totalAwarded = 0;
+              for (final award in awards) {
+                totalAwarded += (award['points_awarded'] as int?) ?? 0;
+              }
+              
+              student['total_points_awarded_by_me'] = totalAwarded;
+            } catch (e) {
+              print('Error getting awards for student $studentId: $e');
+              student['total_points_awarded_by_me'] = 0;
+            }
+            
+            studentsMap[studentId] = student;
           }
-          
-          student['total_points_awarded_by_me'] = totalAwarded;
-          studentsMap[student['id']] = student;
         }
       }
 
+      print('Returning ${studentsMap.length} unique students');
       return studentsMap.values.toList();
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Error getting students: $e');
-      return [];
+      print('Stack trace: $stackTrace');
+      rethrow; // Re-throw instead of returning empty list
     }
   }
 
@@ -179,15 +205,15 @@ class PointAwardService {
       }
 
       // Verify student has subscription with this teacher
-      final subscription = await _supabase
+      final subscriptions = await _supabase
           .from('student_subscriptions')
           .select('id')
           .eq('teacher_id', currentUser!.id)
           .eq('student_id', studentId)
           .inFilter('status', ['active', 'completed'])
-          .maybeSingle();
+          .limit(1);
 
-      if (subscription == null) {
+      if (subscriptions.isEmpty) {
         return {
           'success': false,
           'error': 'Student is not enrolled with you',
@@ -195,19 +221,37 @@ class PointAwardService {
       }
 
       // Create point award record
-      final award = await _supabase.from('teacher_point_awards').insert({
+      final awardResult = await _supabase.from('teacher_point_awards').insert({
         'teacher_id': currentUser!.id,
         'student_id': studentId,
         'points_awarded': points,
         'note': note,
-      }).select().single();
+      }).select();
+      
+      if (awardResult.isEmpty) {
+        return {
+          'success': false,
+          'error': 'Failed to create award record',
+        };
+      }
+      
+      final award = awardResult.first;
 
       // Update student points and level
-      final student = await _supabase
+      final studentResult = await _supabase
           .from('students')
           .select('points, level')
           .eq('id', studentId)
-          .single();
+          .limit(1);
+      
+      if (studentResult.isEmpty) {
+        return {
+          'success': false,
+          'error': 'Student not found',
+        };
+      }
+      
+      final student = studentResult.first;
 
       final currentPoints = (student['points'] as int?) ?? 0;
       final newPoints = currentPoints + points;

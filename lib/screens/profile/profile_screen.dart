@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/services/rating_service.dart';
-import 'package:teacher/screens/auth/login_screen.dart';
+import 'package:teacher/screens/auth/auth_screen.dart';
 import 'package:teacher/screens/profile/edit_profile_screen.dart';
 import 'package:teacher/widgets/rating_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -200,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _authService.signOut();
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          MaterialPageRoute(builder: (context) => const AuthScreen()),
         );
       }
     } catch (e) {
