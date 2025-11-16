@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
+import 'package:teacher/services/storage_service.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> profile;
@@ -13,6 +17,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _authService = AuthService();
+  final _storageService = StorageService();
   
   late TextEditingController _fullNameController;
   late TextEditingController _phoneController;
@@ -22,6 +27,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _meetingLinkController;
   
   bool _isLoading = false;
+  bool _isUploadingAvatar = false;
+  File? _newAvatarFile;
+  String? _currentAvatarUrl;
 
   @override
   void initState() {
@@ -32,6 +40,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _bioController = TextEditingController(text: widget.profile['bio'] ?? '');
     _introVideoController = TextEditingController(text: widget.profile['intro_video_url'] ?? '');
     _meetingLinkController = TextEditingController(text: widget.profile['meeting_link'] ?? '');
+    _currentAvatarUrl = widget.profile['avatar_url'];
   }
 
   @override
@@ -45,6 +54,87 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      setState(() => _isUploadingAvatar = true);
+      
+      final file = await _storageService.pickImage(source: source);
+      if (file != null) {
+        setState(() {
+          _newAvatarFile = file;
+          _isUploadingAvatar = false;
+        });
+      } else {
+        setState(() => _isUploadingAvatar = false);
+      }
+    } catch (e) {
+      setState(() => _isUploadingAvatar = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error picking image: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Choose Profile Picture',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: Colors.teal),
+                title: const Text('Choose from Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: Colors.teal),
+                title: const Text('Take a Photo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              if (_currentAvatarUrl != null || _newAvatarFile != null)
+                ListTile(
+                  leading: const Icon(Icons.delete, color: Colors.red),
+                  title: const Text('Remove Photo'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _newAvatarFile = null;
+                      _currentAvatarUrl = null;
+                    });
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -53,6 +143,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isLoading = true);
 
     try {
+      String? avatarUrl = _currentAvatarUrl;
+      
+      // Upload new avatar if selected
+      if (_newAvatarFile != null) {
+        final teacherId = _authService.currentUser?.id;
+        if (teacherId != null) {
+          avatarUrl = await _storageService.uploadTeacherAvatar(
+            teacherId: teacherId,
+            imageFile: _newAvatarFile!,
+          );
+        }
+      }
+      
       await _authService.updateTeacherProfile({
         'full_name': _fullNameController.text.trim(),
         'phone': _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
@@ -60,6 +163,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'bio': _bioController.text.trim().isEmpty ? null : _bioController.text.trim(),
         'intro_video_url': _introVideoController.text.trim().isEmpty ? null : _introVideoController.text.trim(),
         'meeting_link': _meetingLinkController.text.trim().isEmpty ? null : _meetingLinkController.text.trim(),
+        'avatar_url': avatarUrl,
       });
 
       if (mounted) {
@@ -108,6 +212,87 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            // Profile Picture Section
+            Center(
+              child: Column(
+                children: [
+                  Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: _showImageSourceDialog,
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.grey[200],
+                          child: _isUploadingAvatar
+                              ? const CircularProgressIndicator()
+                              : _newAvatarFile != null
+                                  ? ClipOval(
+                                      child: Image.file(
+                                        _newAvatarFile!,
+                                        width: 120,
+                                        height: 120,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : _currentAvatarUrl != null
+                                      ? ClipOval(
+                                          child: CachedNetworkImage(
+                                            imageUrl: _currentAvatarUrl!,
+                                            width: 120,
+                                            height: 120,
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) => const CircularProgressIndicator(),
+                                            errorWidget: (context, url, error) => Icon(
+                                              Icons.person,
+                                              size: 60,
+                                              color: Colors.grey[400],
+                                            ),
+                                          ),
+                                        )
+                                      : Icon(
+                                          Icons.person,
+                                          size: 60,
+                                          color: Colors.grey[400],
+                                        ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: _showImageSourceDialog,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.teal,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 3),
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton.icon(
+                    onPressed: _showImageSourceDialog,
+                    icon: const Icon(Icons.edit, size: 16),
+                    label: Text(
+                      _currentAvatarUrl == null && _newAvatarFile == null
+                          ? 'Add Profile Picture'
+                          : 'Change Profile Picture',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            
             // Full Name
             TextFormField(
               controller: _fullNameController,
@@ -262,6 +447,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 }
+
+
+
+
 
 
 

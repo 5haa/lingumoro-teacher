@@ -4,6 +4,7 @@ import 'package:teacher/services/rating_service.dart';
 import 'package:teacher/screens/auth/login_screen.dart';
 import 'package:teacher/screens/profile/edit_profile_screen.dart';
 import 'package:teacher/widgets/rating_widget.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -250,16 +251,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.all(32),
                       child: Column(
                         children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.white,
-                            child: Text(
-                              _profile?['full_name']?[0]?.toUpperCase() ?? 'T',
-                              style: TextStyle(
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.teal.shade700,
-                              ),
+                          // Profile Picture
+                          GestureDetector(
+                            onTap: () async {
+                              // Navigate to edit profile when tapping avatar
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditProfileScreen(profile: _profile!),
+                                ),
+                              );
+                              if (result == true) {
+                                _loadProfile();
+                              }
+                            },
+                            child: Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor: Colors.white,
+                                  child: _profile?['avatar_url'] != null
+                                      ? ClipOval(
+                                          child: CachedNetworkImage(
+                                            imageUrl: _profile!['avatar_url'],
+                                            width: 100,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) => const CircularProgressIndicator(),
+                                            errorWidget: (context, url, error) => Text(
+                                              _profile?['full_name']?[0]?.toUpperCase() ?? 'T',
+                                              style: TextStyle(
+                                                fontSize: 40,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.teal.shade700,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          _profile?['full_name']?[0]?.toUpperCase() ?? 'T',
+                                          style: TextStyle(
+                                            fontSize: 40,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.teal.shade700,
+                                          ),
+                                        ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.teal.shade600,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: const Icon(
+                                      Icons.camera_alt,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -329,6 +384,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Bio Section
+                          if (_profile?['bio'] != null && _profile!['bio'].toString().isNotEmpty) ...[
+                            const Text(
+                              'About Me',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Card(
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.info_outline, color: Colors.teal, size: 24),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Text(
+                                        _profile!['bio'],
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.grey[800],
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                          
                           // Ratings Section
                           if (_ratingStats != null && ((_ratingStats!['total_ratings'] as int?) ?? 0) > 0) ...[
                             RatingDisplay(

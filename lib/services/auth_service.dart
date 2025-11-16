@@ -16,6 +16,14 @@ class AuthService {
     String? bio,
     String? specialization,
   }) async {
+    // Check if email already exists in auth.users table
+    final emailExistsResponse = await _supabase
+        .rpc('check_email_exists', params: {'check_email': email});
+
+    if (emailExistsResponse == true) {
+      throw Exception('This email is already registered. Please login instead.');
+    }
+
     // Sign up user - this will send OTP email
     final response = await _supabase.auth.signUp(
       email: email,

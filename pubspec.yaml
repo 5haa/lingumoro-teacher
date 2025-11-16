@@ -53,6 +53,12 @@ dependencies:
   # File picker for chat attachments
   file_picker: ^8.1.2
   
+  # Image picker for profile pictures
+  image_picker: ^1.1.2
+  
+  # Path for file path manipulation
+  path: ^1.9.0
+  
   # Intl for date formatting
   intl: ^0.20.0
   

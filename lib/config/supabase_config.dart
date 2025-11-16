@@ -24,3 +24,17 @@ class SupabaseConfig {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
