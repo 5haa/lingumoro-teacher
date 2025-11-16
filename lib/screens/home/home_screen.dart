@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:teacher/services/auth_service.dart';
-import 'package:teacher/services/language_service.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../config/app_colors.dart';
+import '../../services/auth_service.dart';
+import '../../services/language_service.dart';
+import '../../services/point_award_service.dart';
+import '../../services/session_service.dart';
+import '../../services/rating_service.dart';
+import '../schedule/schedule_screen.dart';
+import '../sessions/sessions_screen.dart';
+import '../students/students_screen.dart';
+import '../chat/chat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,508 +22,638 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _authService = AuthService();
   final _languageService = LanguageService();
+  final _pointAwardService = PointAwardService();
+  final _sessionService = TeacherSessionService();
+  final _ratingService = RatingService();
+  
   Map<String, dynamic>? _profile;
   List<Map<String, dynamic>> _teacherLanguages = [];
+  
+  // Dashboard statistics
+  int _totalStudents = 0;
+  int _upcomingSessions = 0;
+  int _totalSessions = 0;
+  Map<String, dynamic>? _ratingStats;
+  
   bool _isLoading = true;
   bool _isLoadingLanguages = false;
-
+  
   @override
   void initState() {
     super.initState();
-    _loadProfile();
+    _loadAllData();
   }
-
-  Future<void> _loadProfile() async {
+  
+  Future<void> _loadAllData() async {
+    setState(() {
+      _isLoading = true;
+    });
+    
     try {
+      // Load profile
       final profile = await _authService.getTeacherProfile();
-      setState(() {
-        _profile = profile;
-        _isLoading = false;
-      });
-      // Load teacher's languages
+      
       if (profile != null) {
-        _loadTeacherLanguages(profile['id']);
+        // Load all data in parallel
+        await Future.wait([
+          _loadTeacherLanguages(profile['id']),
+          _loadDashboardStats(profile['id']),
+        ]);
+      }
+      
+      if (mounted) {
+        setState(() {
+          _profile = profile;
+          _isLoading = false;
+        });
       }
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
-
+  
   Future<void> _loadTeacherLanguages(String teacherId) async {
     setState(() => _isLoadingLanguages = true);
     try {
       final languages = await _languageService.getTeacherLanguages(teacherId);
-      setState(() {
-        _teacherLanguages = languages;
-        _isLoadingLanguages = false;
-      });
+      if (mounted) {
+        setState(() {
+          _teacherLanguages = languages;
+          _isLoadingLanguages = false;
+        });
+      }
     } catch (e) {
-      setState(() => _isLoadingLanguages = false);
+      if (mounted) {
+        setState(() => _isLoadingLanguages = false);
+      }
     }
   }
-
+  
+  Future<void> _loadDashboardStats(String teacherId) async {
+    try {
+      // Load statistics in parallel
+      final results = await Future.wait([
+        _pointAwardService.getMyStudents(),
+        _sessionService.getUpcomingSessions(),
+        _sessionService.getMySessions(),
+        _ratingService.getMyRatingStats(),
+      ]);
+      
+      if (mounted) {
+        setState(() {
+          _totalStudents = (results[0] as List).length;
+          _upcomingSessions = (results[1] as List).length;
+          _totalSessions = (results[2] as List).length;
+          _ratingStats = results[3] as Map<String, dynamic>?;
+        });
+      }
+    } catch (e) {
+      print('Error loading dashboard stats: $e');
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lingumoro Teacher'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadProfile,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    // Welcome banner
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.teal.shade400,
-                            Colors.teal.shade800,
-                          ],
-                        ),
+      backgroundColor: AppColors.background,
+      extendBody: true,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top Bar
+            _buildTopBar(),
+            
+            // Main Content
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                       ),
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Welcome back,',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _profile?['full_name'] ?? 'Teacher',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          if (_profile?['specialization'] != null) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              _profile!['specialization'],
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                            ),
-                          ],
-                          // Display languages taught
-                          if (_teacherLanguages.isNotEmpty) ...[
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: _teacherLanguages.map((langData) {
-                                final lang = langData['language_courses'];
-                                if (lang == null) return const SizedBox.shrink();
-                                
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.5),
-                                      width: 1,
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadAllData,
+                      color: AppColors.primary,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            
+                            // Dashboard Section
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'DASHBOARD',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                  const SizedBox(height: 10),
+                                  
+                                  // Statistics Cards
+                                  Row(
                                     children: [
-                                      if (lang['flag_url'] != null)
-                                        Image.network(
-                                          lang['flag_url'],
-                                          width: 20,
-                                          height: 15,
-                                          errorBuilder: (context, error, stackTrace) =>
-                                              const Icon(
-                                            Icons.language,
-                                            size: 16,
-                                            color: Colors.white,
-                                          ),
+                                      Expanded(
+                                        child: _buildStatCard(
+                                          'Students',
+                                          '$_totalStudents',
+                                          FontAwesomeIcons.userGroup,
+                                          AppColors.primary,
                                         ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        lang['name'] ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
+                                      ),
+                                      const SizedBox(width: 15),
+                                      Expanded(
+                                        child: _buildStatCard(
+                                          'Upcoming',
+                                          '$_upcomingSessions',
+                                          FontAwesomeIcons.calendar,
+                                          AppColors.primaryDark,
                                         ),
                                       ),
                                     ],
                                   ),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-
-                    // Dashboard cards
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Dashboard',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Quick stats
-                          GridView.count(
-                            crossAxisCount: 2,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            mainAxisSpacing: 16,
-                            crossAxisSpacing: 16,
-                            children: [
-                              _buildStatCard(
-                                'My Courses',
-                                '0',
-                                Icons.book,
-                                Colors.blue,
-                              ),
-                              _buildStatCard(
-                                'Students',
-                                '0',
-                                Icons.people,
-                                Colors.green,
-                              ),
-                              _buildStatCard(
-                                'Assignments',
-                                '0',
-                                Icons.assignment,
-                                Colors.orange,
-                              ),
-                              _buildStatCard(
-                                'Reviews',
-                                '0',
-                                Icons.star,
-                                Colors.amber,
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 32),
-
-                          // Languages I Teach Section
-                          const Text(
-                            'Languages I Teach',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          
-                          _isLoadingLanguages
-                              ? const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16.0),
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                )
-                              : _teacherLanguages.isEmpty
-                                  ? Card(
-                                      elevation: 2,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(24.0),
-                                        child: Center(
-                                          child: Column(
-                                            children: [
-                                              Icon(
-                                                Icons.language,
-                                                size: 48,
-                                                color: Colors.grey[400],
-                                              ),
-                                              const SizedBox(height: 12),
-                                              Text(
-                                                'No languages assigned yet',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.grey[600],
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                'Contact admin to get assigned to language courses',
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: Colors.grey[500],
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
-                                          ),
+                                  
+                                  const SizedBox(height: 10),
+                                  
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildStatCard(
+                                          'Total Sessions',
+                                          '$_totalSessions',
+                                          FontAwesomeIcons.video,
+                                          AppColors.primaryLight,
                                         ),
                                       ),
-                                    )
-                                  : GridView.builder(
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
-                                        crossAxisSpacing: 12,
-                                        mainAxisSpacing: 12,
-                                        childAspectRatio: 1.5,
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: _buildStatCard(
+                                          'Rating',
+                                          _ratingStats != null && (_ratingStats!['total_ratings'] ?? 0) > 0
+                                              ? '${(_ratingStats!['average_rating'] as num?)?.toStringAsFixed(1) ?? '0.0'}'
+                                              : 'N/A',
+                                          FontAwesomeIcons.star,
+                                          Colors.amber.shade700,
+                                        ),
                                       ),
-                                      itemCount: _teacherLanguages.length,
-                                      itemBuilder: (context, index) {
-                                        final langData = _teacherLanguages[index];
-                                        final lang = langData['language_courses'];
-                                        if (lang == null) return const SizedBox.shrink();
-                                        
-                                        return Card(
-                                          elevation: 3,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(16),
-                                          ),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(16),
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                                colors: [
-                                                  Colors.teal.shade400,
-                                                  Colors.teal.shade600,
-                                                ],
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(16.0),
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  // Flag
-                                                  if (lang['flag_url'] != null)
-                                                    Container(
-                                                      width: 50,
-                                                      height: 35,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(8),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.black.withOpacity(0.2),
-                                                            blurRadius: 4,
-                                                            offset: const Offset(0, 2),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius: BorderRadius.circular(8),
-                                                        child: Image.network(
-                                                          lang['flag_url'],
-                                                          fit: BoxFit.cover,
-                                                          errorBuilder: (context, error, stackTrace) =>
-                                                              Container(
-                                                            color: Colors.white,
-                                                            child: const Icon(
-                                                              Icons.language,
-                                                              color: Colors.teal,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  else
-                                                    const Icon(
-                                                      Icons.language,
-                                                      size: 40,
-                                                      color: Colors.white,
-                                                    ),
-                                                  const SizedBox(height: 12),
-                                                  // Language name
-                                                  Text(
-                                                    lang['name'] ?? '',
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.white,
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  // Proficiency level
-                                                  if (langData['proficiency_level'] != null)
-                                                    Container(
-                                                      padding: const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 3,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white.withOpacity(0.3),
-                                                        borderRadius: BorderRadius.circular(12),
-                                                      ),
-                                                      child: Text(
-                                                        langData['proficiency_level'],
-                                                        style: const TextStyle(
-                                                          fontSize: 11,
-                                                          color: Colors.white,
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                    ],
+                                  ),
+                                  
+                                  const SizedBox(height: 12),
+                                  
+                                  // Languages I Teach Section
+                                  const Text(
+                                    'LANGUAGES I TEACH',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
                                     ),
-
-                          const SizedBox(height: 32),
-
-                          // Quick actions
-                          const Text(
-                            'Quick Actions',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  
+                                  _isLoadingLanguages
+                                      ? const Center(
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                                            child: CircularProgressIndicator(
+                                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                                            ),
+                                          ),
+                                        )
+                                      : _teacherLanguages.isEmpty
+                                          ? Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                                child: Column(
+                                                  children: [
+                                                    Icon(
+                                                      FontAwesomeIcons.language,
+                                                      size: 36,
+                                                      color: AppColors.grey.withOpacity(0.5),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      'No languages assigned yet',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: AppColors.textSecondary,
+                                                        fontWeight: FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          : SizedBox(
+                                              height: 80,
+                                              child: ListView.builder(
+                                                scrollDirection: Axis.horizontal,
+                                                itemCount: _teacherLanguages.length,
+                                                itemBuilder: (context, index) {
+                                                  final langData = _teacherLanguages[index];
+                                                  final lang = langData['language_courses'];
+                                                  if (lang == null) return const SizedBox.shrink();
+                                                  
+                                                  return _buildLanguageCard(
+                                                    lang['name'] ?? '',
+                                                    lang['flag_url'],
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                  
+                                  const SizedBox(height: 12),
+                                  
+                                  // Quick Actions Section
+                                  const Text(
+                                    'QUICK ACTIONS',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  
+                                  // Single row with all 4 quick actions
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildActionCard(
+                                          'Schedule',
+                                          FontAwesomeIcons.calendarDays,
+                                          AppColors.primary,
+                                          () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => const ScheduleScreen(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: _buildActionCard(
+                                          'Sessions',
+                                          FontAwesomeIcons.video,
+                                          AppColors.primaryDark,
+                                          () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => const SessionsScreen(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: _buildActionCard(
+                                          'Students',
+                                          FontAwesomeIcons.userGroup,
+                                          AppColors.primaryLight,
+                                          () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => const StudentsScreen(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: _buildActionCard(
+                                          'Chat',
+                                          FontAwesomeIcons.message,
+                                          Colors.blue.shade400,
+                                          () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => const ChatScreen(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          _buildActionButton(
-                            'My Schedule',
-                            Icons.calendar_today,
-                            () {
-                              Navigator.pushNamed(context, '/schedule');
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          _buildActionButton(
-                            'My Sessions',
-                            Icons.video_library,
-                            () {
-                              Navigator.pushNamed(context, '/sessions');
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          _buildActionButton(
-                            'My Students',
-                            Icons.people,
-                            () {},
-                          ),
-                          const SizedBox(height: 12),
-                          _buildActionButton(
-                            'Create Course',
-                            Icons.add_circle,
-                            () {},
-                          ),
-                          const SizedBox(height: 12),
-                          _buildActionButton(
-                            'Messages',
-                            Icons.message,
-                            () {},
-                          ),
-                          const SizedBox(height: 12),
-                          _buildActionButton(
-                            'Analytics',
-                            Icons.bar_chart,
-                            () {},
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              color.withOpacity(0.7),
-              color,
-            ],
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.white),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-              ),
             ),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildActionButton(String title, IconData icon, VoidCallback onTap) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+  
+  Widget _buildTopBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: Row(
+        children: [
+          // Profile Avatar
+          Container(
+            width: 45,
+            height: 45,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipOval(
+              child: _profile?['avatar_url'] != null
+                  ? CachedNetworkImage(
+                      imageUrl: _profile!['avatar_url'],
+                      width: 45,
+                      height: 45,
+                      fit: BoxFit.cover,
+                      errorWidget: (context, url, error) => _buildAvatarInitial(),
+                    )
+                  : _buildAvatarInitial(),
+            ),
+          ),
+          
+          const Expanded(
+            child: Center(
+              child: Text(
+                'LINGUMORO',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ),
+          
+          // Notification Icon
+          Container(
+            width: 45,
+            height: 45,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: const FaIcon(FontAwesomeIcons.bell, size: 20),
+              color: AppColors.textPrimary,
+              onPressed: () {
+                // TODO: Navigate to notifications
+              },
+            ),
+          ),
+        ],
       ),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.teal),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+    );
+  }
+  
+  Widget _buildAvatarInitial() {
+    final initial = (_profile?['full_name']?.toString().isNotEmpty ?? false)
+        ? _profile!['full_name'][0].toUpperCase()
+        : 'T';
+    
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.greenGradient,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          initial,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.white,
+          ),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: onTap,
+      ),
+    );
+  }
+  
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: FaIcon(
+              icon,
+              color: color,
+              size: 20,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildActionCard(String title, IconData icon, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: FaIcon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildLanguageCard(String name, String? flagUrl) {
+    return Container(
+      width: 70,
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipOval(
+            child: flagUrl != null
+                ? CachedNetworkImage(
+                    imageUrl: flagUrl,
+                    width: 36,
+                    height: 36,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      width: 36,
+                      height: 36,
+                      color: AppColors.lightGrey,
+                      child: Icon(
+                        Icons.language,
+                        size: 18,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        gradient: AppColors.greenGradient,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.language,
+                        size: 18,
+                        color: AppColors.white,
+                      ),
+                    ),
+                  )
+                : Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      gradient: AppColors.greenGradient,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.language,
+                      size: 18,
+                      color: AppColors.white,
+                    ),
+                  ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            name,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ],
       ),
     );
   }
 }
-

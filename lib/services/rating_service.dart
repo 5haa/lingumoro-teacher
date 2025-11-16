@@ -10,7 +10,7 @@ class RatingService {
           .from('teacher_rating_stats')
           .select()
           .eq('teacher_id', teacherId)
-          .single();
+          .maybeSingle();
 
       return response;
     } catch (e) {
