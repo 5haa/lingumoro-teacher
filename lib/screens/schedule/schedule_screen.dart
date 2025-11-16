@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:teacher/services/schedule_service.dart';
-import 'package:teacher/services/auth_service.dart';
-import 'package:teacher/screens/schedule/timeslot_management_screen.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../config/app_colors.dart';
+import '../../widgets/custom_back_button.dart';
+import '../../services/schedule_service.dart';
+import '../../services/auth_service.dart';
+import 'timeslot_management_screen.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -73,9 +76,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     if (success) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Schedule added successfully'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: const Text('Schedule added successfully'),
+            backgroundColor: AppColors.primary,
           ),
         );
         _loadSchedules();
@@ -96,19 +99,60 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Schedule'),
-        content: const Text('Are you sure you want to delete this schedule slot?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        backgroundColor: AppColors.white,
+        title: const Text(
+          'Delete Schedule?',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        content: const Text(
+          'Are you sure you want to delete this schedule slot?',
+          style: TextStyle(
+            fontSize: 15,
+            color: AppColors.textSecondary,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 15,
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: AppColors.greenGradient,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+              child: const Text(
+                'Delete',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -121,9 +165,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     if (success) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Schedule deleted successfully'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: const Text('Schedule deleted successfully'),
+            backgroundColor: AppColors.primary,
           ),
         );
         _loadSchedules();
@@ -134,40 +178,94 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Schedule'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.access_time),
-            tooltip: 'Manage 30-min Timeslots',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const TimeslotManagementScreen(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadSchedules,
-              child: _schedules.isEmpty
-                  ? _buildEmptyState()
-                  : _buildScheduleList(),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  const CustomBackButton(),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'MY SCHEDULE',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 45,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const FaIcon(
+                        FontAwesomeIcons.clock,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const TimeslotManagementScreen(),
+                          ),
+                        );
+                      },
+                      tooltip: 'Manage 30-min Timeslots',
+                    ),
+                  ),
+                ],
+              ),
             ),
+
+            // Content
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadSchedules,
+                      color: AppColors.primary,
+                      child: _schedules.isEmpty
+                          ? _buildEmptyState()
+                          : _buildScheduleList(),
+                    ),
+            ),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _addSchedule,
-        backgroundColor: Colors.teal,
-        icon: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: AppColors.primary,
+        icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white, size: 18),
         label: const Text(
           'Add Time Slot',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -178,39 +276,66 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.calendar_today_outlined,
-            size: 80,
-            color: Colors.grey[400],
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: AppColors.grey.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              FontAwesomeIcons.calendarDays,
+              size: 40,
+              color: AppColors.grey.withOpacity(0.3),
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             'No Schedule Set',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
+              color: AppColors.textSecondary.withOpacity(0.6),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Add your available time slots',
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[500],
+              fontSize: 14,
+              color: AppColors.textSecondary.withOpacity(0.5),
             ),
           ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: _addSchedule,
-            icon: const Icon(Icons.add),
-            label: const Text('Add Time Slot'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
+          const SizedBox(height: 30),
+          Container(
+            decoration: BoxDecoration(
+              gradient: AppColors.greenGradient,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ElevatedButton.icon(
+              onPressed: _addSchedule,
+              icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white, size: 16),
+              label: const Text(
+                'Add Time Slot',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
               ),
             ),
           ),
@@ -230,17 +355,19 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       schedulesByDay[day]!.add(schedule);
     }
 
+    // Sort days
+    final sortedDays = schedulesByDay.keys.toList()..sort();
+
     return ListView(
-      padding: const EdgeInsets.all(16),
-      children: schedulesByDay.entries.map((entry) {
-        final dayOfWeek = entry.key;
-        final daySchedules = entry.value;
+      padding: const EdgeInsets.all(20),
+      children: sortedDays.map((dayOfWeek) {
+        final daySchedules = schedulesByDay[dayOfWeek]!;
         
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -252,82 +379,154 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Day Header
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.teal.shade50,
+                  gradient: AppColors.greenGradient,
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.calendar_today,
-                      color: Colors.teal.shade700,
-                      size: 24,
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Center(
+                        child: FaIcon(
+                          FontAwesomeIcons.calendarDays,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      _dayNames[dayOfWeek],
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.teal.shade700,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _dayNames[dayOfWeek],
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${daySchedules.length} ${daySchedules.length == 1 ? 'slot' : 'slots'}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
+              // Time Slots
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: Column(
-                  children: daySchedules.map((schedule) {
+                  children: daySchedules.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final schedule = entry.value;
                     final startTime = schedule['start_time'] as String;
                     final endTime = schedule['end_time'] as String;
                     final isAvailable = schedule['is_available'] as bool;
                     
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
+                      margin: EdgeInsets.only(bottom: index < daySchedules.length - 1 ? 8 : 0),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       decoration: BoxDecoration(
                         color: isAvailable
-                            ? Colors.green.shade50
-                            : Colors.grey.shade100,
+                            ? AppColors.primary.withOpacity(0.05)
+                            : AppColors.lightGrey.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isAvailable
-                              ? Colors.green.shade200
-                              : Colors.grey.shade300,
+                              ? AppColors.primary.withOpacity(0.2)
+                              : AppColors.grey.withOpacity(0.2),
+                          width: 1.5,
                         ),
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 20,
-                            color: isAvailable
-                                ? Colors.green.shade700
-                                : Colors.grey.shade600,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              '${_formatTime(startTime)} - ${_formatTime(endTime)}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: isAvailable
-                                    ? Colors.green.shade700
-                                    : Colors.grey.shade600,
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              gradient: isAvailable
+                                  ? AppColors.greenGradient
+                                  : LinearGradient(
+                                      colors: [
+                                        AppColors.grey.withOpacity(0.3),
+                                        AppColors.grey.withOpacity(0.3),
+                                      ],
+                                    ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: FaIcon(
+                                FontAwesomeIcons.clock,
+                                size: 14,
+                                color: isAvailable ? Colors.white : AppColors.grey,
                               ),
                             ),
                           ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '${_formatTime(startTime)} - ${_formatTime(endTime)}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: isAvailable
+                                        ? AppColors.textPrimary
+                                        : AppColors.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  isAvailable ? 'Available' : 'Unavailable',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: isAvailable
+                                        ? AppColors.primary
+                                        : AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                           IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            color: Colors.red,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                            icon: const FaIcon(
+                              FontAwesomeIcons.trash,
+                              size: 14,
+                              color: Colors.red,
+                            ),
                             onPressed: () => _deleteSchedule(schedule['id']),
+                            tooltip: 'Delete',
                           ),
                         ],
                       ),
@@ -424,91 +623,266 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Add Time Slot'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Day of Week',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          DropdownButtonFormField<int>(
-            value: _selectedDay,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            items: List.generate(7, (index) {
-              return DropdownMenuItem(
-                value: index,
-                child: Text(_dayNames[index]),
-              );
-            }),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() => _selectedDay = value);
-              }
-            },
-          ),
-          
-          const SizedBox(height: 20),
-          
-          const Text(
-            'Time',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          
-          Row(
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      backgroundColor: AppColors.white,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _selectStartTime,
-                  icon: const Icon(Icons.access_time),
-                  label: Text(_startTime.format(context)),
+              // Title
+              const Text(
+                'Add Time Slot',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Text('to'),
-              ),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _selectEndTime,
-                  icon: const Icon(Icons.access_time),
-                  label: Text(_endTime.format(context)),
+              const SizedBox(height: 18),
+              
+              // Day Selection
+              const Text(
+                'Day of Week',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
                 ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: AppColors.border,
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: DropdownButtonFormField<int>(
+                  value: _selectedDay,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  dropdownColor: AppColors.white,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textPrimary,
+                  ),
+                  items: List.generate(7, (index) {
+                    return DropdownMenuItem(
+                      value: index,
+                      child: Text(_dayNames[index]),
+                    );
+                  }),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _selectedDay = value);
+                    }
+                  },
+                ),
+              ),
+              
+              const SizedBox(height: 18),
+              
+              // Time Selection
+              const Text(
+                'Time',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _selectStartTime,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: AppColors.border,
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            FaIcon(
+                              FontAwesomeIcons.clock,
+                              size: 12,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                _startTime.format(context),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      'to',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _selectEndTime,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: AppColors.border,
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            FaIcon(
+                              FontAwesomeIcons.clock,
+                              size: 12,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                _endTime.format(context),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 20),
+              
+              // Actions
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: AppColors.greenGradient,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: _save,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: const Text(
+                          'Add',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: _save,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.teal,
-          ),
-          child: const Text('Add', style: TextStyle(color: Colors.white)),
-        ),
-      ],
     );
   }
 }
-
-
-

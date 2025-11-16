@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:teacher/services/timeslot_service.dart';
-import 'package:teacher/services/auth_service.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../config/app_colors.dart';
+import '../../widgets/custom_back_button.dart';
+import '../../services/timeslot_service.dart';
+import '../../services/auth_service.dart';
 
 class TimeslotManagementScreen extends StatefulWidget {
   const TimeslotManagementScreen({super.key});
@@ -78,7 +81,7 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
         SnackBar(
           content: Text(
               'Timeslot ${!currentStatus ? "enabled" : "disabled"} successfully'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.primary,
         ),
       );
       _loadTimeslots();
@@ -117,7 +120,7 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
         SnackBar(
           content: Text(
               '${unoccupiedSlots.length} timeslots ${enable ? "enabled" : "disabled"}'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.primary,
         ),
       );
       _loadTimeslots();
@@ -127,57 +130,98 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage 30-Min Timeslots'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadTimeslots,
-              child: Column(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
                 children: [
-                  _buildStatsCard(),
-                  Expanded(
-                    child: _timeslots.isEmpty
-                        ? _buildEmptyState()
-                        : _buildTimeslotsList(),
+                  const CustomBackButton(),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'MANAGE TIMESLOTS',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                        letterSpacing: 1,
+                      ),
+                    ),
                   ),
+                  const SizedBox(width: 45),
                 ],
               ),
             ),
+
+            // Content
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadTimeslots,
+                      color: AppColors.primary,
+                      child: Column(
+                        children: [
+                          _buildStatsCard(),
+                          Expanded(
+                            child: _timeslots.isEmpty
+                                ? _buildEmptyState()
+                                : _buildTimeslotsList(),
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildStatsCard() {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.teal.shade400, Colors.teal.shade700],
-        ),
-        borderRadius: BorderRadius.circular(16),
+        gradient: AppColors.greenGradient,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.teal.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Column(
         children: [
-          const Text(
-            'Your Timeslots Overview',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const FaIcon(
+                FontAwesomeIcons.chartLine,
+                color: Colors.white,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Timeslots Overview',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Row(
@@ -186,26 +230,22 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
               _buildStatItem(
                 'Total',
                 _stats['total'] ?? 0,
-                Icons.calendar_today,
-                Colors.white,
+                FontAwesomeIcons.calendarDays,
               ),
               _buildStatItem(
                 'Available',
                 _stats['available'] ?? 0,
-                Icons.check_circle,
-                Colors.white,
+                FontAwesomeIcons.circleCheck,
               ),
               _buildStatItem(
                 'Disabled',
                 _stats['disabled'] ?? 0,
-                Icons.cancel,
-                Colors.white70,
+                FontAwesomeIcons.circleXmark,
               ),
               _buildStatItem(
                 'Booked',
                 _stats['occupied'] ?? 0,
-                Icons.event_busy,
-                Colors.white70,
+                FontAwesomeIcons.calendarCheck,
               ),
             ],
           ),
@@ -214,27 +254,47 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
     );
   }
 
-  Widget _buildStatItem(String label, int value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 8),
-        Text(
-          value.toString(),
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: color,
+  Widget _buildStatItem(String label, int value, IconData icon) {
+    return Flexible(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: FaIcon(
+                icon,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
           ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: color,
+          const SizedBox(height: 6),
+          Text(
+            value.toString(),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-        ),
-      ],
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.white.withOpacity(0.9),
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 
@@ -243,28 +303,39 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.access_time_outlined,
-            size: 80,
-            color: Colors.grey[400],
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: AppColors.grey.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              FontAwesomeIcons.clock,
+              size: 40,
+              color: AppColors.grey.withOpacity(0.3),
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             'No Timeslots Yet',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
+              color: AppColors.textSecondary.withOpacity(0.6),
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Add a schedule to generate 30-min timeslots',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[500],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              'Add a schedule to generate 30-min timeslots',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary.withOpacity(0.5),
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -272,12 +343,13 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
   }
 
   Widget _buildTimeslotsList() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      children: _timeslots.entries.map((entry) {
-        final dayOfWeek = entry.key;
-        final slots = entry.value;
+    // Sort days
+    final sortedDays = _timeslots.keys.toList()..sort();
 
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      children: sortedDays.map((dayOfWeek) {
+        final slots = _timeslots[dayOfWeek]!;
         return _buildDayCard(dayOfWeek, slots);
       }).toList(),
     );
@@ -290,58 +362,106 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
         slots.where((s) => s['is_available'] == false).length;
     final occupiedCount = slots.where((s) => s['is_occupied'] == true).length;
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        childrenPadding: const EdgeInsets.all(16),
+        tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        childrenPadding: const EdgeInsets.all(12),
         leading: Container(
-          padding: const EdgeInsets.all(10),
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
-            color: Colors.teal.shade50,
+            gradient: AppColors.greenGradient,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(
-            Icons.calendar_today,
-            color: Colors.teal.shade700,
+          child: const Center(
+            child: FaIcon(
+              FontAwesomeIcons.calendarDays,
+              color: Colors.white,
+              size: 16,
+            ),
           ),
         ),
         title: Text(
           _dayNames[dayOfWeek],
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
           ),
         ),
-        subtitle: Text(
-          '${slots.length} slots: $availableCount available, $occupiedCount booked',
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey[600],
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Wrap(
+            spacing: 6,
+            runSpacing: 4,
+            children: [
+              _buildStatusBadge('$availableCount available', AppColors.primary),
+              _buildStatusBadge('$occupiedCount booked', Colors.orange),
+              _buildStatusBadge('$disabledCount disabled', AppColors.grey),
+            ],
           ),
         ),
-        trailing: PopupMenuButton(
-          icon: const Icon(Icons.more_vert),
+        trailing: PopupMenuButton<String>(
+          icon: const FaIcon(
+            FontAwesomeIcons.ellipsisVertical,
+            size: 18,
+            color: AppColors.textSecondary,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          color: AppColors.white,
+          elevation: 8,
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem<String>(
               value: 'enable_all',
-              child: Row(
+              child: const Row(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.green),
-                  SizedBox(width: 8),
-                  Text('Enable All'),
+                  FaIcon(
+                    FontAwesomeIcons.circleCheck,
+                    color: AppColors.primary,
+                    size: 18,
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    'Enable All',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem<String>(
               value: 'disable_all',
-              child: Row(
+              child: const Row(
                 children: [
-                  Icon(Icons.cancel, color: Colors.orange),
-                  SizedBox(width: 8),
-                  Text('Disable All'),
+                  FaIcon(
+                    FontAwesomeIcons.circleXmark,
+                    color: Colors.orange,
+                    size: 18,
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    'Disable All',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -356,13 +476,35 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
         ),
         children: [
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: 10,
+            runSpacing: 10,
             children: slots.map((slot) {
               return _buildTimeslotChip(slot);
             }).toList(),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
       ),
     );
   }
@@ -380,22 +522,22 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
     if (isOccupied) {
       backgroundColor = Colors.red.shade50;
       textColor = Colors.red.shade700;
-      icon = Icons.event_busy;
+      icon = FontAwesomeIcons.calendarCheck;
     } else if (isAvailable) {
-      backgroundColor = Colors.green.shade50;
-      textColor = Colors.green.shade700;
-      icon = Icons.check_circle;
+      backgroundColor = AppColors.primary.withOpacity(0.1);
+      textColor = AppColors.primary;
+      icon = FontAwesomeIcons.circleCheck;
     } else {
-      backgroundColor = Colors.grey.shade200;
-      textColor = Colors.grey.shade600;
-      icon = Icons.cancel;
+      backgroundColor = AppColors.lightGrey.withOpacity(0.5);
+      textColor = AppColors.textSecondary;
+      icon = FontAwesomeIcons.circleXmark;
     }
 
     return InkWell(
       onTap: () => _toggleTimeslot(slot['id'], isAvailable, isOccupied),
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
@@ -407,8 +549,8 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: textColor),
-            const SizedBox(width: 6),
+            FaIcon(icon, size: 14, color: textColor),
+            const SizedBox(width: 8),
             Text(
               '${_formatTime(startTime)}-${_formatTime(endTime)}',
               style: TextStyle(
@@ -439,26 +581,3 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
