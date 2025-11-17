@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/config/supabase_config.dart';
 import 'package:teacher/screens/splash_screen.dart';
@@ -9,6 +10,9 @@ import 'package:teacher/services/presence_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp();
 
   await Supabase.initialize(
     url: SupabaseConfig.supabaseUrl,

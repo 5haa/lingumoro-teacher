@@ -1,7 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:teacher/services/firebase_notification_service.dart';
 
 class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
+  final _firebaseNotificationService = FirebaseNotificationService();
 
   User? get currentUser => _supabase.auth.currentUser;
   
@@ -72,6 +74,14 @@ class AuthService {
           'specialization': specialization,
         });
       }
+      
+      // Initialize Firebase notifications
+      try {
+        await _firebaseNotificationService.initialize();
+        print('✅ Firebase notifications initialized successfully');
+      } catch (e) {
+        print('❌ Failed to initialize Firebase notifications: $e');
+      }
     }
 
     return response;
@@ -98,6 +108,14 @@ class AuthService {
     // Check if account is suspended
     if (response.user != null) {
       await _checkSuspensionStatus(response.user!.id);
+      
+      // Initialize Firebase notifications
+      try {
+        await _firebaseNotificationService.initialize();
+        print('✅ Firebase notifications initialized successfully');
+      } catch (e) {
+        print('❌ Failed to initialize Firebase notifications: $e');
+      }
     }
 
     return response;
