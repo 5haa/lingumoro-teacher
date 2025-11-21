@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/services/rating_service.dart';
 import 'package:teacher/screens/auth/auth_screen.dart';
+import 'package:teacher/screens/auth/change_password_screen.dart';
 import 'package:teacher/screens/profile/edit_profile_screen.dart';
 import 'package:teacher/widgets/rating_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -544,10 +545,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 10),
                             
                             _buildActionButton(
-                              'Privacy & Security',
-                              FontAwesomeIcons.shield,
+                              'Change Password',
+                              FontAwesomeIcons.lock,
                               () {
-                                // TODO: Implement privacy settings
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ChangePasswordScreen(),
+                                  ),
+                                );
                               },
                             ),
                             const SizedBox(height: 10),

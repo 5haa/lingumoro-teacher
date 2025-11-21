@@ -5,6 +5,7 @@ import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/widgets/custom_button.dart';
 import 'package:teacher/widgets/custom_back_button.dart';
+import 'reset_password_screen.dart';
 import '../main_navigation.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class OTPVerificationScreen extends StatefulWidget {
   final String? phone;
   final String? bio;
   final String? specialization;
+  final bool isPasswordReset;
 
   const OTPVerificationScreen({
     super.key,
@@ -21,6 +23,7 @@ class OTPVerificationScreen extends StatefulWidget {
     this.phone,
     this.bio,
     this.specialization,
+    this.isPasswordReset = false,
   });
 
   @override
@@ -79,7 +82,11 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     _startTimer();
     
     try {
-      await _authService.resendOTP(widget.email);
+      if (widget.isPasswordReset) {
+        await _authService.resendPasswordResetOTP(widget.email);
+      } else {
+        await _authService.resendOTP(widget.email);
+      }
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -116,22 +123,39 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     setState(() => _isLoading = true);
     
     try {
-      await _authService.verifyOTP(
-        email: widget.email,
-        token: code,
-        fullName: widget.fullName,
-        phone: widget.phone,
-        bio: widget.bio,
-        specialization: widget.specialization,
-      );
-      
-      // Navigate to home screen after successful verification
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const MainNavigation(),
-          ),
+      if (widget.isPasswordReset) {
+        // For password reset, verify OTP
+        await _authService.verifyPasswordResetOTP(
+          email: widget.email,
+          token: code,
         );
+        // After OTP verification, navigate to reset password screen
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => const ResetPasswordScreen(),
+            ),
+          );
+        }
+      } else {
+        // For signup, verify OTP and create profile
+        await _authService.verifyOTP(
+          email: widget.email,
+          token: code,
+          fullName: widget.fullName,
+          phone: widget.phone,
+          bio: widget.bio,
+          specialization: widget.specialization,
+        );
+        
+        // Navigate to home screen after successful verification
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => const MainNavigation(),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -207,7 +231,9 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     
                     // Description
                     Text(
-                      'A verification code was sent to your MAIL enter the code to verify your account',
+                      widget.isPasswordReset
+                          ? 'A verification code was sent to your MAIL enter the code to be able to change the password'
+                          : 'A verification code was sent to your MAIL enter the code to verify your account',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 15,

@@ -226,9 +226,53 @@ class AuthService {
     }).eq('id', currentUser!.id);
   }
 
-  /// Reset password
+  /// Reset password (sends OTP)
   Future<void> resetPassword(String email) async {
     await _supabase.auth.resetPasswordForEmail(email);
+  }
+
+  /// Verify password reset OTP
+  Future<AuthResponse> verifyPasswordResetOTP({
+    required String email,
+    required String token,
+  }) async {
+    // Verify the password reset OTP
+    final response = await _supabase.auth.verifyOTP(
+      type: OtpType.recovery,
+      email: email,
+      token: token,
+    );
+
+    return response;
+  }
+
+  /// Resend password reset OTP
+  Future<void> resendPasswordResetOTP(String email) async {
+    await _supabase.auth.resend(
+      type: OtpType.recovery,
+      email: email,
+    );
+  }
+
+  /// Update password after OTP verification
+  Future<void> updatePassword(String newPassword) async {
+    if (currentUser == null) {
+      throw Exception('No user logged in. Please verify OTP first.');
+    }
+
+    await _supabase.auth.updateUser(
+      UserAttributes(password: newPassword),
+    );
+  }
+
+  /// Request OTP for changing password (when logged in)
+  Future<void> requestChangePasswordOTP() async {
+    if (currentUser == null) {
+      throw Exception('No user logged in');
+    }
+
+    // Send OTP to the current user's email
+    await _supabase.auth.resetPasswordForEmail(currentUser!.email!);
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/widgets/custom_button.dart';
 import 'package:teacher/widgets/custom_text_field.dart';
 import 'package:teacher/l10n/app_localizations.dart';
+import 'forgot_password_screen.dart';
 import '../main_navigation.dart';
 
 class SignInContent extends StatefulWidget {
@@ -69,6 +70,14 @@ class _SignInContentState extends State<SignInContent> {
     }
   }
   
+  void _handleForgotPassword() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const ForgotPasswordScreen(),
+      ),
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -97,6 +106,21 @@ class _SignInContentState extends State<SignInContent> {
           text: l10n.login.toUpperCase(),
           onPressed: _handleSignIn,
           isLoading: _isLoading,
+        ),
+        
+        const SizedBox(height: 20),
+        
+        // Forgot Password button
+        TextButton(
+          onPressed: _handleForgotPassword,
+          child: Text(
+            l10n.forgotPassword,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ],
     );
