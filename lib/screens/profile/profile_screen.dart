@@ -7,6 +7,7 @@ import 'package:teacher/screens/profile/edit_profile_screen.dart';
 import 'package:teacher/widgets/rating_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -48,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load profile: $e'),
+            content: Text('${AppLocalizations.of(context).errorLoadingData}: $e'),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -57,6 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _showEditMeetingLinkDialog() async {
+    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: _profile?['meeting_link'] ?? '');
     
     final result = await showDialog<String>(
@@ -65,9 +67,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Text(
-          'Set Default Meeting Link',
-          style: TextStyle(
+        title: Text(
+          l10n.setDefaultMeetingLink,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -76,15 +78,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'This link will be automatically used for all your upcoming sessions.',
-              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+            Text(
+              l10n.meetingLinkWillBeUsed,
+              style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: controller,
               decoration: InputDecoration(
-                labelText: 'Meeting Link',
+                labelText: l10n.meetingLink,
                 hintText: 'https://meet.google.com/...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -110,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Students will be able to join sessions using this link',
+                      l10n.studentsCanJoinUsingLink,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.blue.shade700,
@@ -125,9 +127,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           Container(
@@ -145,9 +147,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
-                'Save',
-                style: TextStyle(
+              child: Text(
+                l10n.save,
+                style: const TextStyle(
                   color: AppColors.white,
                   fontWeight: FontWeight.bold,
                 ),
@@ -165,7 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Meeting link updated successfully!'),
+              content: Text(AppLocalizations.of(context).meetingLinkUpdated),
               backgroundColor: AppColors.primary,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -178,7 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to update meeting link: $e'),
+              content: Text('${AppLocalizations.of(context).failedToUpdateMeetingLink}: $e'),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(

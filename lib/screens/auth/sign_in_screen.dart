@@ -3,6 +3,7 @@ import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/widgets/custom_button.dart';
 import 'package:teacher/widgets/custom_text_field.dart';
+import 'package:teacher/l10n/app_localizations.dart';
 import '../main_navigation.dart';
 
 class SignInContent extends StatefulWidget {
@@ -26,10 +27,11 @@ class _SignInContentState extends State<SignInContent> {
   }
   
   Future<void> _handleSignIn() async {
+    final l10n = AppLocalizations.of(context);
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter your credentials'),
+        SnackBar(
+          content: Text('${l10n.email} ${l10n.and} ${l10n.password} ${l10n.fieldRequired}'),
           backgroundColor: AppColors.primary,
         ),
       );
@@ -55,12 +57,12 @@ class _SignInContentState extends State<SignInContent> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login failed: ${e.toString()}'),
+            content: Text('${AppLocalizations.of(context).loginFailed}: ${e.toString()}'),
             backgroundColor: AppColors.primary,
           ),
         );
       }
-    } finally {
+    } finally{
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -69,12 +71,13 @@ class _SignInContentState extends State<SignInContent> {
   
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         // Email field
         CustomTextField(
           controller: _emailController,
-          hintText: 'Email or Phone no.',
+          hintText: '${l10n.email} ${l10n.or} ${l10n.phoneNumber}',
           keyboardType: TextInputType.emailAddress,
         ),
         
@@ -83,7 +86,7 @@ class _SignInContentState extends State<SignInContent> {
         // Password field
         CustomTextField(
           controller: _passwordController,
-          hintText: 'Password',
+          hintText: l10n.password,
           obscureText: true,
         ),
         
@@ -91,7 +94,7 @@ class _SignInContentState extends State<SignInContent> {
         
         // Sign In button
         CustomButton(
-          text: 'SIGN IN',
+          text: l10n.login.toUpperCase(),
           onPressed: _handleSignIn,
           isLoading: _isLoading,
         ),
@@ -99,4 +102,10 @@ class _SignInContentState extends State<SignInContent> {
     );
   }
 }
+
+
+
+
+
+
 

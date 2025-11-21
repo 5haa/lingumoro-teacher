@@ -3,6 +3,7 @@ import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/widgets/custom_button.dart';
 import 'package:teacher/widgets/custom_text_field.dart';
+import 'package:teacher/l10n/app_localizations.dart';
 import 'otp_verification_screen.dart';
 
 class SignUpContent extends StatefulWidget {
@@ -32,13 +33,14 @@ class _SignUpContentState extends State<SignUpContent> {
   }
   
   Future<void> _handleSignUp() async {
+    final l10n = AppLocalizations.of(context);
     if (_fullNameController.text.isEmpty || 
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _confirmPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all required fields'),
+        SnackBar(
+          content: Text(l10n.fillAllFields),
           backgroundColor: AppColors.primary,
         ),
       );
@@ -47,8 +49,8 @@ class _SignUpContentState extends State<SignUpContent> {
     
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Passwords do not match'),
+        SnackBar(
+          content: Text(l10n.passwordMismatch),
           backgroundColor: AppColors.primary,
         ),
       );
@@ -88,7 +90,7 @@ class _SignUpContentState extends State<SignUpContent> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Signup failed: ${e.toString()}'),
+            content: Text('${AppLocalizations.of(context).signupFailed}: ${e.toString()}'),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -102,12 +104,13 @@ class _SignUpContentState extends State<SignUpContent> {
   
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         // Full Name field
         CustomTextField(
           controller: _fullNameController,
-          hintText: 'Full Name',
+          hintText: l10n.fullName,
           keyboardType: TextInputType.name,
         ),
         
@@ -116,7 +119,7 @@ class _SignUpContentState extends State<SignUpContent> {
         // Email field
         CustomTextField(
           controller: _emailController,
-          hintText: 'E-Mail',
+          hintText: l10n.email,
           keyboardType: TextInputType.emailAddress,
         ),
         
@@ -125,7 +128,7 @@ class _SignUpContentState extends State<SignUpContent> {
         // Specialization field (optional)
         CustomTextField(
           controller: _specializationController,
-          hintText: 'Specialization (optional)',
+          hintText: l10n.specializationOptional,
           keyboardType: TextInputType.text,
         ),
         
@@ -134,7 +137,7 @@ class _SignUpContentState extends State<SignUpContent> {
         // Password field
         CustomTextField(
           controller: _passwordController,
-          hintText: 'Password',
+          hintText: l10n.password,
           obscureText: true,
         ),
         
@@ -143,7 +146,7 @@ class _SignUpContentState extends State<SignUpContent> {
         // Confirm Password field
         CustomTextField(
           controller: _confirmPasswordController,
-          hintText: 'Confirm Password',
+          hintText: l10n.confirmPassword,
           obscureText: true,
         ),
         
@@ -151,7 +154,7 @@ class _SignUpContentState extends State<SignUpContent> {
         
         // Confirm Account button
         CustomButton(
-          text: 'CONFIRM ACCOUNT',
+          text: l10n.confirmAccount,
           onPressed: _handleSignUp,
           isLoading: _isLoading,
         ),

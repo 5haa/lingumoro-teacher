@@ -7,6 +7,7 @@ import '../../services/language_service.dart';
 import '../../services/point_award_service.dart';
 import '../../services/session_service.dart';
 import '../../services/rating_service.dart';
+import '../../l10n/app_localizations.dart';
 import '../schedule/schedule_screen.dart';
 import '../sessions/sessions_screen.dart';
 import '../students/students_screen.dart';
@@ -148,9 +149,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'DASHBOARD',
-                                    style: TextStyle(
+                                  Text(
+                                    AppLocalizations.of(context).dashboard,
+                                    style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textPrimary,
@@ -163,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Expanded(
                                         child: _buildStatCard(
-                                          'Students',
+                                          AppLocalizations.of(context).students,
                                           '$_totalStudents',
                                           FontAwesomeIcons.userGroup,
                                           AppColors.primary,
@@ -172,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(width: 15),
                                       Expanded(
                                         child: _buildStatCard(
-                                          'Upcoming',
+                                          AppLocalizations.of(context).upcomingSessions,
                                           '$_upcomingSessions',
                                           FontAwesomeIcons.calendar,
                                           AppColors.primaryDark,
@@ -187,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Expanded(
                                         child: _buildStatCard(
-                                          'Total Sessions',
+                                          AppLocalizations.of(context).totalSessions,
                                           '$_totalSessions',
                                           FontAwesomeIcons.video,
                                           AppColors.primaryLight,
@@ -196,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: _buildStatCard(
-                                          'Rating',
+                                          AppLocalizations.of(context).rating,
                                           _ratingStats != null && (_ratingStats!['total_ratings'] ?? 0) > 0
                                               ? '${(_ratingStats!['average_rating'] as num?)?.toStringAsFixed(1) ?? '0.0'}'
                                               : 'N/A',
@@ -210,9 +211,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   const SizedBox(height: 12),
                                   
                                   // Languages I Teach Section
-                                  const Text(
-                                    'LANGUAGES I TEACH',
-                                    style: TextStyle(
+                                  Text(
+                                    AppLocalizations.of(context).languagesITeach,
+                                    style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textPrimary,
@@ -242,8 +243,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     ),
                                                     const SizedBox(height: 8),
                                                     Text(
-                                                      'No languages assigned yet',
-                                                      style: TextStyle(
+                                                      AppLocalizations.of(context).noLanguagesAssigned,
+                                                      style: const TextStyle(
                                                         fontSize: 14,
                                                         color: AppColors.textSecondary,
                                                         fontWeight: FontWeight.w500,
@@ -274,9 +275,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   const SizedBox(height: 12),
                                   
                                   // Quick Actions Section
-                                  const Text(
-                                    'QUICK ACTIONS',
-                                    style: TextStyle(
+                                  Text(
+                                    AppLocalizations.of(context).quickActions,
+                                    style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textPrimary,
@@ -289,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Expanded(
                                         child: _buildActionCard(
-                                          'Schedule',
+                                          AppLocalizations.of(context).schedule,
                                           FontAwesomeIcons.calendarDays,
                                           AppColors.primary,
                                           () {
@@ -305,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: _buildActionCard(
-                                          'Sessions',
+                                          AppLocalizations.of(context).sessions,
                                           FontAwesomeIcons.video,
                                           AppColors.primaryDark,
                                           () {
@@ -321,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: _buildActionCard(
-                                          'Students',
+                                          AppLocalizations.of(context).students,
                                           FontAwesomeIcons.userGroup,
                                           AppColors.primaryLight,
                                           () {
@@ -337,7 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: _buildActionCard(
-                                          'Chat',
+                                          AppLocalizations.of(context).chat,
                                           FontAwesomeIcons.message,
                                           Colors.blue.shade400,
                                           () {
@@ -401,11 +402,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           
-          const Expanded(
+          Expanded(
             child: Center(
               child: Text(
-                'LINGUMORO',
-                style: TextStyle(
+                AppLocalizations.of(context).appName.toUpperCase(),
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
