@@ -6,7 +6,7 @@ import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/config/supabase_config.dart';
 import 'package:teacher/screens/splash_screen.dart';
 import 'package:teacher/screens/schedule/schedule_screen.dart';
-import 'package:teacher/screens/sessions/sessions_screen.dart';
+import 'package:teacher/screens/classes/classes_screen.dart';
 import 'package:teacher/services/presence_service.dart';
 import 'package:teacher/services/locale_service.dart';
 import 'package:teacher/l10n/app_localizations.dart';
@@ -151,7 +151,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       home: const SplashScreen(),
       routes: {
         '/schedule': (context) => const ScheduleScreen(),
-        '/sessions': (context) => const SessionsScreen(),
+        '/classes': (context) => const ClassesScreen(),
       },
     );
   }

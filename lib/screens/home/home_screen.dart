@@ -9,12 +9,11 @@ import '../../services/session_service.dart';
 import '../../services/rating_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../schedule/schedule_screen.dart';
-import '../sessions/sessions_screen.dart';
-import '../students/students_screen.dart';
-import '../chat/chat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(int)? onTabChange;
+  
+  const HomeScreen({super.key, this.onTabChange});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -138,6 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onRefresh: _loadAllData,
                       color: AppColors.primary,
                       child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -310,12 +310,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           FontAwesomeIcons.video,
                                           AppColors.primaryDark,
                                           () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => const SessionsScreen(),
-                                              ),
-                                            );
+                                            // Switch to Classes tab (index 1)
+                                            widget.onTabChange?.call(1);
                                           },
                                         ),
                                       ),
@@ -326,12 +322,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           FontAwesomeIcons.userGroup,
                                           AppColors.primaryLight,
                                           () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => const StudentsScreen(),
-                                              ),
-                                            );
+                                            // Switch to Students tab (index 2)
+                                            widget.onTabChange?.call(2);
                                           },
                                         ),
                                       ),
@@ -342,12 +334,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           FontAwesomeIcons.message,
                                           Colors.blue.shade400,
                                           () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => const ChatScreen(),
-                                              ),
-                                            );
+                                            // Switch to Chat tab (index 3)
+                                            widget.onTabChange?.call(3);
                                           },
                                         ),
                                       ),

@@ -24,13 +24,25 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   void initState() {
     super.initState();
+    _initScreens();
+  }
+  
+  void _initScreens() {
     _screens = [
-      const HomeScreen(),
+      HomeScreen(onTabChange: _onTabChange),
       const ClassesScreen(),
       const StudentsScreen(),
       const ChatScreen(),
       const ProfileScreen(),
     ];
+  }
+  
+  void _onTabChange(int index) {
+    if (index >= 0 && index < _screens.length) {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
   }
   
   List<Map<String, dynamic>> _getNavItems(BuildContext context) {
