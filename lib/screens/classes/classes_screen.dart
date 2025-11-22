@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../config/app_colors.dart';
 import '../../services/session_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/chat_service.dart';
+import '../chat/chat_conversation_screen.dart';
 
 class ClassesScreen extends StatefulWidget {
   const ClassesScreen({super.key});
@@ -18,6 +20,7 @@ class _ClassesScreenState extends State<ClassesScreen>
   late TabController _tabController;
   final TeacherSessionService _sessionService = TeacherSessionService();
   final AuthService _authService = AuthService();
+  final ChatService _chatService = ChatService();
   
   List<Map<String, dynamic>> _upcomingSessions = [];
   List<Map<String, dynamic>> _finishedSessions = [];
@@ -171,7 +174,43 @@ class _ClassesScreenState extends State<ClassesScreen>
     }
   }
 
+  bool _canStartSession(Map<String, dynamic> session) {
+    try {
+      final now = DateTime.now();
+      final scheduledDate = DateTime.parse(session['scheduled_date']);
+      final startTime = session['scheduled_start_time'] ?? '00:00:00';
+      final timeParts = startTime.split(':');
+      
+      final scheduledDateTime = DateTime(
+        scheduledDate.year,
+        scheduledDate.month,
+        scheduledDate.day,
+        int.parse(timeParts[0]),
+        int.parse(timeParts[1]),
+      );
+
+      // Can start 15 minutes before scheduled time
+      final canStartTime = scheduledDateTime.subtract(const Duration(minutes: 15));
+      
+      // Can start if current time is within 15 minutes before the scheduled time
+      return now.isAfter(canStartTime) || now.isAtSameMomentAs(canStartTime);
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> _startSession(Map<String, dynamic> session) async {
+    if (!_canStartSession(session)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You can only start the session within 15 minutes before the scheduled time'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     final success = await _sessionService.startSession(session['id']);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -241,14 +280,74 @@ class _ClassesScreenState extends State<ClassesScreen>
       }
 
       final uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final launched = await launchUrl(
+        uri, 
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        throw Exception('Could not open the meeting link');
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error joining session: $e'),
+            content: Text('Error joining session: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _openChatWithStudent(Map<String, dynamic> session) async {
+    try {
+      final student = session['student'];
+      if (student == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Student information not available'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      final studentId = student['id'];
+      final studentName = student['full_name'] ?? 'Student';
+      final studentAvatar = student['avatar_url'];
+
+      // Get or create conversation
+      final conversation = await _chatService.getOrCreateConversation(studentId);
+      
+      if (conversation != null && mounted) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatConversationScreen(
+              conversationId: conversation['id'],
+              recipientId: studentId,
+              recipientName: studentName,
+              recipientAvatar: studentAvatar,
+            ),
+          ),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to start chat. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error opening chat: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -346,16 +445,20 @@ class _ClassesScreenState extends State<ClassesScreen>
                         valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                       ),
                     )
-                  : RefreshIndicator(
-                      onRefresh: _loadSessions,
-                      color: AppColors.primary,
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _buildClassesList(_upcomingSessions, isUpcoming: true),
-                          _buildClassesList(_finishedSessions, isUpcoming: false),
-                        ],
-                      ),
+                  : TabBarView(
+                      controller: _tabController,
+                      children: [
+                        RefreshIndicator(
+                          onRefresh: _loadSessions,
+                          color: AppColors.primary,
+                          child: _buildClassesList(_upcomingSessions, isUpcoming: true),
+                        ),
+                        RefreshIndicator(
+                          onRefresh: _loadSessions,
+                          color: AppColors.primary,
+                          child: _buildClassesList(_finishedSessions, isUpcoming: false),
+                        ),
+                      ],
                     ),
             ),
           ],
@@ -367,30 +470,55 @@ class _ClassesScreenState extends State<ClassesScreen>
   Widget _buildClassesList(List<Map<String, dynamic>> classes,
       {required bool isUpcoming}) {
     if (classes.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FaIcon(
-              FontAwesomeIcons.calendarXmark,
-              size: 50,
-              color: AppColors.textSecondary.withOpacity(0.3),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              isUpcoming ? 'No upcoming classes' : 'No finished classes',
-              style: TextStyle(
-                fontSize: 15,
-                color: AppColors.textSecondary.withOpacity(0.6),
-                fontWeight: FontWeight.w500,
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FaIcon(
+                    FontAwesomeIcons.calendarXmark,
+                    size: 50,
+                    color: AppColors.textSecondary.withOpacity(0.3),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    isUpcoming ? 'No upcoming classes' : 'No finished classes',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors.textSecondary.withOpacity(0.6),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  if (isUpcoming) ...[
+                    const SizedBox(height: 16),
+                    Icon(
+                      Icons.arrow_downward,
+                      color: AppColors.textSecondary.withOpacity(0.3),
+                      size: 20,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Pull down to refresh',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary.withOpacity(0.4),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       );
     }
 
     return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: classes.length,
       itemBuilder: (context, index) {
@@ -515,16 +643,38 @@ class _ClassesScreenState extends State<ClassesScreen>
           // Student Info
           Row(
             children: [
-              ClipOval(
-                child: student['avatar_url'] != null
-                    ? CachedNetworkImage(
-                        imageUrl: student['avatar_url'],
-                        width: 32,
-                        height: 32,
-                        fit: BoxFit.cover,
-                        errorWidget: (context, url, error) => _buildStudentAvatar(student),
-                      )
-                    : _buildStudentAvatar(student),
+              Stack(
+                children: [
+                  ClipOval(
+                    child: student['avatar_url'] != null
+                        ? CachedNetworkImage(
+                            imageUrl: student['avatar_url'],
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) => _buildStudentAvatar(student),
+                          )
+                        : _buildStudentAvatar(student),
+                  ),
+                  // Online indicator
+                  if (student['is_online'] == true)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.white,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -548,6 +698,24 @@ class _ClassesScreenState extends State<ClassesScreen>
                         ),
                       ),
                   ],
+                ),
+              ),
+              // Chat Button
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: const FaIcon(
+                    FontAwesomeIcons.comment,
+                    size: 12,
+                    color: AppColors.primary,
+                  ),
+                  onPressed: () => _openChatWithStudent(session),
                 ),
               ),
             ],
@@ -649,47 +817,83 @@ class _ClassesScreenState extends State<ClassesScreen>
                   ),
                   const SizedBox(width: 8),
                 ],
-                if (status == 'ready' || status == 'in_progress') ...[
-                  if (session['meeting_link'] != null && session['meeting_link'].toString().isNotEmpty)
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _joinSession(session),
-                        icon: const FaIcon(FontAwesomeIcons.video, size: 12),
-                        label: const Text('Join', style: TextStyle(fontSize: 12)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                        ),
+                // Show Join button if meeting link is set
+                if ((status == 'ready' || status == 'in_progress') &&
+                    session['meeting_link'] != null && 
+                    session['meeting_link'].toString().isNotEmpty) ...[
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _joinSession(session),
+                      icon: const FaIcon(FontAwesomeIcons.video, size: 12, color: Colors.white),
+                      label: const Text('Join', style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                       ),
                     ),
-                  if (status == 'ready')
-                    const SizedBox(width: 8),
-                  if (status == 'ready')
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _startSession(session),
-                        icon: const FaIcon(FontAwesomeIcons.play, size: 12),
-                        label: const Text('Start', style: TextStyle(fontSize: 12)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryDark,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                        ),
+                  ),
+                ],
+                // Show Start button only if: status is ready AND it's time to start
+                if (status == 'ready' && _canStartSession(session)) ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _startSession(session),
+                      icon: const FaIcon(FontAwesomeIcons.play, size: 12, color: Colors.white),
+                      label: const Text('Start', style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade600,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                       ),
                     ),
-                  if (status == 'in_progress')
-                    const SizedBox(width: 8),
-                  if (status == 'in_progress')
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _endSession(session),
-                        icon: const FaIcon(FontAwesomeIcons.stop, size: 12),
-                        label: const Text('End', style: TextStyle(fontSize: 12)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade600,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                        ),
+                  ),
+                ],
+                // Show End button if session is in progress
+                if (status == 'in_progress') ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _endSession(session),
+                      icon: const FaIcon(FontAwesomeIcons.stop, size: 12, color: Colors.white),
+                      label: const Text('End', style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade600,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                       ),
                     ),
+                  ),
+                ],
+                // Show countdown if session is ready but not yet time to start
+                if (status == 'ready' && !_canStartSession(session)) ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange.shade200),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.schedule, color: Colors.orange.shade700, size: 14),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Not yet time',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.orange.shade700,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ],
             ),

@@ -12,7 +12,7 @@ class TeacherSessionService {
           .from('sessions')
           .select('''
             *,
-            student:students(id, full_name, email),
+            student:students(id, full_name, email, avatar_url, is_online),
             language:language_courses(id, name, flag_url),
             subscription:student_subscriptions(id, points_remaining, status)
           ''')
@@ -38,7 +38,7 @@ class TeacherSessionService {
           .from('sessions')
           .select('''
             *,
-            student:students(id, full_name, email),
+            student:students(id, full_name, email, avatar_url, is_online),
             language:language_courses(id, name, flag_url),
             subscription:student_subscriptions(id, points_remaining, status)
           ''')
@@ -66,7 +66,7 @@ class TeacherSessionService {
           .from('sessions')
           .select('''
             *,
-            student:students(id, full_name),
+            student:students(id, full_name, avatar_url, is_online),
             language:language_courses(id, name)
           ''')
           .eq('teacher_id', user.id)
