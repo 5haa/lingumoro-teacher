@@ -89,6 +89,10 @@ dependencies:
   firebase_messaging: ^15.0.0
   flutter_local_notifications: ^17.0.0
 
+  # File download and handling
+  dio: ^5.4.0
+  open_file: ^3.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

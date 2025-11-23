@@ -6,6 +6,7 @@ import '../../config/app_colors.dart';
 import '../../services/session_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/chat_service.dart';
+import '../../services/preload_service.dart';
 import '../chat/chat_conversation_screen.dart';
 
 class ClassesScreen extends StatefulWidget {
@@ -16,20 +17,39 @@ class ClassesScreen extends StatefulWidget {
 }
 
 class _ClassesScreenState extends State<ClassesScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late TabController _tabController;
   final TeacherSessionService _sessionService = TeacherSessionService();
   final AuthService _authService = AuthService();
   final ChatService _chatService = ChatService();
+  final PreloadService _preloadService = PreloadService();
   
   List<Map<String, dynamic>> _upcomingSessions = [];
   List<Map<String, dynamic>> _finishedSessions = [];
   bool _isLoading = false;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _loadSessionsFromCache();
+  }
+
+  void _loadSessionsFromCache() {
+    final cached = _preloadService.sessions;
+    if (cached != null) {
+      setState(() {
+        _upcomingSessions = cached.upcoming;
+        _finishedSessions = cached.finished;
+        _isLoading = false;
+      });
+      print('✅ Loaded sessions from cache');
+      return;
+    }
+    
     _loadSessions();
   }
 
@@ -108,6 +128,11 @@ class _ClassesScreenState extends State<ClassesScreen>
           return 0;
         }
       });
+      
+      _preloadService.cacheSessions(
+        upcoming: upcoming,
+        finished: finished,
+      );
       
       setState(() {
         _upcomingSessions = upcoming;
@@ -357,6 +382,7 @@ class _ClassesScreenState extends State<ClassesScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -579,6 +605,10 @@ class _ClassesScreenState extends State<ClassesScreen>
                     width: 32,
                     height: 32,
                     fit: BoxFit.cover,
+                    fadeInDuration: Duration.zero,
+                    fadeOutDuration: Duration.zero,
+                    placeholderFadeInDuration: Duration.zero,
+                    memCacheWidth: 96,
                     errorWidget: (context, url, error) => Container(
                       width: 32,
                       height: 32,
@@ -652,6 +682,10 @@ class _ClassesScreenState extends State<ClassesScreen>
                             width: 32,
                             height: 32,
                             fit: BoxFit.cover,
+                            fadeInDuration: Duration.zero,
+                            fadeOutDuration: Duration.zero,
+                            placeholderFadeInDuration: Duration.zero,
+                            memCacheWidth: 96,
                             errorWidget: (context, url, error) => _buildStudentAvatar(student),
                           )
                         : _buildStudentAvatar(student),

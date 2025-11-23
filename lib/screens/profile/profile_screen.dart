@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/services/rating_service.dart';
+import 'package:teacher/services/preload_service.dart';
 import 'package:teacher/screens/auth/auth_screen.dart';
 import 'package:teacher/screens/auth/change_password_screen.dart';
 import 'package:teacher/screens/profile/edit_profile_screen.dart';
@@ -17,18 +18,50 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveClientMixin {
   final _authService = AuthService();
   final _ratingService = RatingService();
+  final _preloadService = PreloadService();
   Map<String, dynamic>? _profile;
   Map<String, dynamic>? _ratingStats;
   List<Map<String, dynamic>> _reviews = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
+    _loadProfileFromCache();
+  }
+
+  void _loadProfileFromCache() {
+    if (_preloadService.hasProfile) {
+      _profile = _preloadService.profile;
+      _ratingStats = _preloadService.ratingStats;
+      setState(() {
+        _isLoading = false;
+      });
+      print('✅ Loaded profile from cache');
+      _loadReviews();
+      return;
+    }
+    
     _loadProfile();
+  }
+
+  Future<void> _loadReviews() async {
+    try {
+      final reviews = await _ratingService.getMyRatings();
+      if (mounted) {
+        setState(() {
+          _reviews = reviews;
+        });
+      }
+    } catch (e) {
+      print('Error loading reviews: $e');
+    }
   }
 
   Future<void> _loadProfile() async {
@@ -328,6 +361,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -614,6 +648,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: CachedNetworkImage(
                           imageUrl: avatarUrl,
                           fit: BoxFit.cover,
+                          fadeInDuration: Duration.zero,
+                          fadeOutDuration: Duration.zero,
+                          placeholderFadeInDuration: Duration.zero,
+                          memCacheWidth: 270,
                           placeholder: (context, url) => Center(
                             child: Text(
                               initials,

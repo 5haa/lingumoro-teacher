@@ -8,6 +8,7 @@ import 'package:teacher/screens/main_navigation.dart';
 import 'package:teacher/screens/onboarding_screen.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/services/firebase_notification_service.dart';
+import 'package:teacher/services/preload_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -34,17 +35,18 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthStatus() async {
-    // Wait for minimum splash duration (3 seconds like student app)
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (!mounted) return;
-
+    // Start with minimum splash duration and preloading in parallel
+    final minimumSplashDuration = Future.delayed(const Duration(seconds: 3));
+    
     // Check if onboarding has been completed
     final prefs = await SharedPreferences.getInstance();
     final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
 
     // If onboarding not completed, show onboarding screen
     if (!onboardingCompleted) {
+      await minimumSplashDuration;
+      if (!mounted) return;
+      
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => const OnboardingScreen(),
@@ -55,19 +57,19 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Check authentication status
     final session = Supabase.instance.client.auth.currentSession;
+    final isLoggedIn = session != null;
     
     Widget nextScreen;
     
-    if (session != null) {
+    if (isLoggedIn) {
       // Check if user is suspended
       final authService = AuthService();
       final isSuspended = await authService.checkIfSuspended();
       
       if (isSuspended) {
-        // User is suspended, show auth screen with message
+        await minimumSplashDuration;
         nextScreen = const AuthScreen();
         if (mounted) {
-          // Show suspension message after navigation
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -81,26 +83,49 @@ class _SplashScreenState extends State<SplashScreen> {
           });
         }
       } else {
-        // Initialize Firebase notifications for logged-in users
-        try {
-          final firebaseNotificationService = FirebaseNotificationService();
-          await firebaseNotificationService.initialize();
-          print('✅ Firebase notifications initialized on app startup');
-        } catch (e) {
-          print('❌ Failed to initialize Firebase notifications: $e');
-        }
+        // Preload data and initialize Firebase in parallel
+        await Future.wait([
+          minimumSplashDuration,
+          _preloadAppData(isLoggedIn: true),
+          _initializeFirebaseNotifications(),
+        ]);
         
         nextScreen = const MainNavigation();
       }
     } else {
+      await minimumSplashDuration;
       nextScreen = const AuthScreen();
     }
 
+    if (!mounted) return;
+    
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => nextScreen,
       ),
     );
+  }
+
+  Future<void> _preloadAppData({required bool isLoggedIn}) async {
+    try {
+      final preloadService = PreloadService();
+      await preloadService.preloadData(
+        isLoggedIn: isLoggedIn,
+        context: mounted ? context : null,
+      );
+    } catch (e) {
+      print('❌ Error preloading data: $e');
+    }
+  }
+
+  Future<void> _initializeFirebaseNotifications() async {
+    try {
+      final firebaseNotificationService = FirebaseNotificationService();
+      await firebaseNotificationService.initialize();
+      print('✅ Firebase notifications initialized on app startup');
+    } catch (e) {
+      print('❌ Failed to initialize Firebase notifications: $e');
+    }
   }
 
   @override

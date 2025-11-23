@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/services/point_award_service.dart';
+import 'package:teacher/services/preload_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class StudentsScreen extends StatefulWidget {
@@ -11,21 +12,54 @@ class StudentsScreen extends StatefulWidget {
   State<StudentsScreen> createState() => _StudentsScreenState();
 }
 
-class _StudentsScreenState extends State<StudentsScreen> {
+class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAliveClientMixin {
   final _pointAwardService = PointAwardService();
+  final _preloadService = PreloadService();
   final _searchController = TextEditingController();
 
-  bool _isLoading = true;
+  bool _isLoading = false;
   List<Map<String, dynamic>> _students = [];
   List<Map<String, dynamic>> _filteredStudents = [];
   Map<String, int>? _settings;
   String? _errorMessage;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
     _searchController.addListener(_filterStudents);
+    _loadDataFromCache();
+  }
+
+  void _loadDataFromCache() {
+    final cached = _preloadService.students;
+    if (cached != null) {
+      setState(() {
+        _students = cached;
+        _filteredStudents = cached;
+        _isLoading = false;
+      });
+      print('✅ Loaded students from cache');
+      _loadSettings();
+      return;
+    }
+    
     _loadData();
+  }
+
+  Future<void> _loadSettings() async {
+    try {
+      final settings = await _pointAwardService.getPointSettings();
+      if (mounted) {
+        setState(() {
+          _settings = settings;
+        });
+      }
+    } catch (e) {
+      print('Error loading settings: $e');
+    }
   }
 
   @override
@@ -71,6 +105,8 @@ class _StudentsScreenState extends State<StudentsScreen> {
       
       print('Loaded ${students.length} students');
 
+      _preloadService.cacheStudents(students);
+      
       if (mounted) {
         setState(() {
           _students = students;
@@ -93,6 +129,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -343,6 +380,10 @@ class _StudentsScreenState extends State<StudentsScreen> {
                       ? CachedNetworkImage(
                           imageUrl: avatarUrl,
                           fit: BoxFit.cover,
+                          fadeInDuration: Duration.zero,
+                          fadeOutDuration: Duration.zero,
+                          placeholderFadeInDuration: Duration.zero,
+                          memCacheWidth: 180,
                           placeholder: (context, url) => _buildAvatarInitial(name),
                           errorWidget: (context, url, error) => _buildAvatarInitial(name),
                         )

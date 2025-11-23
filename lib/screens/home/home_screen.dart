@@ -7,6 +7,7 @@ import '../../services/language_service.dart';
 import '../../services/point_award_service.dart';
 import '../../services/session_service.dart';
 import '../../services/rating_service.dart';
+import '../../services/preload_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../schedule/schedule_screen.dart';
 
@@ -19,12 +20,13 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
   final _authService = AuthService();
   final _languageService = LanguageService();
   final _pointAwardService = PointAwardService();
   final _sessionService = TeacherSessionService();
   final _ratingService = RatingService();
+  final _preloadService = PreloadService();
   
   Map<String, dynamic>? _profile;
   List<Map<String, dynamic>> _teacherLanguages = [];
@@ -35,12 +37,37 @@ class _HomeScreenState extends State<HomeScreen> {
   int _totalSessions = 0;
   Map<String, dynamic>? _ratingStats;
   
-  bool _isLoading = true;
+  bool _isLoading = false;
   bool _isLoadingLanguages = false;
+
+  @override
+  bool get wantKeepAlive => true;
   
   @override
   void initState() {
     super.initState();
+    _loadDataFromCache();
+  }
+
+  void _loadDataFromCache() {
+    // Try to load from cache first
+    if (_preloadService.hasProfile) {
+      _profile = _preloadService.profile;
+      _teacherLanguages = _preloadService.teacherLanguages ?? [];
+      if (_preloadService.hasStats) {
+        _totalStudents = _preloadService.totalStudents ?? 0;
+        _upcomingSessions = _preloadService.upcomingSessions ?? 0;
+        _totalSessions = _preloadService.totalSessions ?? 0;
+        _ratingStats = _preloadService.ratingStats;
+      }
+      setState(() {
+        _isLoading = false;
+      });
+      print('✅ Loaded teacher dashboard from cache');
+      return;
+    }
+    
+    // No cache, load from API
     _loadAllData();
   }
   
@@ -116,6 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
   
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBody: true,

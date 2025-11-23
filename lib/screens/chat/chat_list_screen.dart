@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teacher/services/chat_service.dart';
 import 'package:teacher/services/presence_service.dart';
+import 'package:teacher/services/preload_service.dart';
 import 'package:teacher/screens/chat/chat_conversation_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -15,15 +16,16 @@ class ChatListScreen extends StatefulWidget {
   State<ChatListScreen> createState() => _ChatListScreenState();
 }
 
-class _ChatListScreenState extends State<ChatListScreen> {
+class _ChatListScreenState extends State<ChatListScreen> with AutomaticKeepAliveClientMixin {
   final _chatService = ChatService();
   final _presenceService = PresenceService();
+  final _preloadService = PreloadService();
   final _searchController = TextEditingController();
   
   List<Map<String, dynamic>> _conversations = [];
   List<Map<String, dynamic>> _filteredConversations = [];
   List<Map<String, dynamic>> _availableStudents = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
   bool _showAvailable = false;
   Timer? _statusRefreshTimer;
   
@@ -31,14 +33,18 @@ class _ChatListScreenState extends State<ChatListScreen> {
   final Map<String, bool> _onlineStatus = {};
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
-    _loadData();
+    _loadDataFromCache();
     _chatService.subscribeToConversations();
     
     // Listen to conversation updates
     _chatService.onConversationUpdate.listen((update) {
-      _loadData();
+      _preloadService.invalidateChat();
+      _loadData(forceRefresh: true);
     });
     
     // Search listener
@@ -48,6 +54,39 @@ class _ChatListScreenState extends State<ChatListScreen> {
     _statusRefreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       _refreshOnlineStatus();
     });
+  }
+
+  void _loadDataFromCache() {
+    final cached = _preloadService.chatData;
+    if (cached != null) {
+      setState(() {
+        _conversations = cached.conversations;
+        _filteredConversations = cached.conversations;
+        _availableStudents = cached.students;
+        _isLoading = false;
+      });
+      print('✅ Loaded chat data from cache');
+      _subscribeToStatuses();
+      return;
+    }
+    
+    _loadData(forceRefresh: false);
+  }
+
+  void _subscribeToStatuses() {
+    for (var conversation in _conversations) {
+      final student = conversation['student'] as Map<String, dynamic>?;
+      if (student != null && student['id'] != null) {
+        _subscribeToUserStatus(student['id'], 'student');
+      }
+    }
+    
+    for (var student in _availableStudents) {
+      final studentId = student['id'];
+      if (studentId != null) {
+        _subscribeToUserStatus(studentId, 'student');
+      }
+    }
   }
 
   @override
@@ -76,13 +115,25 @@ class _ChatListScreenState extends State<ChatListScreen> {
     });
   }
 
-  Future<void> _loadData() async {
-    if (mounted) {
+  Future<void> _loadData({bool forceRefresh = false}) async {
+    if (forceRefresh && mounted) {
       setState(() => _isLoading = true);
     }
     
-    final conversations = await _chatService.getConversations();
-    final students = await _chatService.getAvailableStudents();
+    // Parallelize queries
+    final results = await Future.wait([
+      _chatService.getConversations(),
+      _chatService.getAvailableStudents(),
+    ]);
+    
+    final conversations = results[0] as List<Map<String, dynamic>>;
+    final students = results[1] as List<Map<String, dynamic>>;
+    
+    // Cache the data
+    _preloadService.cacheChat(
+      conversations: conversations,
+      students: students,
+    );
     
     if (mounted) {
       setState(() {
@@ -92,21 +143,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         _isLoading = false;
       });
       
-      // Subscribe to online status for all conversation participants
-      for (var conversation in conversations) {
-        final student = conversation['student'] as Map<String, dynamic>?;
-        if (student != null && student['id'] != null) {
-          _subscribeToUserStatus(student['id'], 'student');
-        }
-      }
-      
-      // Subscribe to online status for available students
-      for (var student in students) {
-        final studentId = student['id'];
-        if (studentId != null) {
-          _subscribeToUserStatus(studentId, 'student');
-        }
-      }
+      _subscribeToStatuses();
     }
   }
   
@@ -189,6 +226,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -349,6 +387,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                                       width: 60,
                                                       height: 60,
                                                       fit: BoxFit.cover,
+                                                      fadeInDuration: Duration.zero,
+                                                      fadeOutDuration: Duration.zero,
+                                                      placeholderFadeInDuration: Duration.zero,
+                                                      memCacheWidth: 180,
                                                       errorWidget: (_, __, ___) => Container(
                                                         width: 60,
                                                         height: 60,
@@ -544,7 +586,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             ),
           ),
         );
-        _loadData(); // Refresh after returning
+        // Cache is still valid - real-time listener handles updates
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -574,6 +616,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         ? CachedNetworkImage(
                             imageUrl: avatarUrl,
                             fit: BoxFit.cover,
+                            fadeInDuration: Duration.zero,
+                            fadeOutDuration: Duration.zero,
+                            placeholderFadeInDuration: Duration.zero,
+                            memCacheWidth: 165,
                             placeholder: (context, url) => Center(
                               child: Text(
                                 name[0].toUpperCase(),
@@ -780,7 +826,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
               setState(() {
                 _showAvailable = false;
               });
-              _loadData();
+              _preloadService.invalidateChat();
+              _loadData(forceRefresh: true);
             } else if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -818,6 +865,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             ? CachedNetworkImage(
                                 imageUrl: avatarUrl,
                                 fit: BoxFit.cover,
+                                fadeInDuration: Duration.zero,
+                                fadeOutDuration: Duration.zero,
+                                placeholderFadeInDuration: Duration.zero,
+                                memCacheWidth: 165,
                                 errorWidget: (context, url, error) => Center(
                                   child: Text(
                                     name[0].toUpperCase(),
