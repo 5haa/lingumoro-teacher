@@ -10,6 +10,7 @@ import '../../services/rating_service.dart';
 import '../../services/preload_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../schedule/schedule_screen.dart';
+import '../notifications/notifications_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(int)? onTabChange;
@@ -451,7 +452,11 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               icon: const FaIcon(FontAwesomeIcons.bell, size: 20),
               color: AppColors.textPrimary,
               onPressed: () {
-                // TODO: Navigate to notifications
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const NotificationsScreen(),
+                  ),
+                );
               },
             ),
           ),

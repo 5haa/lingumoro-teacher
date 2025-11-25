@@ -186,19 +186,19 @@ class _MainNavigationState extends State<MainNavigation> {
         children: [
           Stack(
             clipBehavior: Clip.none,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: isActive ? AppColors.greenGradient : null,
-                  color: isActive ? null : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: FaIcon(
-                  icon,
-                  color: isActive ? AppColors.white : AppColors.grey,
-                  size: 20,
-                ),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              gradient: isActive ? AppColors.greenGradient : null,
+              color: isActive ? null : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: FaIcon(
+              icon,
+              color: isActive ? AppColors.white : AppColors.grey,
+              size: 20,
+            ),
               ),
               if (showBadge)
                 Positioned(

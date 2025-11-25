@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../config/app_colors.dart';
+import '../screens/notifications/notifications_screen.dart';
 import '../screens/settings/about_us_screen.dart';
 import '../screens/settings/privacy_policy_screen.dart';
 import '../screens/settings/terms_conditions_screen.dart';
@@ -58,6 +59,21 @@ class AppDrawer extends StatelessWidget {
               const SizedBox(height: 40),
 
               // Menu Items
+              _buildMenuItem(
+                context,
+                icon: FontAwesomeIcons.bell,
+                title: 'Notifications',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationsScreen(),
+                    ),
+                  );
+                },
+              ),
+
               _buildMenuItem(
                 context,
                 icon: FontAwesomeIcons.phone,

@@ -558,6 +558,7 @@ class _ClassesScreenState extends State<ClassesScreen>
     final student = session['student'] ?? {};
     final language = session['language'] ?? {};
     final status = session['status'] ?? '';
+    final isMakeup = session['is_makeup'] == true;
 
     final scheduledDate = DateTime.parse(session['scheduled_date']);
     final dateStr = '${_getWeekday(scheduledDate.weekday)}, ${scheduledDate.day}';
@@ -594,6 +595,38 @@ class _ClassesScreenState extends State<ClassesScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Makeup session indicator
+          if (isMakeup) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.shade300),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.refresh,
+                    color: Colors.orange.shade700,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'MAKEUP CLASS',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
           // Language and Status
           Row(
             children: [
