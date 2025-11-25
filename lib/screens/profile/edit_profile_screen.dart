@@ -5,6 +5,7 @@ import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/services/storage_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../../config/app_colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
@@ -216,6 +217,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       String? avatarUrl = _currentAvatarUrl;
+      
+      // Clear old avatar from cache if uploading a new one
+      if (_newAvatarFile != null && _currentAvatarUrl != null) {
+        final cacheManager = DefaultCacheManager();
+        await cacheManager.removeFile(_currentAvatarUrl!);
+        print('🗑️ Cleared old avatar from cache');
+      }
       
       // Upload new avatar if selected
       if (_newAvatarFile != null) {
@@ -448,6 +456,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               )
                             : _currentAvatarUrl != null
                                 ? CachedNetworkImage(
+                                    key: ValueKey(_currentAvatarUrl),
                                     imageUrl: _currentAvatarUrl!,
                                     fit: BoxFit.cover,
                                     width: 120,

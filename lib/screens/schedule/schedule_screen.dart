@@ -66,15 +66,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final currentUser = _authService.currentUser;
     if (currentUser == null) return;
 
-    final success = await _scheduleService.addSchedule(
+    final response = await _scheduleService.addSchedule(
       teacherId: currentUser.id,
       dayOfWeek: result['day_of_week'],
       startTime: result['start_time'],
       endTime: result['end_time'],
     );
 
-    if (success) {
-      if (mounted) {
+    if (mounted) {
+      if (response['success']) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Schedule added successfully'),
@@ -82,13 +82,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
         );
         _loadSchedules();
-      }
-    } else {
-      if (mounted) {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to add schedule'),
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to add schedule'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
           ),
         );
       }

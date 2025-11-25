@@ -8,6 +8,7 @@ import 'package:teacher/screens/auth/change_password_screen.dart';
 import 'package:teacher/screens/profile/edit_profile_screen.dart';
 import 'package:teacher/widgets/rating_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../../config/app_colors.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -64,8 +65,13 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
     }
   }
 
-  Future<void> _loadProfile() async {
+  Future<void> _loadProfile({bool clearImageCache = false}) async {
     try {
+      // Clear image cache if requested (after profile update)
+      if (clearImageCache) {
+        await _clearProfileImageCache();
+      }
+      
       final profile = await _authService.getTeacherProfile();
       final ratingStats = await _ratingService.getMyRatingStats();
       final reviews = await _ratingService.getMyRatings();
@@ -88,6 +94,21 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
           ),
         );
       }
+    }
+  }
+
+  /// Clear cached images for profile avatar
+  Future<void> _clearProfileImageCache() async {
+    try {
+      final cacheManager = DefaultCacheManager();
+      
+      // Clear old avatar from cache
+      if (_profile?['avatar_url'] != null) {
+        await cacheManager.removeFile(_profile!['avatar_url']);
+        print('🗑️ Cleared cached avatar');
+      }
+    } catch (e) {
+      print('⚠️ Error clearing image cache: $e');
     }
   }
 
@@ -554,7 +575,8 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                                   ),
                                 );
                                 if (result == true) {
-                                  _loadProfile();
+                                  await _preloadService.refreshTeacherData();
+                                  _loadProfile(clearImageCache: true);
                                 }
                               },
                             ),
@@ -646,6 +668,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                 child: avatarUrl != null && avatarUrl.toString().isNotEmpty
                     ? ClipOval(
                         child: CachedNetworkImage(
+                          key: ValueKey(avatarUrl),
                           imageUrl: avatarUrl,
                           fit: BoxFit.cover,
                           fadeInDuration: Duration.zero,
@@ -697,7 +720,8 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                       ),
                     );
                     if (result == true) {
-                      _loadProfile();
+                      await _preloadService.refreshTeacherData();
+                      _loadProfile(clearImageCache: true);
                     }
                   },
                   child: Container(
@@ -816,7 +840,8 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                       ),
                     );
                     if (result == true) {
-                      _loadProfile();
+                      await _preloadService.refreshTeacherData();
+                      _loadProfile(clearImageCache: true);
                     }
                   },
                   child: Container(

@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/widgets/app_drawer.dart';
 import 'package:teacher/l10n/app_localizations.dart';
+import 'package:teacher/services/chat_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'home/home_screen.dart';
 import 'classes/classes_screen.dart';
 import 'students/students_screen.dart';
@@ -18,6 +20,9 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
+  int _unreadMessageCount = 0;
+  final _chatService = ChatService();
+  RealtimeChannel? _conversationChannel;
   
   late final List<Widget> _screens;
   
@@ -25,6 +30,14 @@ class _MainNavigationState extends State<MainNavigation> {
   void initState() {
     super.initState();
     _initScreens();
+    _loadUnreadCount();
+    _setupRealtimeListener();
+  }
+
+  @override
+  void dispose() {
+    _conversationChannel?.unsubscribe();
+    super.dispose();
   }
   
   void _initScreens() {
@@ -43,6 +56,53 @@ class _MainNavigationState extends State<MainNavigation> {
         _currentIndex = index;
       });
     }
+  }
+
+  Future<void> _loadUnreadCount() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) return;
+
+      final result = await Supabase.instance.client
+          .from('chat_conversations')
+          .select('teacher_unread_count')
+          .eq('teacher_id', userId);
+
+      int totalUnread = 0;
+      for (var conv in result) {
+        totalUnread += (conv['teacher_unread_count'] as int?) ?? 0;
+      }
+
+      if (mounted) {
+        setState(() {
+          _unreadMessageCount = totalUnread;
+        });
+      }
+    } catch (e) {
+      print('Error loading unread count: $e');
+    }
+  }
+
+  void _setupRealtimeListener() {
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) return;
+
+    _conversationChannel = Supabase.instance.client
+        .channel('unread-messages-$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'chat_conversations',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'teacher_id',
+            value: userId,
+          ),
+          callback: (payload) {
+            _loadUnreadCount();
+          },
+        )
+        .subscribe();
   }
   
   List<Map<String, dynamic>> _getNavItems(BuildContext context) {
@@ -112,6 +172,9 @@ class _MainNavigationState extends State<MainNavigation> {
   }
   
   Widget _buildNavItem(IconData icon, String label, int index, bool isActive) {
+    // Check if this is the chat tab (index 3) and has unread messages
+    final bool showBadge = index == 3 && _unreadMessageCount > 0;
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -121,18 +184,50 @@ class _MainNavigationState extends State<MainNavigation> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              gradient: isActive ? AppColors.greenGradient : null,
-              color: isActive ? null : Colors.transparent,
-              shape: BoxShape.circle,
-            ),
-            child: FaIcon(
-              icon,
-              color: isActive ? AppColors.white : AppColors.grey,
-              size: 20,
-            ),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: isActive ? AppColors.greenGradient : null,
+                  color: isActive ? null : Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+                child: FaIcon(
+                  icon,
+                  color: isActive ? AppColors.white : AppColors.grey,
+                  size: 20,
+                ),
+              ),
+              if (showBadge)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 18,
+                      minHeight: 18,
+                    ),
+                    child: Center(
+                      child: Text(
+                        _unreadMessageCount > 99 ? '99+' : '$_unreadMessageCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 4),
           Text(

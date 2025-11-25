@@ -21,7 +21,8 @@ class ScheduleService {
   }
 
   /// Add a schedule slot
-  Future<bool> addSchedule({
+  /// Returns a Map with 'success' (bool) and optional 'message' (String)
+  Future<Map<String, dynamic>> addSchedule({
     required String teacherId,
     required int dayOfWeek,
     required String startTime,
@@ -45,10 +46,22 @@ class ScheduleService {
         'p_end_time': endTime,
       });
 
-      return true;
+      return {'success': true};
     } catch (e) {
       print('Error adding schedule: $e');
-      return false;
+      
+      // Check if it's a duplicate key error
+      if (e is PostgrestException && e.code == '23505') {
+        return {
+          'success': false,
+          'message': 'This time slot already exists for the selected day. Please choose a different time or day.',
+        };
+      }
+      
+      return {
+        'success': false,
+        'message': 'Failed to add schedule. Please try again.',
+      };
     }
   }
 
