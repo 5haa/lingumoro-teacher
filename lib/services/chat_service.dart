@@ -48,7 +48,7 @@ class ChatService {
         throw Exception('No active subscription found with this student');
       }
 
-      // Check if conversation exists
+      // Check if conversation exists (including deleted ones)
       var conversation = await _supabase
           .from('chat_conversations')
           .select('''
@@ -84,6 +84,32 @@ class ChatService {
             .single();
         
         conversation = newConversation;
+      } else {
+        // If conversation was deleted by teacher, undelete it
+        if (conversation['deleted_by_teacher'] == true) {
+          await _supabase
+              .from('chat_conversations')
+              .update({
+                'deleted_by_teacher': false,
+                'teacher_deleted_at': null,
+              })
+              .eq('id', conversation['id']);
+          
+          // Refresh conversation data
+          conversation = await _supabase
+              .from('chat_conversations')
+              .select('''
+                *,
+                student:student_id (
+                  id,
+                  full_name,
+                  avatar_url,
+                  email
+                )
+              ''')
+              .eq('id', conversation['id'])
+              .single();
+        }
       }
 
       return conversation;
@@ -174,14 +200,39 @@ class ChatService {
   /// Get messages for a conversation
   Future<List<Map<String, dynamic>>> getMessages(String conversationId, {int limit = 50, int offset = 0}) async {
     try {
-      final messages = await _supabase
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) return [];
+
+      // Get conversation to check deletion timestamp
+      final conversation = await _supabase
+          .from('chat_conversations')
+          .select('teacher_deleted_at')
+          .eq('id', conversationId)
+          .maybeSingle();
+
+      if (conversation == null) return [];
+
+      // Get teacher's deletion timestamp
+      DateTime? deletedAt;
+      if (conversation['teacher_deleted_at'] != null) {
+        deletedAt = DateTime.parse(conversation['teacher_deleted_at']);
+      }
+
+      var query = _supabase
           .from('chat_messages')
           .select('''
             *,
             attachments:chat_attachments (*)
           ''')
           .eq('conversation_id', conversationId)
-          .isFilter('deleted_at', null)
+          .isFilter('deleted_at', null);
+
+      // Only show messages created after the deletion timestamp
+      if (deletedAt != null) {
+        query = query.gt('created_at', deletedAt.toIso8601String());
+      }
+
+      final messages = await query
           .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
 
@@ -549,8 +600,23 @@ class ChatService {
     
     _conversationsChannel = _supabase
         .channel('conversations:$userId')
+        // Listen for updates where teacher is the participant
         .onPostgresChanges(
           event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'chat_conversations',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'teacher_id',
+            value: userId,
+          ),
+          callback: (payload) {
+            _conversationUpdateController.add(payload.newRecord);
+          },
+        )
+        // Listen for inserts where teacher is the participant
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
           schema: 'public',
           table: 'chat_conversations',
           filter: PostgresChangeFilter(

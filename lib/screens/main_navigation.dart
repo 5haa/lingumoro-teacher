@@ -89,8 +89,23 @@ class _MainNavigationState extends State<MainNavigation> {
 
     _conversationChannel = Supabase.instance.client
         .channel('unread-messages-$userId')
+        // Listen for updates where teacher is the participant
         .onPostgresChanges(
           event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'chat_conversations',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'teacher_id',
+            value: userId,
+          ),
+          callback: (payload) {
+            _loadUnreadCount();
+          },
+        )
+        // Listen for inserts where teacher is the participant
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
           schema: 'public',
           table: 'chat_conversations',
           filter: PostgresChangeFilter(
