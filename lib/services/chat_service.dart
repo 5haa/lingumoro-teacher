@@ -111,6 +111,7 @@ class ChatService {
             )
           ''')
           .eq('teacher_id', userId)
+          .eq('deleted_by_teacher', false)
           .order('last_message_at', ascending: false);
 
       return List<Map<String, dynamic>>.from(conversations);
@@ -180,6 +181,7 @@ class ChatService {
             attachments:chat_attachments (*)
           ''')
           .eq('conversation_id', conversationId)
+          .isFilter('deleted_at', null)
           .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
 
