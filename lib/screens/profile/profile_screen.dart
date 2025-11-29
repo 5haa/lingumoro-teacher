@@ -432,31 +432,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                       ),
                     ),
                   ),
-                  Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: const FaIcon(
-                        FontAwesomeIcons.rightFromBracket,
-                        size: 18,
-                        color: AppColors.textPrimary,
-                      ),
-                      onPressed: _handleLogout,
-                      tooltip: 'Logout',
-                    ),
-                  ),
+                  const SizedBox(width: 45), // Balance the menu button
                 ],
               ),
             ),
@@ -561,13 +537,14 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                               const SizedBox(height: 20),
                             ],
                             
-                            // Settings Section
-                            _buildSectionTitle('Settings'),
+                            // Personal Information Section
+                            _buildSectionTitle('Personal Information'),
                             const SizedBox(height: 12),
-                            _buildActionButton(
-                              'Edit Profile',
-                              FontAwesomeIcons.pen,
-                              () async {
+                            _buildActionCard(
+                              icon: FontAwesomeIcons.penToSquare,
+                              title: 'Edit Profile',
+                              subtitle: 'Update your profile information',
+                              onTap: () async {
                                 final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -580,30 +557,16 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                                 }
                               },
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 25),
                             
-                            _buildActionButton(
-                              'My Courses',
-                              FontAwesomeIcons.book,
-                              () {
-                                // TODO: Implement courses management
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            
-                            _buildActionButton(
-                              'Notifications',
-                              FontAwesomeIcons.bell,
-                              () {
-                                // TODO: Implement notifications settings
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            
-                            _buildActionButton(
-                              'Change Password',
-                              FontAwesomeIcons.lock,
-                              () {
+                            // Security Section
+                            _buildSectionTitle('Security'),
+                            const SizedBox(height: 12),
+                            _buildActionCard(
+                              icon: FontAwesomeIcons.lock,
+                              title: 'Change Password',
+                              subtitle: 'Update your account password',
+                              onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -612,14 +575,36 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                                 );
                               },
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 30),
                             
-                            _buildActionButton(
-                              'Help & Support',
-                              FontAwesomeIcons.circleQuestion,
-                              () {
-                                // TODO: Implement help
-                              },
+                            // Logout Button
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: _handleLogout,
+                                icon: const FaIcon(
+                                  FontAwesomeIcons.rightFromBracket,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                                label: const Text(
+                                  'LOGOUT',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade600,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  elevation: 0,
+                                ),
+                              ),
                             ),
                             const SizedBox(height: 20),
                           ],
@@ -1153,43 +1138,47 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
     );
   }
 
-  Widget _buildActionButton(String title, IconData icon, VoidCallback onTap) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: FaIcon(
-                    icon,
-                    size: 16,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
+  Widget _buildActionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: FaIcon(
+                icon,
+                color: AppColors.primary,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     title,
                     style: const TextStyle(
                       fontSize: 15,
@@ -1197,15 +1186,23 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                       color: AppColors.textPrimary,
                     ),
                   ),
-                ),
-                const FaIcon(
-                  FontAwesomeIcons.chevronRight,
-                  size: 12,
-                  color: AppColors.textSecondary,
-                ),
-              ],
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            const FaIcon(
+              FontAwesomeIcons.chevronRight,
+              size: 14,
+              color: AppColors.grey,
+            ),
+          ],
         ),
       ),
     );

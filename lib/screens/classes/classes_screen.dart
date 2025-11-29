@@ -595,6 +595,11 @@ class _ClassesScreenState extends State<ClassesScreen>
     final isTeacherCreated = session['teacher_created'] == true;
 
     final scheduledDate = DateTime.parse(session['scheduled_date']);
+    final today = DateTime.now();
+    final isToday = scheduledDate.year == today.year && 
+                    scheduledDate.month == today.month && 
+                    scheduledDate.day == today.day;
+    
     final dateStr = '${_getWeekday(scheduledDate.weekday)}, ${scheduledDate.day}';
     final monthStr = '${_getMonth(scheduledDate.month)} ${scheduledDate.year}';
     final startTime = session['scheduled_start_time']?.substring(0, 5) ?? '00:00';
@@ -618,10 +623,15 @@ class _ClassesScreenState extends State<ClassesScreen>
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
+        border: isToday && isUpcoming
+            ? Border.all(color: Colors.green.shade400, width: 2.5)
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
+            color: isToday && isUpcoming
+                ? Colors.green.withOpacity(0.15)
+                : Colors.black.withOpacity(0.05),
+            blurRadius: isToday && isUpcoming ? 12 : 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -629,6 +639,64 @@ class _ClassesScreenState extends State<ClassesScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Today indicator (for upcoming sessions only)
+          if (isToday && isUpcoming) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.green.shade400, Colors.green.shade600],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.today,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'TODAY',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      startTime,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
           // Makeup session indicator
           if (isMakeup) ...[
             Container(
