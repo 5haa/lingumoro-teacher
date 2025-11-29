@@ -218,5 +218,103 @@ class TeacherSessionService {
       'minute': int.parse(parts[1]),
     };
   }
+
+  /// Get all active subscriptions for teacher's students
+  Future<List<Map<String, dynamic>>> getActiveSubscriptions() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) throw Exception('User not authenticated');
+
+      final response = await _supabase
+          .from('student_subscriptions')
+          .select('''
+            *,
+            student:students(id, full_name, email, avatar_url),
+            language:language_courses(id, name, code, flag_url),
+            package:packages(id, name, duration_minutes)
+          ''')
+          .eq('teacher_id', user.id)
+          .eq('status', 'active')
+          .gt('points_remaining', 0)
+          .order('created_at', ascending: false);
+
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      print('Error fetching active subscriptions: $e');
+      throw Exception('Failed to load active subscriptions');
+    }
+  }
+
+  /// Create a manual session (teacher-created)
+  Future<Map<String, dynamic>?> createManualSession({
+    required String subscriptionId,
+    required String studentId,
+    required String teacherId,
+    required String languageId,
+    required DateTime scheduledDate,
+    required String startTime, // Format: HH:mm
+    required String endTime,   // Format: HH:mm
+  }) async {
+    try {
+      // Validate subscription has remaining points
+      final subscription = await _supabase
+          .from('student_subscriptions')
+          .select('points_remaining, status')
+          .eq('id', subscriptionId)
+          .single();
+
+      if (subscription['status'] != 'active') {
+        throw Exception('Subscription is not active');
+      }
+
+      if (subscription['points_remaining'] <= 0) {
+        throw Exception('No remaining sessions in subscription');
+      }
+
+      // Create the session
+      final response = await _supabase
+          .from('sessions')
+          .insert({
+            'subscription_id': subscriptionId,
+            'student_id': studentId,
+            'teacher_id': teacherId,
+            'language_id': languageId,
+            'scheduled_date': scheduledDate.toIso8601String().split('T')[0],
+            'scheduled_start_time': startTime,
+            'scheduled_end_time': endTime,
+            'status': 'scheduled',
+            'point_deducted': false,
+            'teacher_created': true,
+          })
+          .select()
+          .single();
+
+      return response;
+    } catch (e) {
+      print('Error creating manual session: $e');
+      throw Exception('Failed to create session: ${e.toString()}');
+    }
+  }
+
+  /// Delete a teacher-created session (only if scheduled)
+  Future<bool> deleteSession(String sessionId, bool isTeacherCreated) async {
+    try {
+      if (!isTeacherCreated) {
+        throw Exception('Can only delete manually created sessions');
+      }
+
+      await _supabase
+          .from('sessions')
+          .delete()
+          .eq('id', sessionId)
+          .eq('teacher_created', true)
+          .inFilter('status', ['scheduled', 'ready']);
+
+      return true;
+    } catch (e) {
+      print('Error deleting session: $e');
+      return false;
+    }
+  }
 }
 

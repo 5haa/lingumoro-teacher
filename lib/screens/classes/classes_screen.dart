@@ -8,6 +8,7 @@ import '../../services/auth_service.dart';
 import '../../services/chat_service.dart';
 import '../../services/preload_service.dart';
 import '../chat/chat_conversation_screen.dart';
+import 'create_session_screen.dart';
 
 class ClassesScreen extends StatefulWidget {
   const ClassesScreen({super.key});
@@ -199,43 +200,7 @@ class _ClassesScreenState extends State<ClassesScreen>
     }
   }
 
-  bool _canStartSession(Map<String, dynamic> session) {
-    try {
-      final now = DateTime.now();
-      final scheduledDate = DateTime.parse(session['scheduled_date']);
-      final startTime = session['scheduled_start_time'] ?? '00:00:00';
-      final timeParts = startTime.split(':');
-      
-      final scheduledDateTime = DateTime(
-        scheduledDate.year,
-        scheduledDate.month,
-        scheduledDate.day,
-        int.parse(timeParts[0]),
-        int.parse(timeParts[1]),
-      );
-
-      // Can start 15 minutes before scheduled time
-      final canStartTime = scheduledDateTime.subtract(const Duration(minutes: 15));
-      
-      // Can start if current time is within 15 minutes before the scheduled time
-      return now.isAfter(canStartTime) || now.isAtSameMomentAs(canStartTime);
-    } catch (e) {
-      return false;
-    }
-  }
-
   Future<void> _startSession(Map<String, dynamic> session) async {
-    if (!_canStartSession(session)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('You can only start the session within 15 minutes before the scheduled time'),
-          backgroundColor: Colors.orange,
-          duration: Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
-
     final success = await _sessionService.startSession(session['id']);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -283,6 +248,51 @@ class _ClassesScreenState extends State<ClassesScreen>
       }
     }
   }
+
+  Future<void> _deleteSession(Map<String, dynamic> session) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Session'),
+        content: const Text('Are you sure you want to delete this session? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirmed == true) {
+      final isTeacherCreated = session['teacher_created'] == true;
+      final success = await _sessionService.deleteSession(session['id'], isTeacherCreated);
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Session deleted successfully'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+        _loadSessions();
+      } else if (!success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to delete session. Only teacher-created scheduled sessions can be deleted.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
 
   Future<void> _joinSession(Map<String, dynamic> session) async {
     final meetingLink = session['meeting_link'];
@@ -380,11 +390,34 @@ class _ClassesScreenState extends State<ClassesScreen>
     }
   }
 
+  Future<void> _navigateToCreateSession() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CreateSessionScreen(),
+      ),
+    );
+    
+    // If session was created successfully, reload sessions
+    if (result == true) {
+      _loadSessions();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
       backgroundColor: AppColors.background,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToCreateSession,
+        backgroundColor: AppColors.primary,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 28,
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -559,6 +592,7 @@ class _ClassesScreenState extends State<ClassesScreen>
     final language = session['language'] ?? {};
     final status = session['status'] ?? '';
     final isMakeup = session['is_makeup'] == true;
+    final isTeacherCreated = session['teacher_created'] == true;
 
     final scheduledDate = DateTime.parse(session['scheduled_date']);
     final dateStr = '${_getWeekday(scheduledDate.weekday)}, ${scheduledDate.day}';
@@ -619,6 +653,38 @@ class _ClassesScreenState extends State<ClassesScreen>
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.orange.shade700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+          // Teacher-created indicator
+          if (isTeacherCreated) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.edit,
+                    color: AppColors.primary,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'MANUALLY CREATED',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -862,6 +928,7 @@ class _ClassesScreenState extends State<ClassesScreen>
           // Actions (only for upcoming)
           if (isUpcoming) ...[
             const SizedBox(height: 10),
+            // First row: Link, Join, Start buttons
             Row(
               children: [
                 if (status == 'scheduled' || status == 'ready') ...[
@@ -901,8 +968,8 @@ class _ClassesScreenState extends State<ClassesScreen>
                     ),
                   ),
                 ],
-                // Show Start button only if: status is ready AND it's time to start
-                if (status == 'ready' && _canStartSession(session)) ...[
+                // Show Start button if status is ready
+                if (status == 'ready') ...[
                   const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton.icon(
@@ -933,37 +1000,25 @@ class _ClassesScreenState extends State<ClassesScreen>
                     ),
                   ),
                 ],
-                // Show countdown if session is ready but not yet time to start
-                if (status == 'ready' && !_canStartSession(session)) ...[
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.orange.shade200),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.schedule, color: Colors.orange.shade700, size: 14),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Not yet time',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.orange.shade700,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
+            // Second row: Delete button for teacher-created sessions
+            if (isTeacherCreated && (status == 'scheduled' || status == 'ready')) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _deleteSession(session),
+                  icon: const Icon(Icons.delete_outline, size: 14),
+                  label: const Text('Delete Session', style: TextStyle(fontSize: 12)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red.shade700,
+                    side: BorderSide(color: Colors.red.shade700),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                  ),
+                ),
+              ),
+            ],
           ],
         ],
       ),
