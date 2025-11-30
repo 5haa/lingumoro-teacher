@@ -9,6 +9,7 @@ import 'package:teacher/screens/schedule/schedule_screen.dart';
 import 'package:teacher/screens/classes/classes_screen.dart';
 import 'package:teacher/services/presence_service.dart';
 import 'package:teacher/services/locale_service.dart';
+import 'package:teacher/services/notification_badge_controller.dart';
 import 'package:teacher/l10n/app_localizations.dart';
 import 'package:teacher/providers/locale_provider.dart';
 
@@ -36,6 +37,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final _presenceService = PresenceService();
   final _localeService = LocaleService();
+  final _badgeController = NotificationBadgeController();
 
   @override
   void initState() {
@@ -64,6 +66,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       case AppLifecycleState.resumed:
         // App came to foreground
         _presenceService.startTracking();
+        // Trigger notification badge refresh when app resumes
+        _badgeController.triggerUpdate();
+        print('🔄 App resumed - triggering notification refresh');
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.inactive:
