@@ -486,6 +486,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get chatMessages => 'رسائل المحادثة';
   @override
   String get practiceReminders => 'تذكيرات التمرين';
+  @override
+  String get allNotificationsMarkedRead => 'تم وضع علامة مقروء على جميع الإشعارات';
+  @override
+  String get clearAllNotificationsTitle => 'مسح جميع الإشعارات';
+  @override
+  String get clearAllNotificationsMessage => 'هل أنت متأكد من مسح جميع الإشعارات؟ لا يمكن التراجع عن هذا الإجراء.';
+  @override
+  String get clearAllButton => 'مسح الكل';
+  @override
+  String notificationsCleared(int count) => 'تم مسح $count من الإشعارات';
+  @override
+  String get readAll => 'قراءة الكل';
+  @override
+  String get clear => 'مسح';
+  @override
+  String get youreAllCaughtUp => 'لقد اطلعت على كل شيء!';
   
   // Days of week
   @override
@@ -774,6 +790,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get timeslotsEnabled => 'تم تفعيل {count} أوقات';
   @override
   String get timeslotsDisabled => 'تم تعطيل {count} أوقات';
+  
+  // Schedule management
+  @override
+  String get myScheduleTitle => 'جدولي';
+  @override
+  String get noScheduleSet => 'لم يتم تعيين جدول';
+  @override
+  String get addYourAvailableTimeSlots => 'أضف الأوقات المتاحة لديك';
+  @override
+  String get addTimeSlot => 'إضافة وقت';
+  @override
+  String get deleteScheduleTitle => 'حذف الجدول؟';
+  @override
+  String get deleteScheduleMessage => 'هل أنت متأكد من حذف هذا الوقت من الجدول؟';
+  @override
+  String get slotLabel => 'وقت';
+  @override
+  String get slotsLabel => 'أوقات';
+  @override
+  String get dayOfWeekLabel => 'اليوم من الأسبوع';
+  @override
+  String get timeLabel => 'الوقت';
+  @override
+  String get toLabel => 'إلى';
   
   // Common additional
   @override
@@ -1065,5 +1105,43 @@ class AppLocalizationsAr extends AppLocalizations {
   String get startChatting => 'ابدأ المحادثة...';
   @override
   String get user => 'مستخدم';
+  
+  // Edit Profile
+  @override
+  String get chooseProfilePicture => 'اختر صورة الملف الشخصي';
+  @override
+  String get chooseFromGallery => 'اختر من المعرض';
+  @override
+  String get takeAPhoto => 'التقط صورة';
+  @override
+  String get removePhoto => 'إزالة الصورة';
+  @override
+  String errorPickingImage(String error) => 'خطأ في اختيار الصورة: $error';
+  @override
+  String get profileUpdatedSuccessfully => 'تم تحديث الملف الشخصي بنجاح!';
+  @override
+  String failedToUpdateProfile(String error) => 'فشل تحديث الملف الشخصي: $error';
+  @override
+  String get enterYourFullName => 'أدخل اسمك الكامل';
+  @override
+  String get pleaseEnterYourName => 'الرجاء إدخال اسمك';
+  @override
+  String get specializationExample => 'مثال: الأدب الإنجليزي، الرياضيات';
+  @override
+  String get tellStudentsAboutYourself => 'أخبر الطلاب عن نفسك...';
+  @override
+  String get introductionVideoYouTubeUrl => 'فيديو التعريف (رابط YouTube)';
+  @override
+  String get youtubeUrlHint => 'https://www.youtube.com/watch?v=...';
+  @override
+  String get pleaseEnterValidYouTubeUrl => 'الرجاء إدخال رابط YouTube صالح';
+  @override
+  String get zoomGoogleMeetEtc => 'Zoom، Google Meet، إلخ';
+  @override
+  String get saveChanges => 'حفظ التغييرات';
+  @override
+  String get addPhoto => 'إضافة صورة';
+  @override
+  String get changePhoto => 'تغيير الصورة';
 }
 

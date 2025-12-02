@@ -486,6 +486,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatMessages => 'Chat Messages';
   @override
   String get practiceReminders => 'Practice Reminders';
+  @override
+  String get allNotificationsMarkedRead => 'All notifications marked as read';
+  @override
+  String get clearAllNotificationsTitle => 'Clear All Notifications';
+  @override
+  String get clearAllNotificationsMessage => 'Are you sure you want to clear all notifications? This action cannot be undone.';
+  @override
+  String get clearAllButton => 'Clear All';
+  @override
+  String notificationsCleared(int count) => '$count notification${count == 1 ? '' : 's'} cleared';
+  @override
+  String get readAll => 'Read all';
+  @override
+  String get clear => 'Clear';
+  @override
+  String get youreAllCaughtUp => "You're all caught up!";
   
   // Days of week
   @override
@@ -774,6 +790,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timeslotsEnabled => '{count} timeslots enabled';
   @override
   String get timeslotsDisabled => '{count} timeslots disabled';
+  
+  // Schedule management
+  @override
+  String get myScheduleTitle => 'MY SCHEDULE';
+  @override
+  String get noScheduleSet => 'No Schedule Set';
+  @override
+  String get addYourAvailableTimeSlots => 'Add your available time slots';
+  @override
+  String get addTimeSlot => 'Add Time Slot';
+  @override
+  String get deleteScheduleTitle => 'Delete Schedule?';
+  @override
+  String get deleteScheduleMessage => 'Are you sure you want to delete this schedule slot?';
+  @override
+  String get slotLabel => 'slot';
+  @override
+  String get slotsLabel => 'slots';
+  @override
+  String get dayOfWeekLabel => 'Day of Week';
+  @override
+  String get timeLabel => 'Time';
+  @override
+  String get toLabel => 'to';
   
   // Common additional
   @override
@@ -1065,5 +1105,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startChatting => 'Start chatting...';
   @override
   String get user => 'User';
+  
+  // Edit Profile
+  @override
+  String get chooseProfilePicture => 'Choose Profile Picture';
+  @override
+  String get chooseFromGallery => 'Choose from Gallery';
+  @override
+  String get takeAPhoto => 'Take a Photo';
+  @override
+  String get removePhoto => 'Remove Photo';
+  @override
+  String errorPickingImage(String error) => 'Error picking image: $error';
+  @override
+  String get profileUpdatedSuccessfully => 'Profile updated successfully!';
+  @override
+  String failedToUpdateProfile(String error) => 'Failed to update profile: $error';
+  @override
+  String get enterYourFullName => 'Enter your full name';
+  @override
+  String get pleaseEnterYourName => 'Please enter your name';
+  @override
+  String get specializationExample => 'e.g., English Literature, Math';
+  @override
+  String get tellStudentsAboutYourself => 'Tell students about yourself...';
+  @override
+  String get introductionVideoYouTubeUrl => 'Introduction Video (YouTube URL)';
+  @override
+  String get youtubeUrlHint => 'https://www.youtube.com/watch?v=...';
+  @override
+  String get pleaseEnterValidYouTubeUrl => 'Please enter a valid YouTube URL';
+  @override
+  String get zoomGoogleMeetEtc => 'Zoom, Google Meet, etc.';
+  @override
+  String get saveChanges => 'SAVE CHANGES';
+  @override
+  String get addPhoto => 'Add Photo';
+  @override
+  String get changePhoto => 'Change Photo';
 }
 

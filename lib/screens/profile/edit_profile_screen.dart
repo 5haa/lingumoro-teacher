@@ -10,6 +10,7 @@ import '../../config/app_colors.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_back_button.dart';
+import '../../l10n/app_localizations.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> profile;
@@ -75,7 +76,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error picking image: $e'),
+            content: Text(AppLocalizations.of(context).errorPickingImage(e.toString())),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -111,9 +112,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const Text(
-                  'Choose Profile Picture',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context).chooseProfilePicture,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
@@ -133,9 +134,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       color: AppColors.primary,
                     ),
                   ),
-                  title: const Text(
-                    'Choose from Gallery',
-                    style: TextStyle(
+                  title: Text(
+                    AppLocalizations.of(context).chooseFromGallery,
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
@@ -158,9 +159,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       color: AppColors.primary,
                     ),
                   ),
-                  title: const Text(
-                    'Take a Photo',
-                    style: TextStyle(
+                  title: Text(
+                    AppLocalizations.of(context).takeAPhoto,
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
@@ -184,9 +185,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: Colors.red,
                       ),
                     ),
-                    title: const Text(
-                      'Remove Photo',
-                      style: TextStyle(
+                    title: Text(
+                      AppLocalizations.of(context).removePhoto,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                         color: Colors.red,
@@ -248,7 +249,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Profile updated successfully!'),
+            content: Text(AppLocalizations.of(context).profileUpdatedSuccessfully),
             backgroundColor: AppColors.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -262,7 +263,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to update profile: $e'),
+            content: Text(AppLocalizations.of(context).failedToUpdateProfile(e.toString())),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -308,8 +309,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       children: [
                         // Full Name
                         CustomTextField(
-                          labelText: 'Full Name',
-                          hintText: 'Enter your full name',
+                          labelText: AppLocalizations.of(context).fullName,
+                          hintText: AppLocalizations.of(context).enterYourFullName,
                           controller: _fullNameController,
                           prefixIcon: const FaIcon(
                             FontAwesomeIcons.user,
@@ -318,7 +319,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'Please enter your name';
+                              return AppLocalizations.of(context).pleaseEnterYourName;
                             }
                             return null;
                           },
@@ -327,8 +328,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                         // Specialization
                         CustomTextField(
-                          labelText: 'Specialization',
-                          hintText: 'e.g., English Literature, Math',
+                          labelText: AppLocalizations.of(context).specialization,
+                          hintText: AppLocalizations.of(context).specializationExample,
                           controller: _specializationController,
                           prefixIcon: const FaIcon(
                             FontAwesomeIcons.graduationCap,
@@ -340,8 +341,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                         // Bio
                         CustomTextField(
-                          labelText: 'Bio',
-                          hintText: 'Tell students about yourself...',
+                          labelText: AppLocalizations.of(context).bio,
+                          hintText: AppLocalizations.of(context).tellStudentsAboutYourself,
                           controller: _bioController,
                           maxLines: 4,
                           prefixIcon: const FaIcon(
@@ -354,8 +355,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                         // Intro Video URL
                         CustomTextField(
-                          labelText: 'Introduction Video (YouTube URL)',
-                          hintText: 'https://www.youtube.com/watch?v=...',
+                          labelText: AppLocalizations.of(context).introductionVideoYouTubeUrl,
+                          hintText: AppLocalizations.of(context).youtubeUrlHint,
                           controller: _introVideoController,
                           keyboardType: TextInputType.url,
                           prefixIcon: const FaIcon(
@@ -366,7 +367,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           validator: (value) {
                             if (value != null && value.trim().isNotEmpty) {
                               if (!value.contains('youtube.com') && !value.contains('youtu.be')) {
-                                return 'Please enter a valid YouTube URL';
+                                return AppLocalizations.of(context).pleaseEnterValidYouTubeUrl;
                               }
                             }
                             return null;
@@ -376,8 +377,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                         // Meeting Link
                         CustomTextField(
-                          labelText: 'Default Meeting Link',
-                          hintText: 'Zoom, Google Meet, etc.',
+                          labelText: AppLocalizations.of(context).defaultMeetingLink,
+                          hintText: AppLocalizations.of(context).zoomGoogleMeetEtc,
                           controller: _meetingLinkController,
                           keyboardType: TextInputType.url,
                           prefixIcon: const FaIcon(
@@ -390,7 +391,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                         // Save Button
                         CustomButton(
-                          text: 'SAVE CHANGES',
+                          text: AppLocalizations.of(context).saveChanges,
                           onPressed: _isLoading ? () {} : _saveProfile,
                           isLoading: _isLoading,
                         ),
@@ -577,8 +578,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const SizedBox(width: 8),
                 Text(
                   _currentAvatarUrl == null && _newAvatarFile == null
-                      ? 'Add Photo'
-                      : 'Change Photo',
+                      ? AppLocalizations.of(context).addPhoto
+                      : AppLocalizations.of(context).changePhoto,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,

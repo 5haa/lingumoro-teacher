@@ -276,6 +276,15 @@ abstract class AppLocalizations {
   String get sessionReminders;
   String get chatMessages;
   String get practiceReminders;
+  // Notifications - additional
+  String get allNotificationsMarkedRead;
+  String get clearAllNotificationsTitle;
+  String get clearAllNotificationsMessage;
+  String get clearAllButton;
+  String notificationsCleared(int count);
+  String get readAll;
+  String get clear;
+  String get youreAllCaughtUp;
   
   // Days of week
   String get monday;
@@ -433,6 +442,19 @@ abstract class AppLocalizations {
   String get timeslotsEnabled;
   String get timeslotsDisabled;
   
+  // Schedule management
+  String get myScheduleTitle;
+  String get noScheduleSet;
+  String get addYourAvailableTimeSlots;
+  String get addTimeSlot;
+  String get deleteScheduleTitle;
+  String get deleteScheduleMessage;
+  String get slotLabel;
+  String get slotsLabel;
+  String get dayOfWeekLabel;
+  String get timeLabel;
+  String get toLabel;
+  
   // Common additional
   String get level;
   String levelDisplay(int level);
@@ -585,6 +607,26 @@ abstract class AppLocalizations {
   String get attachmentGeneric;
   String get startChatting;
   String get user;
+  
+  // Edit Profile
+  String get chooseProfilePicture;
+  String get chooseFromGallery;
+  String get takeAPhoto;
+  String get removePhoto;
+  String errorPickingImage(String error);
+  String get profileUpdatedSuccessfully;
+  String failedToUpdateProfile(String error);
+  String get enterYourFullName;
+  String get pleaseEnterYourName;
+  String get specializationExample;
+  String get tellStudentsAboutYourself;
+  String get introductionVideoYouTubeUrl;
+  String get youtubeUrlHint;
+  String get pleaseEnterValidYouTubeUrl;
+  String get zoomGoogleMeetEtc;
+  String get saveChanges;
+  String get addPhoto;
+  String get changePhoto;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

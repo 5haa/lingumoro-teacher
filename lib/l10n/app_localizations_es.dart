@@ -486,6 +486,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get chatMessages => 'Mensajes de Chat';
   @override
   String get practiceReminders => 'Recordatorios de Práctica';
+  @override
+  String get allNotificationsMarkedRead => 'Todas las notificaciones marcadas como leídas';
+  @override
+  String get clearAllNotificationsTitle => 'Borrar Todas las Notificaciones';
+  @override
+  String get clearAllNotificationsMessage => '¿Estás seguro de que quieres borrar todas las notificaciones? Esta acción no se puede deshacer.';
+  @override
+  String get clearAllButton => 'Borrar Todo';
+  @override
+  String notificationsCleared(int count) => 'Se borraron $count notificaciones';
+  @override
+  String get readAll => 'Leer todo';
+  @override
+  String get clear => 'Borrar';
+  @override
+  String get youreAllCaughtUp => '¡Ya estás al día!';
   
   // Days of week
   @override
@@ -774,6 +790,30 @@ class AppLocalizationsEs extends AppLocalizations {
   String get timeslotsEnabled => '{count} horarios habilitados';
   @override
   String get timeslotsDisabled => '{count} horarios deshabilitados';
+  
+  // Schedule management
+  @override
+  String get myScheduleTitle => 'MI HORARIO';
+  @override
+  String get noScheduleSet => 'No hay horario configurado';
+  @override
+  String get addYourAvailableTimeSlots => 'Añade tus horarios disponibles';
+  @override
+  String get addTimeSlot => 'Agregar Horario';
+  @override
+  String get deleteScheduleTitle => '¿Eliminar horario?';
+  @override
+  String get deleteScheduleMessage => '¿Estás seguro de que quieres eliminar este horario?';
+  @override
+  String get slotLabel => 'horario';
+  @override
+  String get slotsLabel => 'horarios';
+  @override
+  String get dayOfWeekLabel => 'Día de la semana';
+  @override
+  String get timeLabel => 'Hora';
+  @override
+  String get toLabel => 'a';
   
   // Common additional
   @override
@@ -1065,5 +1105,43 @@ class AppLocalizationsEs extends AppLocalizations {
   String get startChatting => 'Comienza a chatear...';
   @override
   String get user => 'Usuario';
+  
+  // Edit Profile
+  @override
+  String get chooseProfilePicture => 'Elegir Foto de Perfil';
+  @override
+  String get chooseFromGallery => 'Elegir de la Galería';
+  @override
+  String get takeAPhoto => 'Tomar una Foto';
+  @override
+  String get removePhoto => 'Eliminar Foto';
+  @override
+  String errorPickingImage(String error) => 'Error al elegir imagen: $error';
+  @override
+  String get profileUpdatedSuccessfully => '¡Perfil actualizado exitosamente!';
+  @override
+  String failedToUpdateProfile(String error) => 'Error al actualizar perfil: $error';
+  @override
+  String get enterYourFullName => 'Ingresa tu nombre completo';
+  @override
+  String get pleaseEnterYourName => 'Por favor ingresa tu nombre';
+  @override
+  String get specializationExample => 'ej., Literatura Inglesa, Matemáticas';
+  @override
+  String get tellStudentsAboutYourself => 'Cuéntales a los estudiantes sobre ti...';
+  @override
+  String get introductionVideoYouTubeUrl => 'Video de Introducción (URL de YouTube)';
+  @override
+  String get youtubeUrlHint => 'https://www.youtube.com/watch?v=...';
+  @override
+  String get pleaseEnterValidYouTubeUrl => 'Por favor ingresa una URL válida de YouTube';
+  @override
+  String get zoomGoogleMeetEtc => 'Zoom, Google Meet, etc.';
+  @override
+  String get saveChanges => 'GUARDAR CAMBIOS';
+  @override
+  String get addPhoto => 'Agregar Foto';
+  @override
+  String get changePhoto => 'Cambiar Foto';
 }
 

@@ -4,6 +4,7 @@ import '../../config/app_colors.dart';
 import '../../widgets/custom_back_button.dart';
 import '../../services/schedule_service.dart';
 import '../../services/auth_service.dart';
+import '../../l10n/app_localizations.dart';
 import 'timeslot_management_screen.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -19,15 +20,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   List<Map<String, dynamic>> _schedules = [];
   bool _isLoading = true;
 
-  final List<String> _dayNames = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
+  List<String> _getDayNames(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return [
+      l10n.sunday,
+      l10n.monday,
+      l10n.tuesday,
+      l10n.wednesday,
+      l10n.thursday,
+      l10n.friday,
+      l10n.saturday,
+    ];
+  }
 
   @override
   void initState() {
@@ -95,6 +99,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Future<void> _deleteSchedule(String scheduleId) async {
+    final l10n = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -102,17 +107,17 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           borderRadius: BorderRadius.circular(20),
         ),
         backgroundColor: AppColors.white,
-        title: const Text(
-          'Delete Schedule?',
-          style: TextStyle(
+        title: Text(
+          l10n.deleteScheduleTitle,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
-        content: const Text(
-          'Are you sure you want to delete this schedule slot?',
-          style: TextStyle(
+        content: Text(
+          l10n.deleteScheduleMessage,
+          style: const TextStyle(
             fontSize: 15,
             color: AppColors.textSecondary,
           ),
@@ -123,9 +128,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 15,
               ),
@@ -143,9 +148,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 shadowColor: Colors.transparent,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
-              child: const Text(
-                'Delete',
-                style: TextStyle(
+            child: Text(
+              l10n.deleteButton,
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -176,6 +181,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -188,11 +194,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 children: [
                   const CustomBackButton(),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'MY SCHEDULE',
+                      l10n.myScheduleTitle,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -229,7 +235,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           ),
                         );
                       },
-                      tooltip: 'Manage 30-min Timeslots',
+                      tooltip: l10n.manageTimeslots,
                     ),
                   ),
                 ],
@@ -259,9 +265,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         onPressed: _addSchedule,
         backgroundColor: AppColors.primary,
         icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white, size: 18),
-        label: const Text(
-          'Add Time Slot',
-          style: TextStyle(
+        label: Text(
+          l10n.addTimeSlot,
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
@@ -271,6 +277,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -290,7 +297,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
           const SizedBox(height: 20),
           Text(
-            'No Schedule Set',
+            l10n.noScheduleSet,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -299,7 +306,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Add your available time slots',
+            l10n.addYourAvailableTimeSlots,
             style: TextStyle(
               fontSize: 14,
               color: AppColors.textSecondary.withOpacity(0.5),
@@ -321,9 +328,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             child: ElevatedButton.icon(
               onPressed: _addSchedule,
               icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white, size: 16),
-              label: const Text(
-                'Add Time Slot',
-                style: TextStyle(
+              label: Text(
+                l10n.addTimeSlot,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
@@ -408,7 +415,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        _dayNames[dayOfWeek],
+                        _getDayNames(context)[dayOfWeek],
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -423,7 +430,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        '${daySchedules.length} ${daySchedules.length == 1 ? 'slot' : 'slots'}',
+                        '${daySchedules.length} ${daySchedules.length == 1 ? AppLocalizations.of(context).slotLabel : AppLocalizations.of(context).slotsLabel}',
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -502,7 +509,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  isAvailable ? 'Available' : 'Unavailable',
+                                  isAvailable ? AppLocalizations.of(context).available : AppLocalizations.of(context).disabled,
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: isAvailable
@@ -569,15 +576,18 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
   TimeOfDay _startTime = const TimeOfDay(hour: 9, minute: 0);
   TimeOfDay _endTime = const TimeOfDay(hour: 10, minute: 0);
 
-  final List<String> _dayNames = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
+  List<String> _getDayNames(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return [
+      l10n.sunday,
+      l10n.monday,
+      l10n.tuesday,
+      l10n.wednesday,
+      l10n.thursday,
+      l10n.friday,
+      l10n.saturday,
+    ];
+  }
 
   Future<void> _selectStartTime() async {
     final time = await showTimePicker(
@@ -622,6 +632,7 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
@@ -635,9 +646,9 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title
-              const Text(
-                'Add Time Slot',
-                style: TextStyle(
+              Text(
+                l10n.addTimeSlot,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -646,9 +657,9 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
               const SizedBox(height: 18),
               
               // Day Selection
-              const Text(
-                'Day of Week',
-                style: TextStyle(
+              Text(
+                l10n.dayOfWeekLabel,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primary,
@@ -686,7 +697,7 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
                   items: List.generate(7, (index) {
                     return DropdownMenuItem(
                       value: index,
-                      child: Text(_dayNames[index]),
+                      child: Text(_getDayNames(context)[index]),
                     );
                   }),
                   onChanged: (value) {
@@ -700,9 +711,9 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
               const SizedBox(height: 18),
               
               // Time Selection
-              const Text(
-                'Time',
-                style: TextStyle(
+              Text(
+                l10n.timeLabel,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primary,
@@ -758,11 +769,11 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
                       ),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      'to',
-                      style: TextStyle(
+                      l10n.toLabel,
+                      style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
                       ),
@@ -831,9 +842,9 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.cancel,
+                        style: const TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -865,9 +876,9 @@ class _AddScheduleDialogState extends State<AddScheduleDialog> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child: const Text(
-                          'Add',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.addTimeSlot,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
