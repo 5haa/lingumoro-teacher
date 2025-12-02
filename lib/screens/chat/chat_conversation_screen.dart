@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -759,9 +760,11 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
+      body: Directionality(
+        textDirection: ui.TextDirection.ltr,
+        child: SafeArea(
+          child: Column(
+            children: [
             // Header
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1084,7 +1087,8 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
 
             // Input Area
             _buildMessageInput(),
-          ],
+            ],
+          ),
         ),
       ),
     );
