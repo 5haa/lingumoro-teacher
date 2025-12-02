@@ -21,6 +21,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get retry => 'إعادة المحاولة';
   @override
+  String get requestTimedOut => 'انتهت مهلة الطلب. يرجى التحقق من اتصالك بالإنترنت.';
+  @override
+  String get failedToLoadStudents => 'فشل تحميل الطلاب';
+  @override
   String get save => 'حفظ';
   @override
   String get delete => 'حذف';
@@ -95,7 +99,35 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get forgotPassword => 'نسيت كلمة المرور؟';
   @override
+  String get forgotPasswordTitle => 'نسيت كلمة المرور';
+  @override
+  String get forgotPasswordDescription => 'أدخل عنوان بريدك الإلكتروني وسنرسل لك رمز التحقق لإعادة تعيين كلمة المرور';
+  @override
+  String get pleaseEnterYourEmail => 'الرجاء إدخال بريدك الإلكتروني';
+  @override
+  String get verificationCodeSentToEmail => 'تم إرسال رمز التحقق إلى بريدك الإلكتروني';
+  @override
+  String get failedToSendCode => 'فشل إرسال الرمز';
+  @override
+  String get sendCode => 'إرسال الرمز';
+  @override
   String get resetPassword => 'إعادة تعيين كلمة المرور';
+  @override
+  String get resetPasswordTitle => 'إعادة تعيين كلمة المرور';
+  @override
+  String get resetPasswordDescription => 'أدخل كلمة المرور الجديدة أدناه';
+  @override
+  String get enterNewPasswordBelow => 'أدخل كلمة المرور الجديدة أدناه';
+  @override
+  String get newPassword => 'كلمة المرور الجديدة';
+  @override
+  String get confirmNewPassword => 'تأكيد كلمة المرور الجديدة';
+  @override
+  String get passwordResetSuccessfully => 'تم إعادة تعيين كلمة المرور بنجاح!';
+  @override
+  String get failedToResetPassword => 'فشل إعادة تعيين كلمة المرور';
+  @override
+  String get userNotLoggedIn => 'المستخدم غير مسجل الدخول';
   @override
   String get dontHaveAccount => 'ليس لديك حساب؟';
   @override
@@ -170,6 +202,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get security => 'الأمان';
   @override
   String get changePassword => 'تغيير كلمة المرور';
+  @override
+  String get changePasswordTitle => 'تغيير كلمة المرور';
+  @override
+  String changePasswordDescription(String email) => 'لتغيير كلمة المرور، نحتاج للتحقق من هويتك. سنرسل رمز التحقق إلى $email';
+  @override
+  String get sendVerificationCode => 'إرسال رمز التحقق';
   @override
   String get updatePassword => 'تحديث كلمة المرور';
   @override
@@ -399,7 +437,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get studentsList => 'الطلاب';
   @override
+  String get searchStudents => 'البحث عن الطلاب...';
+  @override
   String get noStudentsFound => 'لم يتم العثور على طلاب';
+  @override
+  String get studentsWillAppearHere => 'سيظهر الطلاب هنا بمجرد الاشتراك في دوراتك';
   @override
   String get sendChatRequest => 'إرسال طلب محادثة';
   @override
@@ -597,9 +639,29 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get pointsAwardedByYou => 'النقاط الممنوحة من قبلك:';
   @override
-  String get pointLimits => 'حدود النقاط:';
+  String get pointLimits => 'حدود النقاط';
   @override
-  String get maxPerAward => 'الحد الأقصى لكل منحة:';
+  String get selectPointsToAward => 'اختر النقاط للمنح';
+  @override
+  String get totalPoints => 'إجمالي النقاط';
+  @override
+  String youveAwardedPointsToThisStudent(int points) => 'لقد منحت $points نقطة لهذا الطالب';
+  @override
+  String get orEnterCustomAmount => 'أو أدخل مبلغاً مخصصاً';
+  @override
+  String get pleaseEnterOrSelectPoints => 'يرجى إدخال أو اختيار النقاط';
+  @override
+  String maxPointsPerAwardValidation(int max) => 'الحد الأقصى $max نقطة لكل منحة';
+  @override
+  String get addANote => 'أضف ملاحظة';
+  @override
+  String get whyIsStudentReceivingPoints => 'لماذا يحصل هذا الطالب على هذه النقاط؟';
+  @override
+  String get noteExample => 'مثال: مشاركة ممتازة في درس اليوم!';
+  @override
+  String get pleaseAddNoteExplainingAward => 'يرجى إضافة ملاحظة توضح المنحة';
+  @override
+  String get maxPerAward => 'لكل منحة';
   @override
   String get maxPerStudent => 'الحد الأقصى لكل طالب:';
   @override
@@ -717,7 +779,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get level => 'المستوى';
   @override
+  String levelDisplay(int level) => 'المستوى $level';
+  @override
   String get pts => 'نقطة';
+  @override
+  String awarded(int points) => 'تم منحه: $points';
   @override
   String get session => 'جلسة';
   @override
@@ -876,6 +942,58 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get dec => 'ديسمبر';
   
+  // Profile additional
+  @override
+  String get allReviews => 'جميع التقييمات';
+  @override
+  String get logoutTitle => 'تسجيل الخروج';
+  @override
+  String get logoutConfirmMessage => 'هل أنت متأكد من تسجيل الخروج؟';
+  @override
+  String get logoutButton => 'تسجيل الخروج';
+  @override
+  String get logoutFailed => 'فشل تسجيل الخروج';
+  @override
+  String get personalInformationSection => 'المعلومات الشخصية';
+  @override
+  String get editProfileTitle => 'تعديل الملف الشخصي';
+  @override
+  String get updateProfileInfo => 'تحديث معلومات ملفك الشخصي';
+  @override
+  String get securitySection => 'الأمان';
+  @override
+  String get teacherPlaceholder => 'معلم';
+  @override
+  String get languageTeacher => 'معلم لغة';
+  
+  // Profile page - additional
+  @override
+  String get profileTitle => 'الملف الشخصي';
+  @override
+  String get aboutMe => 'نبذة عني';
+  @override
+  String get accountInformation => 'معلومات الحساب';
+  @override
+  String get notAvailable => 'غير متاح';
+  @override
+  String get memberSince => 'عضو منذ';
+  @override
+  String get recentReviews => 'التقييمات الأخيرة';
+  @override
+  String get viewAll => 'عرض الكل';
+  @override
+  String get updateYourPassword => 'تحديث كلمة مرور حسابك';
+  @override
+  String get logoutButtonText => 'تسجيل خروج';
+  @override
+  String get defaultMeetingLink => 'رابط الاجتماع الافتراضي';
+  @override
+  String get editMeetingLinkTooltip => 'تعديل رابط الاجتماع';
+  @override
+  String get meetingLinkNotSet => 'لم يتم تعيينه - انقر فوق تعديل لإضافة رابط الاجتماع الخاص بك';
+  @override
+  String get setMeetingLinkMessage => 'عيّن رابط الاجتماع حتى يتمكن الطلاب من الانضمام إلى جلساتك';
+  
   // Chat file operations
   @override
   String get downloading => 'جارٍ التنزيل';
@@ -885,5 +1003,67 @@ class AppLocalizationsAr extends AppLocalizations {
   String get failedToLoadImage => 'فشل تحميل الصورة';
   @override
   String get tapToRetry => 'اضغط للمحاولة مرة أخرى';
+  
+  // Chat list screen
+  @override
+  String get messagesTitle => 'الرسائل';
+  @override
+  String get searchMessages => 'البحث في الرسائل...';
+  @override
+  String get showConversations => 'عرض المحادثات';
+  @override
+  String get startNewChat => 'بدء محادثة جديدة';
+  @override
+  String get requestAccepted => 'تم قبول الطلب!';
+  @override
+  String get failedToAcceptRequest => 'فشل قبول الطلب';
+  @override
+  String get requestRejected => 'تم رفض الطلب';
+  @override
+  String get failedToRejectRequest => 'فشل رفض الطلب';
+  @override
+  String get justNow => 'الآن';
+  @override
+  String minutesAgo(int minutes) => 'منذ ${minutes} د';
+  @override
+  String get oneDayAgo => 'منذ يوم';
+  @override
+  String daysAgo(int days) => 'منذ ${days} أيام';
+  @override
+  String get noResultsFound => 'لا توجد نتائج';
+  @override
+  String get noMessagesYet => 'لا توجد رسائل بعد';
+  @override
+  String get tryDifferentKeywords => 'جرب البحث بكلمات مفتاحية مختلفة';
+  @override
+  String get startConversationWithStudents => 'ابدأ محادثة مع طلابك';
+  @override
+  String get chatRequestTitle => 'طلب محادثة';
+  @override
+  String get noMessageProvided => 'لم يتم تقديم رسالة';
+  @override
+  String get sentChatRequest => 'أرسل طلب محادثة';
+  @override
+  String get deleteChat => 'حذف المحادثة';
+  @override
+  String get deleteChatQuestion => 'حذف المحادثة؟';
+  @override
+  String deleteChatConfirmation(String name) => 'هل أنت متأكد من حذف هذه المحادثة مع $name؟ لا يمكن التراجع عن هذا الإجراء.';
+  @override
+  String get noStudentsAvailable => 'لا يوجد طلاب متاحون';
+  @override
+  String get waitForStudentsToSubscribe => 'انتظر حتى يشترك الطلاب في دوراتك';
+  @override
+  String get imageAttachment => '🖼️ صورة';
+  @override
+  String get voiceMessage => '🎤 رسالة صوتية';
+  @override
+  String get fileAttachment => '📎 ملف';
+  @override
+  String get attachmentGeneric => '📎 مرفق';
+  @override
+  String get startChatting => 'ابدأ المحادثة...';
+  @override
+  String get user => 'مستخدم';
 }
 

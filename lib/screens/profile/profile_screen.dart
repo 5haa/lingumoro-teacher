@@ -269,9 +269,9 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'All Reviews',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context).allReviews,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -305,26 +305,27 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
   }
 
   Future<void> _handleLogout() async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Text(
-          'Logout',
-          style: TextStyle(
+        title: Text(
+          l10n.logoutTitle,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: const Text('Are you sure you want to logout?'),
+        content: Text(l10n.logoutConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           Container(
@@ -342,9 +343,9 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
-                'Logout',
-                style: TextStyle(
+              child: Text(
+                l10n.logoutButton,
+                style: const TextStyle(
                   color: AppColors.white,
                   fontWeight: FontWeight.bold,
                 ),
@@ -367,7 +368,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Logout failed: $e'),
+              content: Text('${l10n.logoutFailed}: $e'),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -419,11 +420,11 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                       },
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
-                        'PROFILE',
-                        style: TextStyle(
+                        AppLocalizations.of(context).profileTitle,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -464,43 +465,43 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                             
                             // Bio Section
                             if (_profile?['bio'] != null && _profile!['bio'].toString().isNotEmpty) ...[
-                              _buildSectionTitle('About Me'),
+                              _buildSectionTitle(AppLocalizations.of(context).aboutMe),
                               const SizedBox(height: 12),
                               _buildBioCard(),
                               const SizedBox(height: 20),
                             ],
                             
                             // Account Information
-                            _buildSectionTitle('Account Information'),
+                            _buildSectionTitle(AppLocalizations.of(context).accountInformation),
                             const SizedBox(height: 12),
                             _buildInfoCard(
-                              'Full Name',
-                              _profile?['full_name'] ?? 'N/A',
+                              AppLocalizations.of(context).fullName,
+                              _profile?['full_name'] ?? AppLocalizations.of(context).notAvailable,
                               FontAwesomeIcons.user,
                             ),
                             const SizedBox(height: 10),
                             
                             if (_profile?['specialization'] != null) ...[
                               _buildInfoCard(
-                                'Specialization',
+                                AppLocalizations.of(context).specialization,
                                 _profile!['specialization'],
                                 FontAwesomeIcons.graduationCap,
                               ),
                               const SizedBox(height: 10),
                             ],
                             
-                            _buildInfoCard(
-                              'Email',
-                              _profile?['email'] ?? 'N/A',
-                              FontAwesomeIcons.envelope,
-                            ),
+            _buildInfoCard(
+              AppLocalizations.of(context).email,
+              _profile?['email'] ?? AppLocalizations.of(context).notAvailable,
+              FontAwesomeIcons.envelope,
+            ),
                             const SizedBox(height: 10),
                             
                             _buildInfoCard(
-                              'Member Since',
+                              AppLocalizations.of(context).memberSince,
                               _profile?['created_at'] != null
                                   ? _formatDate(_profile!['created_at'])
-                                  : 'N/A',
+                                  : AppLocalizations.of(context).notAvailable,
                               FontAwesomeIcons.calendar,
                             ),
                             const SizedBox(height: 20),
@@ -514,12 +515,12 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  _buildSectionTitle('Recent Reviews'),
+                                  _buildSectionTitle(AppLocalizations.of(context).recentReviews),
                                   TextButton(
                                     onPressed: _showAllReviewsDialog,
-                                    child: const Text(
-                                      'View All',
-                                      style: TextStyle(
+                                    child: Text(
+                                      AppLocalizations.of(context).viewAll,
+                                      style: const TextStyle(
                                         color: AppColors.primary,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -538,12 +539,12 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                             ],
                             
                             // Personal Information Section
-                            _buildSectionTitle('Personal Information'),
+                            _buildSectionTitle(AppLocalizations.of(context).personalInformationSection),
                             const SizedBox(height: 12),
                             _buildActionCard(
                               icon: FontAwesomeIcons.penToSquare,
-                              title: 'Edit Profile',
-                              subtitle: 'Update your profile information',
+                              title: AppLocalizations.of(context).editProfileTitle,
+                              subtitle: AppLocalizations.of(context).updateProfileInfo,
                               onTap: () async {
                                 final result = await Navigator.push(
                                   context,
@@ -560,12 +561,12 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                             const SizedBox(height: 25),
                             
                             // Security Section
-                            _buildSectionTitle('Security'),
+                            _buildSectionTitle(AppLocalizations.of(context).securitySection),
                             const SizedBox(height: 12),
                             _buildActionCard(
                               icon: FontAwesomeIcons.lock,
-                              title: 'Change Password',
-                              subtitle: 'Update your account password',
+                              title: AppLocalizations.of(context).changePassword,
+                              subtitle: AppLocalizations.of(context).updateYourPassword,
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -587,9 +588,9 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                                   size: 16,
                                   color: Colors.white,
                                 ),
-                                label: const Text(
-                                  'LOGOUT',
-                                  style: TextStyle(
+                                label: Text(
+                                  AppLocalizations.of(context).logoutButtonText,
+                                  style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -619,7 +620,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
   }
 
   Widget _buildProfileHeader() {
-    final fullName = _profile?['full_name'] ?? 'Teacher';
+    final fullName = _profile?['full_name'] ?? AppLocalizations.of(context).teacherPlaceholder;
     final initials = fullName.isNotEmpty
         ? fullName.split(' ').map((n) => n[0]).take(2).join().toUpperCase()
         : 'T';
@@ -784,7 +785,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          'Language Teacher',
+                          AppLocalizations.of(context).languageTeacher,
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
@@ -835,18 +836,18 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                       gradient: AppColors.greenGradient,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        FaIcon(
+                        const FaIcon(
                           FontAwesomeIcons.penToSquare,
                           size: 12,
                           color: Colors.white,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
-                          'Edit Profile',
-                          style: TextStyle(
+                          AppLocalizations.of(context).editProfileTitle,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -1003,9 +1004,9 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Default Meeting Link',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context).defaultMeetingLink,
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -1017,7 +1018,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                 icon: const FaIcon(FontAwesomeIcons.pen, size: 14),
                 color: AppColors.primary,
                 onPressed: _showEditMeetingLinkDialog,
-                tooltip: 'Edit Meeting Link',
+                tooltip: AppLocalizations.of(context).editMeetingLinkTooltip,
               ),
             ],
           ),
@@ -1025,7 +1026,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
           Text(
             hasLink
                 ? _profile!['meeting_link']
-                : 'Not set - Click edit to add your meeting link',
+                : AppLocalizations.of(context).meetingLinkNotSet,
             style: TextStyle(
               fontSize: 13,
               color: hasLink ? AppColors.textPrimary : AppColors.textSecondary,
@@ -1053,7 +1054,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Set your meeting link so students can join your sessions',
+                      AppLocalizations.of(context).setMeetingLinkMessage,
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.orange.shade700,

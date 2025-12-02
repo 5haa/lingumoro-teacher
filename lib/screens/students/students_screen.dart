@@ -4,6 +4,7 @@ import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/services/point_award_service.dart';
 import 'package:teacher/services/preload_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../l10n/app_localizations.dart';
 
 class StudentsScreen extends StatefulWidget {
   const StudentsScreen({super.key});
@@ -97,7 +98,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
         const Duration(seconds: 10),
         onTimeout: () {
           print('Timeout loading students');
-          throw Exception('Request timed out. Please check your internet connection.');
+          throw Exception(AppLocalizations.of(context).requestTimedOut);
         },
       );
       
@@ -121,7 +122,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Failed to load students: ${e.toString()}';
+          _errorMessage = '${AppLocalizations.of(context).failedToLoadStudents}: ${e.toString()}';
         });
       }
     }
@@ -166,11 +167,11 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                       },
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
-                        'STUDENTS',
-                        style: TextStyle(
+                        AppLocalizations.of(context).studentsList,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -211,9 +212,9 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                     Expanded(
                       child: TextField(
                         controller: _searchController,
-                        decoration: const InputDecoration(
-                          hintText: 'Search students...',
-                          hintStyle: TextStyle(
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context).searchStudents,
+                          hintStyle: const TextStyle(
                             color: Color(0xFF999999),
                             fontSize: 15,
                           ),
@@ -263,7 +264,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                 ElevatedButton.icon(
                                   onPressed: _loadData,
                                   icon: const FaIcon(FontAwesomeIcons.arrowRotateRight, size: 16),
-                                  label: const Text('Retry'),
+                                  label: Text(AppLocalizations.of(context).retry),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
                                     foregroundColor: AppColors.white,
@@ -300,8 +301,8 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                     const SizedBox(height: 20),
                                     Text(
                                       _searchController.text.isNotEmpty
-                                          ? 'No students found'
-                                          : 'No students enrolled yet',
+                                          ? AppLocalizations.of(context).noStudentsFound
+                                          : AppLocalizations.of(context).noStudentsEnrolled,
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -311,8 +312,8 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                     const SizedBox(height: 8),
                                     Text(
                                       _searchController.text.isNotEmpty
-                                          ? 'Try searching with different keywords'
-                                          : 'Students will appear here once they subscribe to your courses',
+                                          ? AppLocalizations.of(context).tryDifferentKeywords
+                                          : AppLocalizations.of(context).studentsWillAppearHere,
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: AppColors.textSecondary.withOpacity(0.5),
@@ -342,7 +343,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
   }
 
   Widget _buildStudentCard(Map<String, dynamic> student) {
-    final name = student['full_name'] ?? 'Unknown';
+    final name = student['full_name'] ?? AppLocalizations.of(context).studentPlaceholder;
     final email = student['email'] ?? '';
     final avatarUrl = student['avatar_url'];
     final level = student['level'] ?? 1;
@@ -432,7 +433,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        'Level $level',
+                        AppLocalizations.of(context).levelDisplay(level),
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
@@ -463,7 +464,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          'Awarded: $totalAwarded',
+                          AppLocalizations.of(context).awarded(totalAwarded),
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
@@ -492,18 +493,18 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      FaIcon(
+                      const FaIcon(
                         FontAwesomeIcons.star,
                         size: 14,
                         color: AppColors.white,
                       ),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
                       Text(
-                        'Award',
-                        style: TextStyle(
+                        AppLocalizations.of(context).award,
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: AppColors.white,
@@ -603,10 +604,10 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                       ),
                     ),
                     const SizedBox(width: 16),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'Award Points',
-                        style: TextStyle(
+                        AppLocalizations.of(context).awardPoints,
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -672,7 +673,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      student['full_name'] ?? 'Student',
+                                      student['full_name'] ?? AppLocalizations.of(context).studentPlaceholder,
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -717,9 +718,9 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                 ),
                                 child: Column(
                                   children: [
-                                    const Text(
-                                      'Current Level',
-                                      style: TextStyle(
+                                    Text(
+                                      AppLocalizations.of(context).currentLevel,
+                                      style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.white70,
                                         fontWeight: FontWeight.w500,
@@ -757,9 +758,9 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                 ),
                                 child: Column(
                                   children: [
-                                    const Text(
-                                      'Total Points',
-                                      style: TextStyle(
+                                    Text(
+                                      AppLocalizations.of(context).totalPoints,
+                                      style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.white70,
                                         fontWeight: FontWeight.w500,
@@ -803,7 +804,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'You\'ve awarded $totalAwarded points to this student',
+                                  AppLocalizations.of(context).youveAwardedPointsToThisStudent(totalAwarded),
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
@@ -818,9 +819,9 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                         const SizedBox(height: 24),
 
                         // Quick Select Points
-                        const Text(
-                          'Select Points to Award',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context).selectPointsToAward,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
@@ -931,7 +932,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                               }
                             },
                             decoration: InputDecoration(
-                              labelText: 'Or enter custom amount',
+                              labelText: AppLocalizations.of(context).orEnterCustomAmount,
                               labelStyle: const TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 14,
@@ -944,7 +945,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                   color: AppColors.primary,
                                 ),
                               ),
-                              hintText: 'Enter points',
+                              hintText: AppLocalizations.of(context).enterPoints,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 borderSide: BorderSide.none,
@@ -967,14 +968,14 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter or select points';
+                                return AppLocalizations.of(context).pleaseEnterOrSelectPoints;
                               }
                               final points = int.tryParse(value);
                               if (points == null || points <= 0) {
-                                return 'Please enter a valid positive number';
+                                return AppLocalizations.of(context).enterValidPositiveNumber;
                               }
                               if (_settings != null && points > _settings!['max_points_per_award']!) {
-                                return 'Max ${_settings!['max_points_per_award']} points per award';
+                                return AppLocalizations.of(context).maxPointsPerAwardValidation(_settings!['max_points_per_award']!);
                               }
                               return null;
                             },
@@ -998,9 +999,9 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                   children: [
                                     Icon(Icons.info_outline, size: 18, color: Colors.blue.shade700),
                                     const SizedBox(width: 8),
-                                    const Text(
-                                      'Point Limits',
-                                      style: TextStyle(
+                                    Text(
+                                      AppLocalizations.of(context).pointLimits,
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.textPrimary,
@@ -1009,10 +1010,10 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                                   ],
                                 ),
                                 const SizedBox(height: 10),
-                                _buildLimitRow('Per award', _settings!['max_points_per_award']!),
-                                _buildLimitRow('Per student', _settings!['max_points_per_student_total']!),
-                                _buildLimitRow('Per day', _settings!['max_points_per_day']!),
-                                _buildLimitRow('Per week', _settings!['max_points_per_week']!),
+                                _buildLimitRow(AppLocalizations.of(context).maxPerAward, _settings!['max_points_per_award']!),
+                                _buildLimitRow(AppLocalizations.of(context).maxPerStudent, _settings!['max_points_per_student_total']!),
+                                _buildLimitRow(AppLocalizations.of(context).maxPerDay, _settings!['max_points_per_day']!),
+                                _buildLimitRow(AppLocalizations.of(context).maxPerWeek, _settings!['max_points_per_week']!),
                               ],
                             ),
                           ),
@@ -1021,9 +1022,9 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                         const SizedBox(height: 20),
 
                         // Note Input
-                        const Text(
-                          'Add a Note',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context).addANote,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
@@ -1048,7 +1049,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                             maxLines: 4,
                             maxLength: 500,
                             decoration: InputDecoration(
-                              hintText: 'Why is this student receiving these points?\n\nExample: Excellent participation in today\'s class!',
+                              hintText: '${AppLocalizations.of(context).whyIsStudentReceivingPoints}\n\n${AppLocalizations.of(context).noteExample}',
                               hintStyle: TextStyle(
                                 color: AppColors.textSecondary.withOpacity(0.5),
                                 fontSize: 14,
@@ -1075,10 +1076,10 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please add a note explaining the award';
+                                return AppLocalizations.of(context).pleaseAddNoteExplainingAward;
                               }
                               if (value.length < 10) {
-                                return 'Note must be at least 10 characters';
+                                return AppLocalizations.of(context).noteMinLength;
                               }
                               return null;
                             },
@@ -1122,9 +1123,9 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context).cancel,
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
@@ -1170,9 +1171,9 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
                             size: 16,
                             color: Colors.white,
                           ),
-                          label: const Text(
-                            'Award Points',
-                            style: TextStyle(
+                          label: Text(
+                            AppLocalizations.of(context).awardPoints,
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -1245,7 +1246,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Points awarded successfully! New level: ${result['new_level']}',
+                '${AppLocalizations.of(context).pointsAwardedSuccessfully} ${AppLocalizations.of(context).newLevel} ${result['new_level']}',
               ),
               backgroundColor: AppColors.primary,
               behavior: SnackBarBehavior.floating,
@@ -1261,7 +1262,7 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result?['error'] ?? 'Failed to award points'),
+              content: Text(result?['error'] ?? AppLocalizations.of(context).failedToAwardPoints),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(

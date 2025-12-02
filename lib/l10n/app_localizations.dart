@@ -30,6 +30,8 @@ abstract class AppLocalizations {
   String get success;
   String get loading;
   String get retry;
+  String get requestTimedOut;
+  String get failedToLoadStudents;
   String get save;
   String get delete;
   String get edit;
@@ -70,7 +72,21 @@ abstract class AppLocalizations {
   String get confirmPassword;
   String get fullName;
   String get forgotPassword;
+  String get forgotPasswordTitle;
+  String get forgotPasswordDescription;
+  String get pleaseEnterYourEmail;
+  String get verificationCodeSentToEmail;
+  String get failedToSendCode;
+  String get sendCode;
   String get resetPassword;
+  String get resetPasswordTitle;
+  String get resetPasswordDescription;
+  String get enterNewPasswordBelow;
+  String get newPassword;
+  String get confirmNewPassword;
+  String get passwordResetSuccessfully;
+  String get failedToResetPassword;
+  String get userNotLoggedIn;
   String get dontHaveAccount;
   String get alreadyHaveAccount;
   String get enterEmail;
@@ -110,6 +126,9 @@ abstract class AppLocalizations {
   String get personalInformation;
   String get security;
   String get changePassword;
+  String get changePasswordTitle;
+  String changePasswordDescription(String email);
+  String get sendVerificationCode;
   String get updatePassword;
   String get currentLevel;
   String get proMember;
@@ -230,7 +249,9 @@ abstract class AppLocalizations {
   
   // Students
   String get studentsList;
+  String get searchStudents;
   String get noStudentsFound;
+  String get studentsWillAppearHere;
   String get sendChatRequest;
   String get chatRequestSent;
   String get alreadyChatting;
@@ -342,6 +363,16 @@ abstract class AppLocalizations {
   String get currentPointsLabel;
   String get pointsAwardedByYou;
   String get pointLimits;
+  String get selectPointsToAward;
+  String get totalPoints;
+  String youveAwardedPointsToThisStudent(int points);
+  String get orEnterCustomAmount;
+  String get pleaseEnterOrSelectPoints;
+  String maxPointsPerAwardValidation(int max);
+  String get addANote;
+  String get whyIsStudentReceivingPoints;
+  String get noteExample;
+  String get pleaseAddNoteExplainingAward;
   String get maxPerAward;
   String get maxPerStudent;
   String get maxPerDay;
@@ -404,7 +435,9 @@ abstract class AppLocalizations {
   
   // Common additional
   String get level;
+  String levelDisplay(int level);
   String get pts;
+  String awarded(int points);
   String get session;
   String get minute;
   String get minutesPlural;
@@ -487,11 +520,71 @@ abstract class AppLocalizations {
   String get nov;
   String get dec;
   
+  // Profile additional
+  String get allReviews;
+  String get logoutTitle;
+  String get logoutConfirmMessage;
+  String get logoutButton;
+  String get logoutFailed;
+  String get personalInformationSection;
+  String get editProfileTitle;
+  String get updateProfileInfo;
+  String get securitySection;
+  String get teacherPlaceholder;
+  String get languageTeacher;
+  
+  // Profile page - additional
+  String get profileTitle;
+  String get aboutMe;
+  String get accountInformation;
+  String get notAvailable;
+  String get memberSince;
+  String get recentReviews;
+  String get viewAll;
+  String get updateYourPassword;
+  String get logoutButtonText;
+  String get defaultMeetingLink;
+  String get editMeetingLinkTooltip;
+  String get meetingLinkNotSet;
+  String get setMeetingLinkMessage;
+  
   // Chat file operations
   String get downloading;
   String get downloadFailed;
   String get failedToLoadImage;
   String get tapToRetry;
+  
+  // Chat list screen
+  String get messagesTitle;
+  String get searchMessages;
+  String get showConversations;
+  String get startNewChat;
+  String get requestAccepted;
+  String get failedToAcceptRequest;
+  String get requestRejected;
+  String get failedToRejectRequest;
+  String get justNow;
+  String minutesAgo(int minutes);
+  String get oneDayAgo;
+  String daysAgo(int days);
+  String get noResultsFound;
+  String get noMessagesYet;
+  String get tryDifferentKeywords;
+  String get startConversationWithStudents;
+  String get chatRequestTitle;
+  String get noMessageProvided;
+  String get sentChatRequest;
+  String get deleteChat;
+  String get deleteChatQuestion;
+  String deleteChatConfirmation(String name);
+  String get noStudentsAvailable;
+  String get waitForStudentsToSubscribe;
+  String get imageAttachment;
+  String get voiceMessage;
+  String get fileAttachment;
+  String get attachmentGeneric;
+  String get startChatting;
+  String get user;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

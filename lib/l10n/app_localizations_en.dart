@@ -21,6 +21,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get retry => 'Retry';
   @override
+  String get requestTimedOut => 'Request timed out. Please check your internet connection.';
+  @override
+  String get failedToLoadStudents => 'Failed to load students';
+  @override
   String get save => 'Save';
   @override
   String get delete => 'Delete';
@@ -95,7 +99,35 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get forgotPassword => 'Forgot Password?';
   @override
+  String get forgotPasswordTitle => 'FORGOT PASSWORD';
+  @override
+  String get forgotPasswordDescription => 'Enter your email address and we will send you a verification code to reset your password';
+  @override
+  String get pleaseEnterYourEmail => 'Please enter your email';
+  @override
+  String get verificationCodeSentToEmail => 'Verification code sent to your email';
+  @override
+  String get failedToSendCode => 'Failed to send code';
+  @override
+  String get sendCode => 'SEND CODE';
+  @override
   String get resetPassword => 'Reset Password';
+  @override
+  String get resetPasswordTitle => 'RESET PASSWORD';
+  @override
+  String get resetPasswordDescription => 'Enter your new password below';
+  @override
+  String get enterNewPasswordBelow => 'Enter your new password below';
+  @override
+  String get newPassword => 'New Password';
+  @override
+  String get confirmNewPassword => 'Confirm New Password';
+  @override
+  String get passwordResetSuccessfully => 'Password reset successfully!';
+  @override
+  String get failedToResetPassword => 'Failed to reset password';
+  @override
+  String get userNotLoggedIn => 'User not logged in';
   @override
   String get dontHaveAccount => "Don't have an account?";
   @override
@@ -170,6 +202,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get security => 'Security';
   @override
   String get changePassword => 'Change Password';
+  @override
+  String get changePasswordTitle => 'CHANGE PASSWORD';
+  @override
+  String changePasswordDescription(String email) => 'To change your password, we need to verify your identity. We will send a verification code to $email';
+  @override
+  String get sendVerificationCode => 'SEND VERIFICATION CODE';
   @override
   String get updatePassword => 'Update your password';
   @override
@@ -399,7 +437,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get studentsList => 'STUDENTS';
   @override
+  String get searchStudents => 'Search students...';
+  @override
   String get noStudentsFound => 'No students found';
+  @override
+  String get studentsWillAppearHere => 'Students will appear here once they subscribe to your courses';
   @override
   String get sendChatRequest => 'Send Chat Request';
   @override
@@ -597,9 +639,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pointsAwardedByYou => 'Points awarded by you:';
   @override
-  String get pointLimits => 'Point Limits:';
+  String get pointLimits => 'Point Limits';
   @override
-  String get maxPerAward => 'Max per award:';
+  String get selectPointsToAward => 'Select Points to Award';
+  @override
+  String get totalPoints => 'Total Points';
+  @override
+  String youveAwardedPointsToThisStudent(int points) => 'You\'ve awarded $points points to this student';
+  @override
+  String get orEnterCustomAmount => 'Or enter custom amount';
+  @override
+  String get pleaseEnterOrSelectPoints => 'Please enter or select points';
+  @override
+  String maxPointsPerAwardValidation(int max) => 'Max $max points per award';
+  @override
+  String get addANote => 'Add a Note';
+  @override
+  String get whyIsStudentReceivingPoints => 'Why is this student receiving these points?';
+  @override
+  String get noteExample => 'Example: Excellent participation in today\'s class!';
+  @override
+  String get pleaseAddNoteExplainingAward => 'Please add a note explaining the award';
+  @override
+  String get maxPerAward => 'Per award';
   @override
   String get maxPerStudent => 'Max per student:';
   @override
@@ -717,7 +779,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get level => 'Level';
   @override
+  String levelDisplay(int level) => 'Level $level';
+  @override
   String get pts => 'pts';
+  @override
+  String awarded(int points) => 'Awarded: $points';
   @override
   String get session => 'Session';
   @override
@@ -876,6 +942,58 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dec => 'Dec';
   
+  // Profile additional
+  @override
+  String get allReviews => 'All Reviews';
+  @override
+  String get logoutTitle => 'Logout';
+  @override
+  String get logoutConfirmMessage => 'Are you sure you want to logout?';
+  @override
+  String get logoutButton => 'Logout';
+  @override
+  String get logoutFailed => 'Logout failed';
+  @override
+  String get personalInformationSection => 'Personal Information';
+  @override
+  String get editProfileTitle => 'Edit Profile';
+  @override
+  String get updateProfileInfo => 'Update your profile information';
+  @override
+  String get securitySection => 'Security';
+  @override
+  String get teacherPlaceholder => 'Teacher';
+  @override
+  String get languageTeacher => 'Language Teacher';
+  
+  // Profile page - additional
+  @override
+  String get profileTitle => 'PROFILE';
+  @override
+  String get aboutMe => 'About Me';
+  @override
+  String get accountInformation => 'Account Information';
+  @override
+  String get notAvailable => 'N/A';
+  @override
+  String get memberSince => 'Member Since';
+  @override
+  String get recentReviews => 'Recent Reviews';
+  @override
+  String get viewAll => 'View All';
+  @override
+  String get updateYourPassword => 'Update your account password';
+  @override
+  String get logoutButtonText => 'LOGOUT';
+  @override
+  String get defaultMeetingLink => 'Default Meeting Link';
+  @override
+  String get editMeetingLinkTooltip => 'Edit Meeting Link';
+  @override
+  String get meetingLinkNotSet => 'Not set - Click edit to add your meeting link';
+  @override
+  String get setMeetingLinkMessage => 'Set your meeting link so students can join your sessions';
+  
   // Chat file operations
   @override
   String get downloading => 'Downloading';
@@ -885,5 +1003,67 @@ class AppLocalizationsEn extends AppLocalizations {
   String get failedToLoadImage => 'Failed to load image';
   @override
   String get tapToRetry => 'Tap to retry';
+  
+  // Chat list screen
+  @override
+  String get messagesTitle => 'MESSAGES';
+  @override
+  String get searchMessages => 'Search messages...';
+  @override
+  String get showConversations => 'Show Conversations';
+  @override
+  String get startNewChat => 'Start New Chat';
+  @override
+  String get requestAccepted => 'Request accepted!';
+  @override
+  String get failedToAcceptRequest => 'Failed to accept request';
+  @override
+  String get requestRejected => 'Request rejected';
+  @override
+  String get failedToRejectRequest => 'Failed to reject request';
+  @override
+  String get justNow => 'just now';
+  @override
+  String minutesAgo(int minutes) => '${minutes}m ago';
+  @override
+  String get oneDayAgo => '1d ago';
+  @override
+  String daysAgo(int days) => '${days}d ago';
+  @override
+  String get noResultsFound => 'No results found';
+  @override
+  String get noMessagesYet => 'No messages yet';
+  @override
+  String get tryDifferentKeywords => 'Try searching with different keywords';
+  @override
+  String get startConversationWithStudents => 'Start a conversation with your students';
+  @override
+  String get chatRequestTitle => 'Chat Request';
+  @override
+  String get noMessageProvided => 'No message provided';
+  @override
+  String get sentChatRequest => 'Sent a chat request';
+  @override
+  String get deleteChat => 'Delete Chat';
+  @override
+  String get deleteChatQuestion => 'Delete Chat?';
+  @override
+  String deleteChatConfirmation(String name) => 'Are you sure you want to delete this chat with $name? This action cannot be undone.';
+  @override
+  String get noStudentsAvailable => 'No students available';
+  @override
+  String get waitForStudentsToSubscribe => 'Wait for students to subscribe to your courses';
+  @override
+  String get imageAttachment => '🖼️ Image';
+  @override
+  String get voiceMessage => '🎤 Voice message';
+  @override
+  String get fileAttachment => '📎 File';
+  @override
+  String get attachmentGeneric => '📎 Attachment';
+  @override
+  String get startChatting => 'Start chatting...';
+  @override
+  String get user => 'User';
 }
 

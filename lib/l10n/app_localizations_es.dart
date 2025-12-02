@@ -21,6 +21,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get retry => 'Reintentar';
   @override
+  String get requestTimedOut => 'La solicitud expiró. Por favor verifica tu conexión a internet.';
+  @override
+  String get failedToLoadStudents => 'Error al cargar estudiantes';
+  @override
   String get save => 'Guardar';
   @override
   String get delete => 'Eliminar';
@@ -95,7 +99,35 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get forgotPassword => '¿Olvidaste tu contraseña?';
   @override
+  String get forgotPasswordTitle => 'OLVIDÉ MI CONTRASEÑA';
+  @override
+  String get forgotPasswordDescription => 'Ingresa tu dirección de correo electrónico y te enviaremos un código de verificación para restablecer tu contraseña';
+  @override
+  String get pleaseEnterYourEmail => 'Por favor ingresa tu correo electrónico';
+  @override
+  String get verificationCodeSentToEmail => 'Código de verificación enviado a tu correo electrónico';
+  @override
+  String get failedToSendCode => 'Error al enviar código';
+  @override
+  String get sendCode => 'ENVIAR CÓDIGO';
+  @override
   String get resetPassword => 'Restablecer Contraseña';
+  @override
+  String get resetPasswordTitle => 'RESTABLECER CONTRASEÑA';
+  @override
+  String get resetPasswordDescription => 'Ingresa tu nueva contraseña a continuación';
+  @override
+  String get enterNewPasswordBelow => 'Ingresa tu nueva contraseña a continuación';
+  @override
+  String get newPassword => 'Nueva Contraseña';
+  @override
+  String get confirmNewPassword => 'Confirmar Nueva Contraseña';
+  @override
+  String get passwordResetSuccessfully => '¡Contraseña restablecida exitosamente!';
+  @override
+  String get failedToResetPassword => 'Error al restablecer contraseña';
+  @override
+  String get userNotLoggedIn => 'Usuario no ha iniciado sesión';
   @override
   String get dontHaveAccount => '¿No tienes una cuenta?';
   @override
@@ -170,6 +202,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get security => 'Seguridad';
   @override
   String get changePassword => 'Cambiar Contraseña';
+  @override
+  String get changePasswordTitle => 'CAMBIAR CONTRASEÑA';
+  @override
+  String changePasswordDescription(String email) => 'Para cambiar tu contraseña, necesitamos verificar tu identidad. Enviaremos un código de verificación a $email';
+  @override
+  String get sendVerificationCode => 'ENVIAR CÓDIGO DE VERIFICACIÓN';
   @override
   String get updatePassword => 'Actualiza tu contraseña';
   @override
@@ -399,7 +437,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get studentsList => 'ESTUDIANTES';
   @override
+  String get searchStudents => 'Buscar estudiantes...';
+  @override
   String get noStudentsFound => 'No se encontraron estudiantes';
+  @override
+  String get studentsWillAppearHere => 'Los estudiantes aparecerán aquí una vez que se suscriban a tus cursos';
   @override
   String get sendChatRequest => 'Enviar Solicitud de Chat';
   @override
@@ -597,9 +639,29 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get pointsAwardedByYou => 'Puntos otorgados por ti:';
   @override
-  String get pointLimits => 'Límites de Puntos:';
+  String get pointLimits => 'Límites de Puntos';
   @override
-  String get maxPerAward => 'Máx. por otorgamiento:';
+  String get selectPointsToAward => 'Seleccionar Puntos para Otorgar';
+  @override
+  String get totalPoints => 'Puntos Totales';
+  @override
+  String youveAwardedPointsToThisStudent(int points) => 'Has otorgado $points puntos a este estudiante';
+  @override
+  String get orEnterCustomAmount => 'O ingresa una cantidad personalizada';
+  @override
+  String get pleaseEnterOrSelectPoints => 'Por favor ingresa o selecciona puntos';
+  @override
+  String maxPointsPerAwardValidation(int max) => 'Máximo $max puntos por premio';
+  @override
+  String get addANote => 'Agregar una Nota';
+  @override
+  String get whyIsStudentReceivingPoints => '¿Por qué este estudiante está recibiendo estos puntos?';
+  @override
+  String get noteExample => 'Ejemplo: ¡Excelente participación en la clase de hoy!';
+  @override
+  String get pleaseAddNoteExplainingAward => 'Por favor agrega una nota explicando el premio';
+  @override
+  String get maxPerAward => 'Por premio';
   @override
   String get maxPerStudent => 'Máx. por estudiante:';
   @override
@@ -717,7 +779,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get level => 'Nivel';
   @override
+  String levelDisplay(int level) => 'Nivel $level';
+  @override
   String get pts => 'pts';
+  @override
+  String awarded(int points) => 'Otorgados: $points';
   @override
   String get session => 'Sesión';
   @override
@@ -876,6 +942,58 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get dec => 'Dic';
   
+  // Profile additional
+  @override
+  String get allReviews => 'Todas las Reseñas';
+  @override
+  String get logoutTitle => 'Cerrar Sesión';
+  @override
+  String get logoutConfirmMessage => '¿Estás seguro de que quieres cerrar sesión?';
+  @override
+  String get logoutButton => 'Cerrar Sesión';
+  @override
+  String get logoutFailed => 'Error al cerrar sesión';
+  @override
+  String get personalInformationSection => 'Información Personal';
+  @override
+  String get editProfileTitle => 'Editar Perfil';
+  @override
+  String get updateProfileInfo => 'Actualiza tu información de perfil';
+  @override
+  String get securitySection => 'Seguridad';
+  @override
+  String get teacherPlaceholder => 'Profesor';
+  @override
+  String get languageTeacher => 'Profesor de Idiomas';
+  
+  // Profile page - additional
+  @override
+  String get profileTitle => 'PERFIL';
+  @override
+  String get aboutMe => 'Acerca de Mí';
+  @override
+  String get accountInformation => 'Información de la Cuenta';
+  @override
+  String get notAvailable => 'N/D';
+  @override
+  String get memberSince => 'Miembro Desde';
+  @override
+  String get recentReviews => 'Reseñas Recientes';
+  @override
+  String get viewAll => 'Ver Todas';
+  @override
+  String get updateYourPassword => 'Actualiza la contraseña de tu cuenta';
+  @override
+  String get logoutButtonText => 'CERRAR SESIÓN';
+  @override
+  String get defaultMeetingLink => 'Enlace de Reunión Predeterminado';
+  @override
+  String get editMeetingLinkTooltip => 'Editar Enlace de Reunión';
+  @override
+  String get meetingLinkNotSet => 'No configurado - Haz clic en editar para agregar tu enlace de reunión';
+  @override
+  String get setMeetingLinkMessage => 'Configura tu enlace de reunión para que los estudiantes puedan unirse a tus sesiones';
+  
   // Chat file operations
   @override
   String get downloading => 'Descargando';
@@ -885,5 +1003,67 @@ class AppLocalizationsEs extends AppLocalizations {
   String get failedToLoadImage => 'Error al cargar la imagen';
   @override
   String get tapToRetry => 'Toca para reintentar';
+  
+  // Chat list screen
+  @override
+  String get messagesTitle => 'MENSAJES';
+  @override
+  String get searchMessages => 'Buscar mensajes...';
+  @override
+  String get showConversations => 'Mostrar Conversaciones';
+  @override
+  String get startNewChat => 'Iniciar Nuevo Chat';
+  @override
+  String get requestAccepted => '¡Solicitud aceptada!';
+  @override
+  String get failedToAcceptRequest => 'Error al aceptar solicitud';
+  @override
+  String get requestRejected => 'Solicitud rechazada';
+  @override
+  String get failedToRejectRequest => 'Error al rechazar solicitud';
+  @override
+  String get justNow => 'ahora';
+  @override
+  String minutesAgo(int minutes) => 'hace ${minutes}m';
+  @override
+  String get oneDayAgo => 'hace 1d';
+  @override
+  String daysAgo(int days) => 'hace ${days}d';
+  @override
+  String get noResultsFound => 'No se encontraron resultados';
+  @override
+  String get noMessagesYet => 'No hay mensajes aún';
+  @override
+  String get tryDifferentKeywords => 'Intenta buscar con diferentes palabras clave';
+  @override
+  String get startConversationWithStudents => 'Inicia una conversación con tus estudiantes';
+  @override
+  String get chatRequestTitle => 'Solicitud de Chat';
+  @override
+  String get noMessageProvided => 'No se proporcionó mensaje';
+  @override
+  String get sentChatRequest => 'Envió una solicitud de chat';
+  @override
+  String get deleteChat => 'Eliminar Chat';
+  @override
+  String get deleteChatQuestion => '¿Eliminar Chat?';
+  @override
+  String deleteChatConfirmation(String name) => '¿Estás seguro de que quieres eliminar este chat con $name? Esta acción no se puede deshacer.';
+  @override
+  String get noStudentsAvailable => 'No hay estudiantes disponibles';
+  @override
+  String get waitForStudentsToSubscribe => 'Espera a que los estudiantes se suscriban a tus cursos';
+  @override
+  String get imageAttachment => '🖼️ Imagen';
+  @override
+  String get voiceMessage => '🎤 Mensaje de voz';
+  @override
+  String get fileAttachment => '📎 Archivo';
+  @override
+  String get attachmentGeneric => '📎 Adjunto';
+  @override
+  String get startChatting => 'Comienza a chatear...';
+  @override
+  String get user => 'Usuario';
 }
 
