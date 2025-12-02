@@ -5,6 +5,7 @@ import '../../config/app_colors.dart';
 import '../../services/session_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/custom_back_button.dart';
+import '../../l10n/app_localizations.dart';
 
 class CreateSessionScreen extends StatefulWidget {
   const CreateSessionScreen({super.key});
@@ -43,9 +44,10 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error loading subscriptions: $e'),
+            content: Text('${l10n.errorLoadingData}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -142,10 +144,11 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
   }
 
   Future<void> _createSession() async {
+    final l10n = AppLocalizations.of(context);
     if (_selectedSubscription == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a student subscription'),
+        SnackBar(
+          content: Text(l10n.selectStudentSubscription),
           backgroundColor: Colors.orange,
         ),
       );
@@ -157,8 +160,8 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
     final endMinutes = _endTime.hour * 60 + _endTime.minute;
     if (endMinutes <= startMinutes) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('End time must be after start time'),
+        SnackBar(
+          content: Text(l10n.endTimeMustBeAfterStart),
           backgroundColor: Colors.orange,
         ),
       );
@@ -182,9 +185,10 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
       );
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Session created successfully'),
+          SnackBar(
+            content: Text(l10n.sessionCreatedSuccessfully),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -192,9 +196,10 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error creating session: $e'),
+            content: Text('${l10n.errorCreatingSession} $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -221,11 +226,11 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                   CustomBackButton(
                     onPressed: () => Navigator.pop(context),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
-                        'CREATE SESSION',
-                        style: TextStyle(
+                        AppLocalizations.of(context).createSession,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -253,9 +258,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Select Student Section
-                          const Text(
-                            'Select Student',
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context).selectStudent,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
@@ -280,7 +285,7 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      'No active subscriptions found',
+                                      AppLocalizations.of(context).noActiveSubscriptions,
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: AppColors.textSecondary.withOpacity(0.7),
@@ -379,7 +384,7 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                                                 ),
                                                 const SizedBox(width: 4),
                                                 Text(
-                                                  '${subscription['points_remaining']} sessions left',
+                                                  '${subscription['points_remaining']} ${AppLocalizations.of(context).sessionsLeft}',
                                                   style: const TextStyle(
                                                     fontSize: 11,
                                                     color: AppColors.textSecondary,
@@ -427,9 +432,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                           const SizedBox(height: 24),
 
                           // Date and Time Section
-                          const Text(
-                            'Session Schedule',
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context).sessionSchedule,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
@@ -475,9 +480,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        const Text(
-                                          'Date',
-                                          style: TextStyle(
+                                        Text(
+                                          AppLocalizations.of(context).dateLabel,
+                                          style: const TextStyle(
                                             fontSize: 12,
                                             color: AppColors.textSecondary,
                                           ),
@@ -546,9 +551,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                                               ),
                                             ),
                                             const SizedBox(width: 8),
-                                            const Text(
-                                              'Start',
-                                              style: TextStyle(
+                                            Text(
+                                              AppLocalizations.of(context).start,
+                                              style: const TextStyle(
                                                 fontSize: 12,
                                                 color: AppColors.textSecondary,
                                               ),
@@ -610,9 +615,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                                               ),
                                             ),
                                             const SizedBox(width: 8),
-                                            const Text(
-                                              'End',
-                                              style: TextStyle(
+                                            Text(
+                                              AppLocalizations.of(context).end,
+                                              style: const TextStyle(
                                                 fontSize: 12,
                                                 color: AppColors.textSecondary,
                                               ),
@@ -661,9 +666,9 @@ class _CreateSessionScreenState extends State<CreateSessionScreen> {
                                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                       ),
                                     )
-                                  : const Text(
-                                      'CREATE SESSION',
-                                      style: TextStyle(
+                                  : Text(
+                                      AppLocalizations.of(context).createSessionButton,
+                                      style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.5,

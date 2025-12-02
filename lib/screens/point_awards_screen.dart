@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/point_award_service.dart';
+import '../l10n/app_localizations.dart';
 
 class PointAwardsScreen extends StatefulWidget {
   const PointAwardsScreen({super.key});
@@ -56,8 +57,10 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Award Points to ${student['full_name']}'),
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        return AlertDialog(
+        title: Text('${l10n.awardPointsTo} ${student['full_name']}'),
         content: Form(
           key: formKey,
           child: SingleChildScrollView(
@@ -76,14 +79,14 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Current Level: ${student['level'] ?? 1}',
+                        '${l10n.currentLevelLabel} ${student['level'] ?? 1}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
-                      Text('Current Points: ${student['points'] ?? 0}'),
+                      Text('${l10n.currentPointsLabel} ${student['points'] ?? 0}'),
                       const SizedBox(height: 4),
                       Text(
-                        'Points awarded by you: ${student['total_points_awarded_by_me'] ?? 0}',
+                        '${l10n.pointsAwardedByYou} ${student['total_points_awarded_by_me'] ?? 0}',
                         style: TextStyle(
                           color: Colors.orange.shade700,
                           fontWeight: FontWeight.w600,
@@ -106,15 +109,15 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Point Limits:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        Text(
+                          l10n.pointLimits,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
-                        Text('Max per award: ${_settings!['max_points_per_award']}'),
-                        Text('Max per student: ${_settings!['max_points_per_student_total']}'),
-                        Text('Max per day: ${_settings!['max_points_per_day']}'),
-                        Text('Max per week: ${_settings!['max_points_per_week']}'),
+                        Text('${l10n.maxPerAward} ${_settings!['max_points_per_award']}'),
+                        Text('${l10n.maxPerStudent} ${_settings!['max_points_per_student_total']}'),
+                        Text('${l10n.maxPerDay} ${_settings!['max_points_per_day']}'),
+                        Text('${l10n.maxPerWeek} ${_settings!['max_points_per_week']}'),
                       ],
                     ),
                   ),
@@ -125,21 +128,21 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                 TextFormField(
                   controller: pointsController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Points to Award *',
-                    hintText: 'Enter points',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.pointsToAward,
+                    hintText: l10n.enterPoints,
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter points';
+                      return l10n.pleaseEnterPoints;
                     }
                     final points = int.tryParse(value);
                     if (points == null || points <= 0) {
-                      return 'Please enter a valid positive number';
+                      return l10n.enterValidPositiveNumber;
                     }
                     if (_settings != null && points > _settings!['max_points_per_award']!) {
-                      return 'Max ${_settings!['max_points_per_award']} points per award';
+                      return l10n.maxPointsPerAward.replaceAll('{max}', _settings!['max_points_per_award'].toString());
                     }
                     return null;
                   },
@@ -151,18 +154,18 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                   controller: noteController,
                   maxLines: 3,
                   maxLength: 500,
-                  decoration: const InputDecoration(
-                    labelText: 'Note *',
-                    hintText: 'Why are you awarding these points?',
-                    border: OutlineInputBorder(),
-                    helperText: 'Explain why the student earned these points',
+                  decoration: InputDecoration(
+                    labelText: l10n.note,
+                    hintText: l10n.whyAwardingPoints,
+                    border: const OutlineInputBorder(),
+                    helperText: l10n.explainWhyEarned,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a note';
+                      return l10n.pleaseEnterNote;
                     }
                     if (value.length < 10) {
-                      return 'Note must be at least 10 characters';
+                      return l10n.noteMinLength;
                     }
                     return null;
                   },
@@ -174,7 +177,7 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -191,10 +194,11 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Award Points'),
+            child: Text(l10n.awardPoints),
           ),
         ],
-      ),
+      );
+      },
     );
   }
 
@@ -220,10 +224,11 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
 
         if (result != null && result['success'] == true) {
           // Show success message
+          final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Points awarded successfully! New level: ${result['new_level']}',
+                '${l10n.pointsAwardedSuccessfully} ${result['new_level']}',
               ),
               backgroundColor: Colors.green,
             ),
@@ -233,9 +238,10 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
           _loadData();
         } else {
           // Show error message
+          final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result?['error'] ?? 'Failed to award points'),
+              content: Text(result?['error'] ?? l10n.failedToAwardPoints),
               backgroundColor: Colors.red,
             ),
           );
@@ -258,7 +264,7 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Award Points to Students'),
+        title: Text(AppLocalizations.of(context).awardPointsToStudents),
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
       ),
@@ -277,9 +283,9 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton(
+                        ElevatedButton(
                         onPressed: _loadData,
-                        child: const Text('Retry'),
+                        child: Text(AppLocalizations.of(context).retry),
                       ),
                     ],
                   ),
@@ -292,7 +298,7 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                           Icon(Icons.people_outline, size: 64, color: Colors.grey.shade400),
                           const SizedBox(height: 16),
                           Text(
-                            'No students enrolled yet',
+                            AppLocalizations.of(context).noStudentsEnrolled,
                             style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                           ),
                         ],
@@ -351,7 +357,7 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: Text(
-                                          'Level ${student['level'] ?? 1}',
+                                          '${AppLocalizations.of(context).levelLabel} ${student['level'] ?? 1}',
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
@@ -370,7 +376,7 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: Text(
-                                          '${student['points'] ?? 0} pts',
+                                          '${student['points'] ?? 0} ${AppLocalizations.of(context).pts}',
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
@@ -383,7 +389,7 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                                   if (student['total_points_awarded_by_me'] > 0) ...[
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Awarded by you: ${student['total_points_awarded_by_me']} pts',
+                                      '${AppLocalizations.of(context).awardedByYou} ${student['total_points_awarded_by_me']} ${AppLocalizations.of(context).pts}',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.orange.shade700,
@@ -396,7 +402,7 @@ class _PointAwardsScreenState extends State<PointAwardsScreen> {
                               trailing: ElevatedButton.icon(
                                 onPressed: () => _showAwardDialog(student),
                                 icon: const Icon(Icons.star, size: 18),
-                                label: const Text('Award'),
+                                label: Text(AppLocalizations.of(context).award),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,
                                   foregroundColor: Colors.white,

@@ -584,5 +584,306 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noReviewsYet => 'Aún no hay reseñas';
   @override
   String get totalRatings => 'Total de Calificaciones';
+  
+  // Point Awards
+  @override
+  String get awardPointsToStudents => 'Otorgar Puntos a Estudiantes';
+  @override
+  String get awardPointsTo => 'Otorgar Puntos a';
+  @override
+  String get currentLevelLabel => 'Nivel Actual:';
+  @override
+  String get currentPointsLabel => 'Puntos Actuales:';
+  @override
+  String get pointsAwardedByYou => 'Puntos otorgados por ti:';
+  @override
+  String get pointLimits => 'Límites de Puntos:';
+  @override
+  String get maxPerAward => 'Máx. por otorgamiento:';
+  @override
+  String get maxPerStudent => 'Máx. por estudiante:';
+  @override
+  String get maxPerDay => 'Máx. por día:';
+  @override
+  String get maxPerWeek => 'Máx. por semana:';
+  @override
+  String get pointsToAward => 'Puntos a Otorgar *';
+  @override
+  String get enterPoints => 'Ingresa puntos';
+  @override
+  String get pleaseEnterPoints => 'Por favor ingresa puntos';
+  @override
+  String get enterValidPositiveNumber => 'Por favor ingresa un número positivo válido';
+  @override
+  String get maxPointsPerAward => 'Máx. {max} puntos por otorgamiento';
+  @override
+  String get note => 'Nota *';
+  @override
+  String get whyAwardingPoints => '¿Por qué estás otorgando estos puntos?';
+  @override
+  String get explainWhyEarned => 'Explica por qué el estudiante ganó estos puntos';
+  @override
+  String get pleaseEnterNote => 'Por favor ingresa una nota';
+  @override
+  String get noteMinLength => 'La nota debe tener al menos 10 caracteres';
+  @override
+  String get awardPoints => 'Otorgar Puntos';
+  @override
+  String get pointsAwardedSuccessfully => '¡Puntos otorgados exitosamente! Nuevo nivel:';
+  @override
+  String get newLevel => 'Nuevo nivel:';
+  @override
+  String get failedToAwardPoints => 'Error al otorgar puntos';
+  @override
+  String get noStudentsEnrolled => 'Aún no hay estudiantes inscritos';
+  @override
+  String get levelLabel => 'Nivel';
+  @override
+  String get awardedByYou => 'Otorgados por ti:';
+  @override
+  String get award => 'Otorgar';
+  
+  // Create Session
+  @override
+  String get createSession => 'CREAR SESIÓN';
+  @override
+  String get selectStudent => 'Seleccionar Estudiante';
+  @override
+  String get noActiveSubscriptions => 'No se encontraron suscripciones activas';
+  @override
+  String get sessionSchedule => 'Horario de Sesión';
+  @override
+  String get dateLabel => 'Fecha';
+  @override
+  String get start => 'Inicio';
+  @override
+  String get end => 'Fin';
+  @override
+  String get createSessionButton => 'CREAR SESIÓN';
+  @override
+  String get selectStudentSubscription => 'Por favor selecciona una suscripción de estudiante';
+  @override
+  String get endTimeMustBeAfterStart => 'La hora de fin debe ser después de la hora de inicio';
+  @override
+  String get sessionCreatedSuccessfully => 'Sesión creada exitosamente';
+  @override
+  String get errorCreatingSession => 'Error al crear sesión:';
+  @override
+  String get sessionsLeft => 'sesiones restantes';
+  
+  // Timeslot Management
+  @override
+  String get manageTimeslots => 'GESTIONAR HORARIOS';
+  @override
+  String get timeslotsOverview => 'Resumen de Horarios';
+  @override
+  String get total => 'Total';
+  @override
+  String get available => 'Disponible';
+  @override
+  String get disabled => 'Deshabilitado';
+  @override
+  String get booked => 'Reservado';
+  @override
+  String get noTimeslotsYet => 'Aún No Hay Horarios';
+  @override
+  String get addScheduleToGenerate => 'Agrega un horario para generar horarios de 30 minutos';
+  @override
+  String get availableLabel => 'disponible';
+  @override
+  String get bookedLabel => 'reservado';
+  @override
+  String get disabledLabel => 'deshabilitado';
+  @override
+  String get enableAll => 'Habilitar Todo';
+  @override
+  String get disableAll => 'Deshabilitar Todo';
+  @override
+  String get cannotDisableOccupied => 'No se puede deshabilitar horario ocupado';
+  @override
+  String get timeslotEnabledSuccessfully => 'Horario habilitado exitosamente';
+  @override
+  String get timeslotDisabledSuccessfully => 'Horario deshabilitado exitosamente';
+  @override
+  String get failedToUpdateTimeslot => 'Error al actualizar horario';
+  @override
+  String get noAvailableSlotsToToggle => 'No hay horarios disponibles para cambiar';
+  @override
+  String get timeslotsEnabled => '{count} horarios habilitados';
+  @override
+  String get timeslotsDisabled => '{count} horarios deshabilitados';
+  
+  // Common additional
+  @override
+  String get level => 'Nivel';
+  @override
+  String get pts => 'pts';
+  @override
+  String get session => 'Sesión';
+  @override
+  String get minute => 'minuto';
+  @override
+  String get minutesPlural => 'minutos';
+  
+  // Chat additional
+  @override
+  String get chatDeletedSuccessfully => 'Chat eliminado exitosamente';
+  @override
+  String get failedToDeleteChat => 'Error al eliminar el chat. Por favor intenta de nuevo.';
+  @override
+  String get messageUnsent => 'Mensaje no enviado';
+  @override
+  String get downloadedToUnableToOpen => 'Descargado a: {filePath}\nNo se pudo abrir el archivo: {message}';
+  
+  // Classes additional
+  @override
+  String get errorLoadingSessions => 'Error al cargar sesiones:';
+  @override
+  String get errorJoiningSession => 'Error al unirse a la sesión:';
+  @override
+  String get teacherInformationNotAvailable => 'Información del profesor no disponible';
+  @override
+  String get unableToStartChat => 'No se pudo iniciar el chat. Por favor intenta de nuevo.';
+  @override
+  String get errorOpeningChat => 'Error al abrir el chat:';
+  @override
+  String get unableToLoadTeacherDetails => 'No se pudieron cargar los detalles del profesor';
+  @override
+  String get myClasses => 'MIS CLASES';
+  @override
+  String get noUpcomingClasses => 'No hay clases próximas';
+  @override
+  String get noFinishedClasses => 'No hay clases finalizadas';
+  @override
+  String get pullDownToRefresh => 'Desliza hacia abajo para actualizar';
+  @override
+  String get setMeetingLink => 'Establecer Enlace de Reunión';
+  @override
+  String get enterMeetingLinkHint => 'Ingresa enlace de reunión (Zoom, Google Meet, etc.)';
+  @override
+  String get meetingLinkUpdatedSuccessfully => 'Enlace de reunión actualizado exitosamente';
+  @override
+  String get sessionStarted => 'Sesión iniciada';
+  @override
+  String get endSessionTitle => 'Finalizar Sesión';
+  @override
+  String get endSessionMessage => '¿Estás seguro de que quieres finalizar esta sesión? Se marcará como completada y se descontará un punto de la suscripción.';
+  @override
+  String get sessionEndedSuccessfully => 'Sesión finalizada exitosamente';
+  @override
+  String get cancelSessionTitle => 'Cancelar Sesión';
+  @override
+  String get cancelSessionMessage => '¿Estás seguro de que quieres cancelar esta sesión? El estudiante será notificado.';
+  @override
+  String get reasonOptional => 'Razón (opcional)';
+  @override
+  String get enterCancellationReason => 'Ingresa la razón de cancelación...';
+  @override
+  String get back => 'Atrás';
+  @override
+  String get cancelledByTeacher => 'Cancelada por el profesor';
+  @override
+  String get sessionCancelledSuccessfully => 'Sesión cancelada exitosamente';
+  @override
+  String get failedToCancelSession => 'Error al cancelar sesión';
+  @override
+  String get deleteSessionTitle => 'Eliminar Sesión';
+  @override
+  String get deleteSessionMessage => '¿Estás seguro de que quieres eliminar esta sesión? Esta acción no se puede deshacer.';
+  @override
+  String get deleteButton => 'Eliminar';
+  @override
+  String get sessionDeletedSuccessfully => 'Sesión eliminada exitosamente';
+  @override
+  String get failedToDeleteSessionOnly => 'Error al eliminar sesión. Solo se pueden eliminar sesiones programadas creadas por el profesor.';
+  @override
+  String get pleaseSetMeetingLinkFirst => 'Por favor establece un enlace de reunión primero';
+  @override
+  String get studentInformationNotAvailable => 'Información del estudiante no disponible';
+  @override
+  String get studentPlaceholder => 'Estudiante';
+  @override
+  String get today => 'HOY';
+  @override
+  String get makeupClass => 'CLASE DE RECUPERACIÓN';
+  @override
+  String get manuallyCreated => 'CREADA MANUALMENTE';
+  @override
+  String get languagePlaceholder => 'Idioma';
+  @override
+  String get updateLink => 'Actualizar Enlace';
+  @override
+  String get setLink => 'Establecer Enlace';
+  @override
+  String get joinButton => 'Unirse';
+  @override
+  String get startButton => 'Iniciar';
+  @override
+  String get endButton => 'Finalizar';
+  @override
+  String get deleteSessionButton => 'Eliminar Sesión';
+  @override
+  String get cancelSessionButton => 'Cancelar Sesión';
+  @override
+  String get statusScheduled => 'Programada';
+  @override
+  String get statusReady => 'Lista';
+  @override
+  String get statusInProgress => 'En Progreso';
+  @override
+  String get statusCompleted => 'Completada';
+  @override
+  String get statusCancelled => 'Cancelada';
+  @override
+  String get statusMissed => 'Perdida';
+  @override
+  String get min => 'min';
+  @override
+  String get mon => 'Lun';
+  @override
+  String get tue => 'Mar';
+  @override
+  String get wed => 'Mié';
+  @override
+  String get thu => 'Jue';
+  @override
+  String get fri => 'Vie';
+  @override
+  String get sat => 'Sáb';
+  @override
+  String get sun => 'Dom';
+  @override
+  String get jan => 'Ene';
+  @override
+  String get feb => 'Feb';
+  @override
+  String get mar => 'Mar';
+  @override
+  String get apr => 'Abr';
+  // may is already defined above - same in short form
+  @override
+  String get jun => 'Jun';
+  @override
+  String get jul => 'Jul';
+  @override
+  String get aug => 'Ago';
+  @override
+  String get sep => 'Sep';
+  @override
+  String get oct => 'Oct';
+  @override
+  String get nov => 'Nov';
+  @override
+  String get dec => 'Dic';
+  
+  // Chat file operations
+  @override
+  String get downloading => 'Descargando';
+  @override
+  String get downloadFailed => 'Error al descargar:';
+  @override
+  String get failedToLoadImage => 'Error al cargar la imagen';
+  @override
+  String get tapToRetry => 'Toca para reintentar';
 }
 

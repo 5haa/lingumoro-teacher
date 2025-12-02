@@ -17,6 +17,7 @@ import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 
 class ChatConversationScreen extends StatefulWidget {
   final String conversationId;
@@ -434,7 +435,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
             children: [
               const CircularProgressIndicator(color: AppColors.primary),
               const SizedBox(height: 16),
-              Text('Downloading $fileName...'),
+              Text('${AppLocalizations.of(context).downloading} $fileName...'),
             ],
           ),
         ),
@@ -459,7 +460,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Downloaded to: $filePath\nUnable to open file: ${result.message}'),
+              content: Text(AppLocalizations.of(context).downloadedToUnableToOpen.replaceAll('{filePath}', filePath).replaceAll('{message}', result.message)),
               duration: const Duration(seconds: 4),
             ),
           );
@@ -473,7 +474,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Download failed: $e'),
+            content: Text('${AppLocalizations.of(context).downloadFailed} $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -1159,12 +1160,12 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
                             color: Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.error_outline, size: 12, color: Colors.red),
-                              SizedBox(width: 4),
-                              Text('Tap to retry', style: TextStyle(fontSize: 10, color: Colors.red)),
+                              const Icon(Icons.error_outline, size: 12, color: Colors.red),
+                              const SizedBox(width: 4),
+                              Text(AppLocalizations.of(context).tapToRetry, style: const TextStyle(fontSize: 10, color: Colors.red)),
                             ],
                           ),
                         ),
@@ -1342,7 +1343,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
                     children: [
                       Icon(Icons.broken_image, color: Colors.grey[600], size: 48),
                       const SizedBox(height: 8),
-                      Text('Failed to load image', style: TextStyle(color: Colors.grey[600])),
+                      Text(AppLocalizations.of(context).failedToLoadImage, style: TextStyle(color: Colors.grey[600])),
                     ],
                   ),
                 );
@@ -1860,8 +1861,8 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
       if (mounted) {
         Navigator.pop(context); // Go back to chat list
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Chat deleted successfully'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).chatDeletedSuccessfully),
             backgroundColor: Colors.green,
           ),
         );
@@ -1870,8 +1871,8 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
       print('Error deleting chat: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to delete chat. Please try again.'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).failedToDeleteChat),
             backgroundColor: Colors.red,
           ),
         );
@@ -1949,10 +1950,10 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Message unsent'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).messageUnsent),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }

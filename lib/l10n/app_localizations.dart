@@ -334,6 +334,164 @@ abstract class AppLocalizations {
   String get viewAllReviews;
   String get noReviewsYet;
   String get totalRatings;
+  
+  // Point Awards
+  String get awardPointsToStudents;
+  String get awardPointsTo;
+  String get currentLevelLabel;
+  String get currentPointsLabel;
+  String get pointsAwardedByYou;
+  String get pointLimits;
+  String get maxPerAward;
+  String get maxPerStudent;
+  String get maxPerDay;
+  String get maxPerWeek;
+  String get pointsToAward;
+  String get enterPoints;
+  String get pleaseEnterPoints;
+  String get enterValidPositiveNumber;
+  String get maxPointsPerAward;
+  String get note;
+  String get whyAwardingPoints;
+  String get explainWhyEarned;
+  String get pleaseEnterNote;
+  String get noteMinLength;
+  String get awardPoints;
+  String get pointsAwardedSuccessfully;
+  String get newLevel;
+  String get failedToAwardPoints;
+  String get noStudentsEnrolled;
+  String get levelLabel;
+  String get awardedByYou;
+  String get award;
+  
+  // Create Session
+  String get createSession;
+  String get selectStudent;
+  String get noActiveSubscriptions;
+  String get sessionSchedule;
+  String get dateLabel;
+  String get start;
+  String get end;
+  String get createSessionButton;
+  String get selectStudentSubscription;
+  String get endTimeMustBeAfterStart;
+  String get sessionCreatedSuccessfully;
+  String get errorCreatingSession;
+  String get sessionsLeft;
+  
+  // Timeslot Management
+  String get manageTimeslots;
+  String get timeslotsOverview;
+  String get total;
+  String get available;
+  String get disabled;
+  String get booked;
+  String get noTimeslotsYet;
+  String get addScheduleToGenerate;
+  String get availableLabel;
+  String get bookedLabel;
+  String get disabledLabel;
+  String get enableAll;
+  String get disableAll;
+  String get cannotDisableOccupied;
+  String get timeslotEnabledSuccessfully;
+  String get timeslotDisabledSuccessfully;
+  String get failedToUpdateTimeslot;
+  String get noAvailableSlotsToToggle;
+  String get timeslotsEnabled;
+  String get timeslotsDisabled;
+  
+  // Common additional
+  String get level;
+  String get pts;
+  String get session;
+  String get minute;
+  String get minutesPlural;
+  
+  // Chat additional
+  String get chatDeletedSuccessfully;
+  String get failedToDeleteChat;
+  String get messageUnsent;
+  String get downloadedToUnableToOpen;
+  
+  // Classes additional
+  String get errorLoadingSessions;
+  String get errorJoiningSession;
+  String get teacherInformationNotAvailable;
+  String get unableToStartChat;
+  String get errorOpeningChat;
+  String get unableToLoadTeacherDetails;
+  String get myClasses;
+  String get noUpcomingClasses;
+  String get noFinishedClasses;
+  String get pullDownToRefresh;
+  String get setMeetingLink;
+  String get enterMeetingLinkHint;
+  String get meetingLinkUpdatedSuccessfully;
+  String get sessionStarted;
+  String get endSessionTitle;
+  String get endSessionMessage;
+  String get sessionEndedSuccessfully;
+  String get cancelSessionTitle;
+  String get cancelSessionMessage;
+  String get reasonOptional;
+  String get enterCancellationReason;
+  String get back;
+  String get cancelledByTeacher;
+  String get sessionCancelledSuccessfully;
+  String get failedToCancelSession;
+  String get deleteSessionTitle;
+  String get deleteSessionMessage;
+  String get deleteButton;
+  String get sessionDeletedSuccessfully;
+  String get failedToDeleteSessionOnly;
+  String get pleaseSetMeetingLinkFirst;
+  String get studentInformationNotAvailable;
+  String get studentPlaceholder;
+  String get today;
+  String get makeupClass;
+  String get manuallyCreated;
+  String get languagePlaceholder;
+  String get updateLink;
+  String get setLink;
+  String get joinButton;
+  String get startButton;
+  String get endButton;
+  String get deleteSessionButton;
+  String get cancelSessionButton;
+  String get statusScheduled;
+  String get statusReady;
+  String get statusInProgress;
+  String get statusCompleted;
+  String get statusCancelled;
+  String get statusMissed;
+  String get min;
+  String get mon;
+  String get tue;
+  String get wed;
+  String get thu;
+  String get fri;
+  String get sat;
+  String get sun;
+  String get jan;
+  String get feb;
+  String get mar;
+  String get apr;
+  // may is already defined above in full months - same in short form
+  String get jun;
+  String get jul;
+  String get aug;
+  String get sep;
+  String get oct;
+  String get nov;
+  String get dec;
+  
+  // Chat file operations
+  String get downloading;
+  String get downloadFailed;
+  String get failedToLoadImage;
+  String get tapToRetry;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

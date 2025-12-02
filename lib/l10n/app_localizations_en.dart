@@ -584,5 +584,306 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noReviewsYet => 'No reviews yet';
   @override
   String get totalRatings => 'Total Ratings';
+  
+  // Point Awards
+  @override
+  String get awardPointsToStudents => 'Award Points to Students';
+  @override
+  String get awardPointsTo => 'Award Points to';
+  @override
+  String get currentLevelLabel => 'Current Level:';
+  @override
+  String get currentPointsLabel => 'Current Points:';
+  @override
+  String get pointsAwardedByYou => 'Points awarded by you:';
+  @override
+  String get pointLimits => 'Point Limits:';
+  @override
+  String get maxPerAward => 'Max per award:';
+  @override
+  String get maxPerStudent => 'Max per student:';
+  @override
+  String get maxPerDay => 'Max per day:';
+  @override
+  String get maxPerWeek => 'Max per week:';
+  @override
+  String get pointsToAward => 'Points to Award *';
+  @override
+  String get enterPoints => 'Enter points';
+  @override
+  String get pleaseEnterPoints => 'Please enter points';
+  @override
+  String get enterValidPositiveNumber => 'Please enter a valid positive number';
+  @override
+  String get maxPointsPerAward => 'Max {max} points per award';
+  @override
+  String get note => 'Note *';
+  @override
+  String get whyAwardingPoints => 'Why are you awarding these points?';
+  @override
+  String get explainWhyEarned => 'Explain why the student earned these points';
+  @override
+  String get pleaseEnterNote => 'Please enter a note';
+  @override
+  String get noteMinLength => 'Note must be at least 10 characters';
+  @override
+  String get awardPoints => 'Award Points';
+  @override
+  String get pointsAwardedSuccessfully => 'Points awarded successfully! New level:';
+  @override
+  String get newLevel => 'New level:';
+  @override
+  String get failedToAwardPoints => 'Failed to award points';
+  @override
+  String get noStudentsEnrolled => 'No students enrolled yet';
+  @override
+  String get levelLabel => 'Level';
+  @override
+  String get awardedByYou => 'Awarded by you:';
+  @override
+  String get award => 'Award';
+  
+  // Create Session
+  @override
+  String get createSession => 'CREATE SESSION';
+  @override
+  String get selectStudent => 'Select Student';
+  @override
+  String get noActiveSubscriptions => 'No active subscriptions found';
+  @override
+  String get sessionSchedule => 'Session Schedule';
+  @override
+  String get dateLabel => 'Date';
+  @override
+  String get start => 'Start';
+  @override
+  String get end => 'End';
+  @override
+  String get createSessionButton => 'CREATE SESSION';
+  @override
+  String get selectStudentSubscription => 'Please select a student subscription';
+  @override
+  String get endTimeMustBeAfterStart => 'End time must be after start time';
+  @override
+  String get sessionCreatedSuccessfully => 'Session created successfully';
+  @override
+  String get errorCreatingSession => 'Error creating session:';
+  @override
+  String get sessionsLeft => 'sessions left';
+  
+  // Timeslot Management
+  @override
+  String get manageTimeslots => 'MANAGE TIMESLOTS';
+  @override
+  String get timeslotsOverview => 'Timeslots Overview';
+  @override
+  String get total => 'Total';
+  @override
+  String get available => 'Available';
+  @override
+  String get disabled => 'Disabled';
+  @override
+  String get booked => 'Booked';
+  @override
+  String get noTimeslotsYet => 'No Timeslots Yet';
+  @override
+  String get addScheduleToGenerate => 'Add a schedule to generate 30-min timeslots';
+  @override
+  String get availableLabel => 'available';
+  @override
+  String get bookedLabel => 'booked';
+  @override
+  String get disabledLabel => 'disabled';
+  @override
+  String get enableAll => 'Enable All';
+  @override
+  String get disableAll => 'Disable All';
+  @override
+  String get cannotDisableOccupied => 'Cannot disable occupied timeslot';
+  @override
+  String get timeslotEnabledSuccessfully => 'Timeslot enabled successfully';
+  @override
+  String get timeslotDisabledSuccessfully => 'Timeslot disabled successfully';
+  @override
+  String get failedToUpdateTimeslot => 'Failed to update timeslot';
+  @override
+  String get noAvailableSlotsToToggle => 'No available slots to toggle';
+  @override
+  String get timeslotsEnabled => '{count} timeslots enabled';
+  @override
+  String get timeslotsDisabled => '{count} timeslots disabled';
+  
+  // Common additional
+  @override
+  String get level => 'Level';
+  @override
+  String get pts => 'pts';
+  @override
+  String get session => 'Session';
+  @override
+  String get minute => 'minute';
+  @override
+  String get minutesPlural => 'minutes';
+  
+  // Chat additional
+  @override
+  String get chatDeletedSuccessfully => 'Chat deleted successfully';
+  @override
+  String get failedToDeleteChat => 'Failed to delete chat. Please try again.';
+  @override
+  String get messageUnsent => 'Message unsent';
+  @override
+  String get downloadedToUnableToOpen => 'Downloaded to: {filePath}\nUnable to open file: {message}';
+  
+  // Classes additional
+  @override
+  String get errorLoadingSessions => 'Error loading sessions:';
+  @override
+  String get errorJoiningSession => 'Error joining session:';
+  @override
+  String get teacherInformationNotAvailable => 'Teacher information not available';
+  @override
+  String get unableToStartChat => 'Unable to start chat. Please try again.';
+  @override
+  String get errorOpeningChat => 'Error opening chat:';
+  @override
+  String get unableToLoadTeacherDetails => 'Unable to load teacher details';
+  @override
+  String get myClasses => 'MY CLASSES';
+  @override
+  String get noUpcomingClasses => 'No upcoming classes';
+  @override
+  String get noFinishedClasses => 'No finished classes';
+  @override
+  String get pullDownToRefresh => 'Pull down to refresh';
+  @override
+  String get setMeetingLink => 'Set Meeting Link';
+  @override
+  String get enterMeetingLinkHint => 'Enter meeting link (Zoom, Google Meet, etc.)';
+  @override
+  String get meetingLinkUpdatedSuccessfully => 'Meeting link updated successfully';
+  @override
+  String get sessionStarted => 'Session started';
+  @override
+  String get endSessionTitle => 'End Session';
+  @override
+  String get endSessionMessage => 'Are you sure you want to end this session? This will mark it as completed and deduct a point from the subscription.';
+  @override
+  String get sessionEndedSuccessfully => 'Session ended successfully';
+  @override
+  String get cancelSessionTitle => 'Cancel Session';
+  @override
+  String get cancelSessionMessage => 'Are you sure you want to cancel this session? The student will be notified.';
+  @override
+  String get reasonOptional => 'Reason (optional)';
+  @override
+  String get enterCancellationReason => 'Enter cancellation reason...';
+  @override
+  String get back => 'Back';
+  @override
+  String get cancelledByTeacher => 'Cancelled by teacher';
+  @override
+  String get sessionCancelledSuccessfully => 'Session cancelled successfully';
+  @override
+  String get failedToCancelSession => 'Failed to cancel session';
+  @override
+  String get deleteSessionTitle => 'Delete Session';
+  @override
+  String get deleteSessionMessage => 'Are you sure you want to delete this session? This action cannot be undone.';
+  @override
+  String get deleteButton => 'Delete';
+  @override
+  String get sessionDeletedSuccessfully => 'Session deleted successfully';
+  @override
+  String get failedToDeleteSessionOnly => 'Failed to delete session. Only teacher-created scheduled sessions can be deleted.';
+  @override
+  String get pleaseSetMeetingLinkFirst => 'Please set a meeting link first';
+  @override
+  String get studentInformationNotAvailable => 'Student information not available';
+  @override
+  String get studentPlaceholder => 'Student';
+  @override
+  String get today => 'TODAY';
+  @override
+  String get makeupClass => 'MAKEUP CLASS';
+  @override
+  String get manuallyCreated => 'MANUALLY CREATED';
+  @override
+  String get languagePlaceholder => 'Language';
+  @override
+  String get updateLink => 'Update Link';
+  @override
+  String get setLink => 'Set Link';
+  @override
+  String get joinButton => 'Join';
+  @override
+  String get startButton => 'Start';
+  @override
+  String get endButton => 'End';
+  @override
+  String get deleteSessionButton => 'Delete Session';
+  @override
+  String get cancelSessionButton => 'Cancel Session';
+  @override
+  String get statusScheduled => 'Scheduled';
+  @override
+  String get statusReady => 'Ready';
+  @override
+  String get statusInProgress => 'In Progress';
+  @override
+  String get statusCompleted => 'Completed';
+  @override
+  String get statusCancelled => 'Cancelled';
+  @override
+  String get statusMissed => 'Missed';
+  @override
+  String get min => 'min';
+  @override
+  String get mon => 'Mon';
+  @override
+  String get tue => 'Tue';
+  @override
+  String get wed => 'Wed';
+  @override
+  String get thu => 'Thu';
+  @override
+  String get fri => 'Fri';
+  @override
+  String get sat => 'Sat';
+  @override
+  String get sun => 'Sun';
+  @override
+  String get jan => 'Jan';
+  @override
+  String get feb => 'Feb';
+  @override
+  String get mar => 'Mar';
+  @override
+  String get apr => 'Apr';
+  // may is already defined above - same in short form
+  @override
+  String get jun => 'Jun';
+  @override
+  String get jul => 'Jul';
+  @override
+  String get aug => 'Aug';
+  @override
+  String get sep => 'Sep';
+  @override
+  String get oct => 'Oct';
+  @override
+  String get nov => 'Nov';
+  @override
+  String get dec => 'Dec';
+  
+  // Chat file operations
+  @override
+  String get downloading => 'Downloading';
+  @override
+  String get downloadFailed => 'Download failed:';
+  @override
+  String get failedToLoadImage => 'Failed to load image';
+  @override
+  String get tapToRetry => 'Tap to retry';
 }
 

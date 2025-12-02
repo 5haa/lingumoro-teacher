@@ -4,6 +4,7 @@ import '../../config/app_colors.dart';
 import '../../widgets/custom_back_button.dart';
 import '../../services/timeslot_service.dart';
 import '../../services/auth_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class TimeslotManagementScreen extends StatefulWidget {
   const TimeslotManagementScreen({super.key});
@@ -21,15 +22,18 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
   Map<String, int> _stats = {};
   bool _isLoading = true;
 
-  final List<String> _dayNames = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
+  List<String> _getDayNames(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return [
+      l10n.sunday,
+      l10n.monday,
+      l10n.tuesday,
+      l10n.wednesday,
+      l10n.thursday,
+      l10n.friday,
+      l10n.saturday,
+    ];
+  }
 
   @override
   void initState() {
@@ -63,10 +67,11 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
 
   Future<void> _toggleTimeslot(
       String timeslotId, bool currentStatus, bool isOccupied) async {
+    final l10n = AppLocalizations.of(context);
     if (isOccupied) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cannot disable occupied timeslot'),
+        SnackBar(
+          content: Text(l10n.cannotDisableOccupied),
           backgroundColor: Colors.orange,
         ),
       );
@@ -80,15 +85,15 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              'Timeslot ${!currentStatus ? "enabled" : "disabled"} successfully'),
+              !currentStatus ? l10n.timeslotEnabledSuccessfully : l10n.timeslotDisabledSuccessfully),
           backgroundColor: AppColors.primary,
         ),
       );
       _loadTimeslots();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to update timeslot'),
+        SnackBar(
+          content: Text(l10n.failedToUpdateTimeslot),
           backgroundColor: Colors.red,
         ),
       );
@@ -102,10 +107,11 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
         .map((slot) => slot['id'] as String)
         .toList();
 
+    final l10n = AppLocalizations.of(context);
     if (unoccupiedSlots.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No available slots to toggle'),
+        SnackBar(
+          content: Text(l10n.noAvailableSlotsToToggle),
           backgroundColor: Colors.orange,
         ),
       );
@@ -119,7 +125,7 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              '${unoccupiedSlots.length} timeslots ${enable ? "enabled" : "disabled"}'),
+              enable ? l10n.timeslotsEnabled.replaceAll('{count}', unoccupiedSlots.length.toString()) : l10n.timeslotsDisabled.replaceAll('{count}', unoccupiedSlots.length.toString())),
           backgroundColor: AppColors.primary,
         ),
       );
@@ -141,11 +147,11 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
                 children: [
                   const CustomBackButton(),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'MANAGE TIMESLOTS',
+                      AppLocalizations.of(context).manageTimeslots,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -213,9 +219,9 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
                 size: 16,
               ),
               const SizedBox(width: 8),
-              const Text(
-                'Timeslots Overview',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context).timeslotsOverview,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -228,22 +234,22 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildStatItem(
-                'Total',
+                AppLocalizations.of(context).total,
                 _stats['total'] ?? 0,
                 FontAwesomeIcons.calendarDays,
               ),
               _buildStatItem(
-                'Available',
+                AppLocalizations.of(context).available,
                 _stats['available'] ?? 0,
                 FontAwesomeIcons.circleCheck,
               ),
               _buildStatItem(
-                'Disabled',
+                AppLocalizations.of(context).disabled,
                 _stats['disabled'] ?? 0,
                 FontAwesomeIcons.circleXmark,
               ),
               _buildStatItem(
-                'Booked',
+                AppLocalizations.of(context).booked,
                 _stats['occupied'] ?? 0,
                 FontAwesomeIcons.calendarCheck,
               ),
@@ -318,7 +324,7 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
           ),
           const SizedBox(height: 20),
           Text(
-            'No Timeslots Yet',
+            AppLocalizations.of(context).noTimeslotsYet,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -329,7 +335,7 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
-              'Add a schedule to generate 30-min timeslots',
+              AppLocalizations.of(context).addScheduleToGenerate,
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary.withOpacity(0.5),
@@ -394,7 +400,7 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
           ),
         ),
         title: Text(
-          _dayNames[dayOfWeek],
+          _getDayNames(context)[dayOfWeek],
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -407,9 +413,9 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
             spacing: 6,
             runSpacing: 4,
             children: [
-              _buildStatusBadge('$availableCount available', AppColors.primary),
-              _buildStatusBadge('$occupiedCount booked', Colors.orange),
-              _buildStatusBadge('$disabledCount disabled', AppColors.grey),
+              _buildStatusBadge('$availableCount ${AppLocalizations.of(context).availableLabel}', AppColors.primary),
+              _buildStatusBadge('$occupiedCount ${AppLocalizations.of(context).bookedLabel}', Colors.orange),
+              _buildStatusBadge('$disabledCount ${AppLocalizations.of(context).disabledLabel}', AppColors.grey),
             ],
           ),
         ),
@@ -427,17 +433,17 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
           itemBuilder: (context) => [
             PopupMenuItem<String>(
               value: 'enable_all',
-              child: const Row(
+              child: Row(
                 children: [
-                  FaIcon(
+                  const FaIcon(
                     FontAwesomeIcons.circleCheck,
                     color: AppColors.primary,
                     size: 18,
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Text(
-                    'Enable All',
-                    style: TextStyle(
+                    AppLocalizations.of(context).enableAll,
+                    style: const TextStyle(
                       fontSize: 15,
                       color: AppColors.textPrimary,
                     ),
@@ -447,17 +453,17 @@ class _TimeslotManagementScreenState extends State<TimeslotManagementScreen> {
             ),
             PopupMenuItem<String>(
               value: 'disable_all',
-              child: const Row(
+              child: Row(
                 children: [
-                  FaIcon(
+                  const FaIcon(
                     FontAwesomeIcons.circleXmark,
                     color: Colors.orange,
                     size: 18,
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Text(
-                    'Disable All',
-                    style: TextStyle(
+                    AppLocalizations.of(context).disableAll,
+                    style: const TextStyle(
                       fontSize: 15,
                       color: AppColors.textPrimary,
                     ),

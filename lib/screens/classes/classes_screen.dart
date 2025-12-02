@@ -9,6 +9,7 @@ import '../../services/chat_service.dart';
 import '../../services/preload_service.dart';
 import '../chat/chat_conversation_screen.dart';
 import 'create_session_screen.dart';
+import '../../l10n/app_localizations.dart';
 
 class ClassesScreen extends StatefulWidget {
   const ClassesScreen({super.key});
@@ -143,7 +144,7 @@ class _ClassesScreenState extends State<ClassesScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error loading sessions: $e'),
+            content: Text('${AppLocalizations.of(context).errorLoadingSessions} $e'),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -161,26 +162,26 @@ class _ClassesScreenState extends State<ClassesScreen>
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Set Meeting Link'),
+        title: Text(AppLocalizations.of(context).setMeetingLink),
         content: TextField(
           controller: linkController,
-          decoration: const InputDecoration(
-            hintText: 'Enter meeting link (Zoom, Google Meet, etc.)',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context).enterMeetingLinkHint,
+            border: const OutlineInputBorder(),
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, linkController.text),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
             ),
-            child: const Text('Save'),
+            child: Text(AppLocalizations.of(context).save),
           ),
         ],
       ),
@@ -190,8 +191,8 @@ class _ClassesScreenState extends State<ClassesScreen>
       final success = await _sessionService.setMeetingLink(session['id'], result);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Meeting link updated successfully'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).meetingLinkUpdatedSuccessfully),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -204,8 +205,8 @@ class _ClassesScreenState extends State<ClassesScreen>
     final success = await _sessionService.startSession(session['id']);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Session started'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).sessionStarted),
           backgroundColor: AppColors.primary,
         ),
       );
@@ -221,17 +222,17 @@ class _ClassesScreenState extends State<ClassesScreen>
           borderRadius: BorderRadius.circular(20),
         ),
         backgroundColor: AppColors.white,
-        title: const Text(
-          'End Session',
-          style: TextStyle(
+        title: Text(
+          AppLocalizations.of(context).endSessionTitle,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
-        content: const Text(
-          'Are you sure you want to end this session? This will mark it as completed and deduct a point from the subscription.',
-          style: TextStyle(
+        content: Text(
+          AppLocalizations.of(context).endSessionMessage,
+          style: const TextStyle(
             fontSize: 15,
             color: AppColors.textSecondary,
           ),
@@ -242,9 +243,9 @@ class _ClassesScreenState extends State<ClassesScreen>
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context).cancel,
+              style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 15,
               ),
@@ -262,9 +263,9 @@ class _ClassesScreenState extends State<ClassesScreen>
                 shadowColor: Colors.transparent,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
-              child: const Text(
-                'End Session',
-                style: TextStyle(
+              child: Text(
+                AppLocalizations.of(context).endSessionTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -280,8 +281,8 @@ class _ClassesScreenState extends State<ClassesScreen>
       final success = await _sessionService.endSession(session['id']);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Session ended successfully'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).sessionEndedSuccessfully),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -300,9 +301,9 @@ class _ClassesScreenState extends State<ClassesScreen>
           borderRadius: BorderRadius.circular(20),
         ),
         backgroundColor: AppColors.white,
-        title: const Text(
-          'Cancel Session',
-          style: TextStyle(
+        title: Text(
+          AppLocalizations.of(context).cancelSessionTitle,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -312,9 +313,9 @@ class _ClassesScreenState extends State<ClassesScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Are you sure you want to cancel this session? The student will be notified.',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context).cancelSessionMessage,
+              style: const TextStyle(
                 fontSize: 15,
                 color: AppColors.textSecondary,
               ),
@@ -324,8 +325,8 @@ class _ClassesScreenState extends State<ClassesScreen>
               controller: reasonController,
               maxLines: 3,
               decoration: InputDecoration(
-                labelText: 'Reason (optional)',
-                hintText: 'Enter cancellation reason...',
+                labelText: AppLocalizations.of(context).reasonOptional,
+                hintText: AppLocalizations.of(context).enterCancellationReason,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -343,9 +344,9 @@ class _ClassesScreenState extends State<ClassesScreen>
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text(
-              'Back',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context).back,
+              style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 15,
               ),
@@ -363,9 +364,9 @@ class _ClassesScreenState extends State<ClassesScreen>
                 shadowColor: Colors.transparent,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
-              child: const Text(
-                'Cancel Session',
-                style: TextStyle(
+              child: Text(
+                AppLocalizations.of(context).cancelSessionTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -378,20 +379,20 @@ class _ClassesScreenState extends State<ClassesScreen>
     );
     
     if (confirmed == true) {
-      final reason = reasonController.text.isEmpty ? 'Cancelled by teacher' : reasonController.text;
+      final reason = reasonController.text.isEmpty ? AppLocalizations.of(context).cancelledByTeacher : reasonController.text;
       final success = await _sessionService.cancelSession(session['id'], reason);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Session cancelled successfully'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).sessionCancelledSuccessfully),
             backgroundColor: AppColors.primary,
           ),
         );
         _loadSessions();
       } else if (!success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to cancel session'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).failedToCancelSession),
             backgroundColor: Colors.red,
           ),
         );
@@ -409,17 +410,17 @@ class _ClassesScreenState extends State<ClassesScreen>
           borderRadius: BorderRadius.circular(20),
         ),
         backgroundColor: AppColors.white,
-        title: const Text(
-          'Delete Session',
-          style: TextStyle(
+        title: Text(
+          AppLocalizations.of(context).deleteSessionTitle,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
-        content: const Text(
-          'Are you sure you want to delete this session? This action cannot be undone.',
-          style: TextStyle(
+        content: Text(
+          AppLocalizations.of(context).deleteSessionMessage,
+          style: const TextStyle(
             fontSize: 15,
             color: AppColors.textSecondary,
           ),
@@ -430,9 +431,9 @@ class _ClassesScreenState extends State<ClassesScreen>
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context).cancel,
+              style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 15,
               ),
@@ -450,9 +451,9 @@ class _ClassesScreenState extends State<ClassesScreen>
                 shadowColor: Colors.transparent,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
-              child: const Text(
-                'Delete',
-                style: TextStyle(
+              child: Text(
+                AppLocalizations.of(context).deleteButton,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -469,16 +470,16 @@ class _ClassesScreenState extends State<ClassesScreen>
       final success = await _sessionService.deleteSession(session['id'], isTeacherCreated);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Session deleted successfully'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).sessionDeletedSuccessfully),
             backgroundColor: AppColors.primary,
           ),
         );
         _loadSessions();
       } else if (!success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to delete session. Only teacher-created scheduled sessions can be deleted.'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).failedToDeleteSessionOnly),
             backgroundColor: Colors.red,
           ),
         );
@@ -492,8 +493,8 @@ class _ClassesScreenState extends State<ClassesScreen>
     if (meetingLink == null || meetingLink.toString().isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please set a meeting link first'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).pleaseSetMeetingLinkFirst),
             backgroundColor: Colors.orange,
           ),
         );
@@ -520,7 +521,7 @@ class _ClassesScreenState extends State<ClassesScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error joining session: ${e.toString()}'),
+            content: Text('${AppLocalizations.of(context).errorJoiningSession} ${e.toString()}'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -535,8 +536,8 @@ class _ClassesScreenState extends State<ClassesScreen>
       if (student == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Student information not available'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context).studentInformationNotAvailable),
               backgroundColor: Colors.red,
             ),
           );
@@ -545,7 +546,7 @@ class _ClassesScreenState extends State<ClassesScreen>
       }
 
       final studentId = student['id'];
-      final studentName = student['full_name'] ?? 'Student';
+      final studentName = student['full_name'] ?? AppLocalizations.of(context).studentPlaceholder;
       final studentAvatar = student['avatar_url'];
 
       // Get or create conversation
@@ -565,8 +566,8 @@ class _ClassesScreenState extends State<ClassesScreen>
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Unable to start chat. Please try again.'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).unableToStartChat),
             backgroundColor: Colors.red,
           ),
         );
@@ -575,7 +576,7 @@ class _ClassesScreenState extends State<ClassesScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error opening chat: ${e.toString()}'),
+            content: Text('${AppLocalizations.of(context).errorOpeningChat} ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -645,11 +646,11 @@ class _ClassesScreenState extends State<ClassesScreen>
                       },
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
-                        'MY CLASSES',
-                        style: TextStyle(
+                        AppLocalizations.of(context).myClasses,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -680,9 +681,9 @@ class _ClassesScreenState extends State<ClassesScreen>
                 ),
                 indicatorColor: AppColors.primary,
                 indicatorWeight: 3,
-                tabs: const [
-                  Tab(text: 'Upcoming'),
-                  Tab(text: 'Finished'),
+                tabs: [
+                  Tab(text: AppLocalizations.of(context).upcoming),
+                  Tab(text: AppLocalizations.of(context).finished),
                 ],
               ),
             ),
@@ -738,7 +739,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    isUpcoming ? 'No upcoming classes' : 'No finished classes',
+                    isUpcoming ? AppLocalizations.of(context).noUpcomingClasses : AppLocalizations.of(context).noFinishedClasses,
                     style: TextStyle(
                       fontSize: 15,
                       color: AppColors.textSecondary.withOpacity(0.6),
@@ -754,7 +755,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Pull down to refresh',
+                      AppLocalizations.of(context).pullDownToRefresh,
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary.withOpacity(0.4),
@@ -800,12 +801,12 @@ class _ClassesScreenState extends State<ClassesScreen>
     final timeStr = '$startTime - $endTime';
 
     // Calculate duration
-    String duration = '45 min';
+    String duration = '45 ${AppLocalizations.of(context).min}';
     try {
       final start = DateTime.parse('2000-01-01 ${session['scheduled_start_time']}');
       final end = DateTime.parse('2000-01-01 ${session['scheduled_end_time']}');
       final diff = end.difference(start).inMinutes;
-      duration = '$diff min';
+      duration = '$diff ${AppLocalizations.of(context).min}';
     } catch (e) {
       // Keep default
     }
@@ -860,9 +861,9 @@ class _ClassesScreenState extends State<ClassesScreen>
                     size: 16,
                   ),
                   const SizedBox(width: 6),
-                  const Text(
-                    'TODAY',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context).today,
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -909,7 +910,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'MAKEUP CLASS',
+                    AppLocalizations.of(context).makeupClass,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -941,7 +942,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'MANUALLY CREATED',
+                    AppLocalizations.of(context).manuallyCreated,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -1001,7 +1002,7 @@ class _ClassesScreenState extends State<ClassesScreen>
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  language['name'] ?? 'Language',
+                  language['name'] ?? AppLocalizations.of(context).languagePlaceholder,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -1076,7 +1077,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      student['full_name'] ?? 'Student',
+                      student['full_name'] ?? AppLocalizations.of(context).studentPlaceholder,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -1199,8 +1200,8 @@ class _ClassesScreenState extends State<ClassesScreen>
                       icon: const FaIcon(FontAwesomeIcons.link, size: 12),
                       label: Text(
                         session['meeting_link'] != null && session['meeting_link'].toString().isNotEmpty
-                            ? 'Update Link'
-                            : 'Set Link',
+                            ? AppLocalizations.of(context).updateLink
+                            : AppLocalizations.of(context).setLink,
                         style: const TextStyle(fontSize: 12),
                       ),
                       style: OutlinedButton.styleFrom(
@@ -1220,7 +1221,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                     child: ElevatedButton.icon(
                       onPressed: () => _joinSession(session),
                       icon: const FaIcon(FontAwesomeIcons.video, size: 12, color: Colors.white),
-                      label: const Text('Join', style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
+                      label: Text(AppLocalizations.of(context).joinButton, style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -1236,7 +1237,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                     child: ElevatedButton.icon(
                       onPressed: () => _startSession(session),
                       icon: const FaIcon(FontAwesomeIcons.play, size: 12, color: Colors.white),
-                      label: const Text('Start', style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
+                      label: Text(AppLocalizations.of(context).startButton, style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green.shade600,
                         foregroundColor: Colors.white,
@@ -1252,7 +1253,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                     child: ElevatedButton.icon(
                       onPressed: () => _endSession(session),
                       icon: const FaIcon(FontAwesomeIcons.stop, size: 12, color: Colors.white),
-                      label: const Text('End', style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
+                      label: Text(AppLocalizations.of(context).endButton, style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red.shade600,
                         foregroundColor: Colors.white,
@@ -1273,7 +1274,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                   child: OutlinedButton.icon(
                     onPressed: () => _deleteSession(session),
                     icon: const Icon(Icons.delete_outline, size: 14),
-                    label: const Text('Delete Session', style: TextStyle(fontSize: 12)),
+                    label: Text(AppLocalizations.of(context).deleteSessionButton, style: const TextStyle(fontSize: 12)),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red.shade700,
                       side: BorderSide(color: Colors.red.shade700),
@@ -1288,7 +1289,7 @@ class _ClassesScreenState extends State<ClassesScreen>
                   child: OutlinedButton.icon(
                     onPressed: () => _cancelSession(session),
                     icon: const Icon(Icons.cancel_outlined, size: 14),
-                    label: const Text('Cancel Session', style: TextStyle(fontSize: 12)),
+                    label: Text(AppLocalizations.of(context).cancelSessionButton, style: const TextStyle(fontSize: 12)),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.orange.shade700,
                       side: BorderSide(color: Colors.orange.shade700),
@@ -1348,43 +1349,36 @@ class _ClassesScreenState extends State<ClassesScreen>
   }
 
   String _getStatusText(String status) {
+    final loc = AppLocalizations.of(context);
     switch (status.toLowerCase()) {
       case 'scheduled':
-        return 'Scheduled';
+        return loc.statusScheduled;
       case 'ready':
-        return 'Ready';
+        return loc.statusReady;
       case 'in_progress':
-        return 'In Progress';
+        return loc.statusInProgress;
       case 'completed':
-        return 'Completed';
+        return loc.statusCompleted;
       case 'cancelled':
-        return 'Cancelled';
+        return loc.statusCancelled;
       case 'missed':
-        return 'Missed';
+        return loc.statusMissed;
       default:
         return status;
     }
   }
 
   String _getWeekday(int weekday) {
-    const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final loc = AppLocalizations.of(context);
+    final weekdays = [loc.mon, loc.tue, loc.wed, loc.thu, loc.fri, loc.sat, loc.sun];
     return weekdays[weekday - 1];
   }
 
   String _getMonth(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
+    final loc = AppLocalizations.of(context);
+    final months = [
+      loc.jan, loc.feb, loc.mar, loc.apr, loc.may, loc.jun,
+      loc.jul, loc.aug, loc.sep, loc.oct, loc.nov, loc.dec
     ];
     return months[month - 1];
   }

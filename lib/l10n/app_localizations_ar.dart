@@ -584,5 +584,306 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noReviewsYet => 'لا توجد مراجعات بعد';
   @override
   String get totalRatings => 'إجمالي التقييمات';
+  
+  // Point Awards
+  @override
+  String get awardPointsToStudents => 'منح النقاط للطلاب';
+  @override
+  String get awardPointsTo => 'منح النقاط إلى';
+  @override
+  String get currentLevelLabel => 'المستوى الحالي:';
+  @override
+  String get currentPointsLabel => 'النقاط الحالية:';
+  @override
+  String get pointsAwardedByYou => 'النقاط الممنوحة من قبلك:';
+  @override
+  String get pointLimits => 'حدود النقاط:';
+  @override
+  String get maxPerAward => 'الحد الأقصى لكل منحة:';
+  @override
+  String get maxPerStudent => 'الحد الأقصى لكل طالب:';
+  @override
+  String get maxPerDay => 'الحد الأقصى يومياً:';
+  @override
+  String get maxPerWeek => 'الحد الأقصى أسبوعياً:';
+  @override
+  String get pointsToAward => 'النقاط الممنوحة *';
+  @override
+  String get enterPoints => 'أدخل النقاط';
+  @override
+  String get pleaseEnterPoints => 'الرجاء إدخال النقاط';
+  @override
+  String get enterValidPositiveNumber => 'الرجاء إدخال رقم موجب صالح';
+  @override
+  String get maxPointsPerAward => 'الحد الأقصى {max} نقاط لكل منحة';
+  @override
+  String get note => 'ملاحظة *';
+  @override
+  String get whyAwardingPoints => 'لماذا تمنح هذه النقاط؟';
+  @override
+  String get explainWhyEarned => 'اشرح لماذا حصل الطالب على هذه النقاط';
+  @override
+  String get pleaseEnterNote => 'الرجاء إدخال ملاحظة';
+  @override
+  String get noteMinLength => 'يجب أن تكون الملاحظة 10 أحرف على الأقل';
+  @override
+  String get awardPoints => 'منح النقاط';
+  @override
+  String get pointsAwardedSuccessfully => 'تم منح النقاط بنجاح! المستوى الجديد:';
+  @override
+  String get newLevel => 'المستوى الجديد:';
+  @override
+  String get failedToAwardPoints => 'فشل منح النقاط';
+  @override
+  String get noStudentsEnrolled => 'لا يوجد طلاب مسجلون بعد';
+  @override
+  String get levelLabel => 'المستوى';
+  @override
+  String get awardedByYou => 'ممنوحة من قبلك:';
+  @override
+  String get award => 'منح';
+  
+  // Create Session
+  @override
+  String get createSession => 'إنشاء جلسة';
+  @override
+  String get selectStudent => 'اختر الطالب';
+  @override
+  String get noActiveSubscriptions => 'لم يتم العثور على اشتراكات نشطة';
+  @override
+  String get sessionSchedule => 'جدول الجلسة';
+  @override
+  String get dateLabel => 'التاريخ';
+  @override
+  String get start => 'البداية';
+  @override
+  String get end => 'النهاية';
+  @override
+  String get createSessionButton => 'إنشاء الجلسة';
+  @override
+  String get selectStudentSubscription => 'الرجاء اختيار اشتراك طالب';
+  @override
+  String get endTimeMustBeAfterStart => 'يجب أن يكون وقت النهاية بعد وقت البداية';
+  @override
+  String get sessionCreatedSuccessfully => 'تم إنشاء الجلسة بنجاح';
+  @override
+  String get errorCreatingSession => 'خطأ في إنشاء الجلسة:';
+  @override
+  String get sessionsLeft => 'جلسات متبقية';
+  
+  // Timeslot Management
+  @override
+  String get manageTimeslots => 'إدارة الأوقات';
+  @override
+  String get timeslotsOverview => 'نظرة عامة على الأوقات';
+  @override
+  String get total => 'الإجمالي';
+  @override
+  String get available => 'متاح';
+  @override
+  String get disabled => 'معطل';
+  @override
+  String get booked => 'محجوز';
+  @override
+  String get noTimeslotsYet => 'لا توجد أوقات بعد';
+  @override
+  String get addScheduleToGenerate => 'أضف جدولاً لإنشاء أوقات مدتها 30 دقيقة';
+  @override
+  String get availableLabel => 'متاح';
+  @override
+  String get bookedLabel => 'محجوز';
+  @override
+  String get disabledLabel => 'معطل';
+  @override
+  String get enableAll => 'تفعيل الكل';
+  @override
+  String get disableAll => 'تعطيل الكل';
+  @override
+  String get cannotDisableOccupied => 'لا يمكن تعطيل الوقت المحجوز';
+  @override
+  String get timeslotEnabledSuccessfully => 'تم تفعيل الوقت بنجاح';
+  @override
+  String get timeslotDisabledSuccessfully => 'تم تعطيل الوقت بنجاح';
+  @override
+  String get failedToUpdateTimeslot => 'فشل تحديث الوقت';
+  @override
+  String get noAvailableSlotsToToggle => 'لا توجد أوقات متاحة للتبديل';
+  @override
+  String get timeslotsEnabled => 'تم تفعيل {count} أوقات';
+  @override
+  String get timeslotsDisabled => 'تم تعطيل {count} أوقات';
+  
+  // Common additional
+  @override
+  String get level => 'المستوى';
+  @override
+  String get pts => 'نقطة';
+  @override
+  String get session => 'جلسة';
+  @override
+  String get minute => 'دقيقة';
+  @override
+  String get minutesPlural => 'دقائق';
+  
+  // Chat additional
+  @override
+  String get chatDeletedSuccessfully => 'تم حذف المحادثة بنجاح';
+  @override
+  String get failedToDeleteChat => 'فشل حذف المحادثة. يرجى المحاولة مرة أخرى.';
+  @override
+  String get messageUnsent => 'تم إلغاء إرسال الرسالة';
+  @override
+  String get downloadedToUnableToOpen => 'تم التنزيل إلى: {filePath}\nتعذر فتح الملف: {message}';
+  
+  // Classes additional
+  @override
+  String get errorLoadingSessions => 'خطأ في تحميل الجلسات:';
+  @override
+  String get errorJoiningSession => 'خطأ في الانضمام إلى الجلسة:';
+  @override
+  String get teacherInformationNotAvailable => 'معلومات المعلم غير متاحة';
+  @override
+  String get unableToStartChat => 'تعذر بدء المحادثة. يرجى المحاولة مرة أخرى.';
+  @override
+  String get errorOpeningChat => 'خطأ في فتح المحادثة:';
+  @override
+  String get unableToLoadTeacherDetails => 'تعذر تحميل تفاصيل المعلم';
+  @override
+  String get myClasses => 'فصولي';
+  @override
+  String get noUpcomingClasses => 'لا توجد فصول قادمة';
+  @override
+  String get noFinishedClasses => 'لا توجد فصول منتهية';
+  @override
+  String get pullDownToRefresh => 'اسحب لأسفل للتحديث';
+  @override
+  String get setMeetingLink => 'تعيين رابط الاجتماع';
+  @override
+  String get enterMeetingLinkHint => 'أدخل رابط الاجتماع (Zoom، Google Meet، إلخ)';
+  @override
+  String get meetingLinkUpdatedSuccessfully => 'تم تحديث رابط الاجتماع بنجاح';
+  @override
+  String get sessionStarted => 'بدأت الجلسة';
+  @override
+  String get endSessionTitle => 'إنهاء الجلسة';
+  @override
+  String get endSessionMessage => 'هل أنت متأكد من إنهاء هذه الجلسة؟ سيتم وضع علامة مكتملة عليها وخصم نقطة من الاشتراك.';
+  @override
+  String get sessionEndedSuccessfully => 'انتهت الجلسة بنجاح';
+  @override
+  String get cancelSessionTitle => 'إلغاء الجلسة';
+  @override
+  String get cancelSessionMessage => 'هل أنت متأكد من إلغاء هذه الجلسة؟ سيتم إخطار الطالب.';
+  @override
+  String get reasonOptional => 'السبب (اختياري)';
+  @override
+  String get enterCancellationReason => 'أدخل سبب الإلغاء...';
+  @override
+  String get back => 'رجوع';
+  @override
+  String get cancelledByTeacher => 'ألغيت بواسطة المعلم';
+  @override
+  String get sessionCancelledSuccessfully => 'تم إلغاء الجلسة بنجاح';
+  @override
+  String get failedToCancelSession => 'فشل إلغاء الجلسة';
+  @override
+  String get deleteSessionTitle => 'حذف الجلسة';
+  @override
+  String get deleteSessionMessage => 'هل أنت متأكد من حذف هذه الجلسة؟ لا يمكن التراجع عن هذا الإجراء.';
+  @override
+  String get deleteButton => 'حذف';
+  @override
+  String get sessionDeletedSuccessfully => 'تم حذف الجلسة بنجاح';
+  @override
+  String get failedToDeleteSessionOnly => 'فشل حذف الجلسة. يمكن حذف الجلسات المجدولة المنشأة بواسطة المعلم فقط.';
+  @override
+  String get pleaseSetMeetingLinkFirst => 'يرجى تعيين رابط الاجتماع أولاً';
+  @override
+  String get studentInformationNotAvailable => 'معلومات الطالب غير متاحة';
+  @override
+  String get studentPlaceholder => 'الطالب';
+  @override
+  String get today => 'اليوم';
+  @override
+  String get makeupClass => 'فصل تعويضي';
+  @override
+  String get manuallyCreated => 'تم إنشاؤها يدوياً';
+  @override
+  String get languagePlaceholder => 'اللغة';
+  @override
+  String get updateLink => 'تحديث الرابط';
+  @override
+  String get setLink => 'تعيين الرابط';
+  @override
+  String get joinButton => 'انضم';
+  @override
+  String get startButton => 'ابدأ';
+  @override
+  String get endButton => 'إنهاء';
+  @override
+  String get deleteSessionButton => 'حذف الجلسة';
+  @override
+  String get cancelSessionButton => 'إلغاء الجلسة';
+  @override
+  String get statusScheduled => 'مجدولة';
+  @override
+  String get statusReady => 'جاهزة';
+  @override
+  String get statusInProgress => 'جارية';
+  @override
+  String get statusCompleted => 'مكتملة';
+  @override
+  String get statusCancelled => 'ملغاة';
+  @override
+  String get statusMissed => 'فائتة';
+  @override
+  String get min => 'دقيقة';
+  @override
+  String get mon => 'إثنين';
+  @override
+  String get tue => 'ثلاثاء';
+  @override
+  String get wed => 'أربعاء';
+  @override
+  String get thu => 'خميس';
+  @override
+  String get fri => 'جمعة';
+  @override
+  String get sat => 'سبت';
+  @override
+  String get sun => 'أحد';
+  @override
+  String get jan => 'يناير';
+  @override
+  String get feb => 'فبراير';
+  @override
+  String get mar => 'مارس';
+  @override
+  String get apr => 'أبريل';
+  // may is already defined above - same in short form
+  @override
+  String get jun => 'يونيو';
+  @override
+  String get jul => 'يوليو';
+  @override
+  String get aug => 'أغسطس';
+  @override
+  String get sep => 'سبتمبر';
+  @override
+  String get oct => 'أكتوبر';
+  @override
+  String get nov => 'نوفمبر';
+  @override
+  String get dec => 'ديسمبر';
+  
+  // Chat file operations
+  @override
+  String get downloading => 'جارٍ التنزيل';
+  @override
+  String get downloadFailed => 'فشل التنزيل:';
+  @override
+  String get failedToLoadImage => 'فشل تحميل الصورة';
+  @override
+  String get tapToRetry => 'اضغط للمحاولة مرة أخرى';
 }
 
