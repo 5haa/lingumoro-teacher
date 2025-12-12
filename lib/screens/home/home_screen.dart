@@ -423,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           Expanded(
             child: Center(
               child: Text(
-                AppLocalizations.of(context).appName.toUpperCase(),
+                AppLocalizations.of(context).appName,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
