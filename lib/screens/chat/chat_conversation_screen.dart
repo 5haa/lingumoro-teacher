@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:teacher/services/chat_service.dart';
 import 'package:teacher/services/presence_service.dart';
 import 'package:teacher/services/preload_service.dart';
+import '../students/student_public_profile_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -803,101 +804,107 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Stack(
-                    children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primary.withOpacity(0.1),
+                  GestureDetector(
+                    onTap: _viewStudentProfile,
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primary.withOpacity(0.1),
+                          ),
+                          child: ClipOval(
+                            child: widget.recipientAvatar != null && widget.recipientAvatar!.isNotEmpty
+                                ? CachedNetworkImage(
+                                    imageUrl: widget.recipientAvatar!,
+                                    fit: BoxFit.cover,
+                                    fadeInDuration: Duration.zero,
+                                    fadeOutDuration: Duration.zero,
+                                    placeholderFadeInDuration: Duration.zero,
+                                    memCacheWidth: 180,
+                                    placeholder: (context, url) => Center(
+                                      child: Text(
+                                        widget.recipientName[0].toUpperCase(),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Center(
+                                      child: Text(
+                                        widget.recipientName[0].toUpperCase(),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Center(
+                                    child: Text(
+                                      widget.recipientName[0].toUpperCase(),
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                          ),
                         ),
-                        child: ClipOval(
-                          child: widget.recipientAvatar != null && widget.recipientAvatar!.isNotEmpty
-                              ? CachedNetworkImage(
-                                  imageUrl: widget.recipientAvatar!,
-                                  fit: BoxFit.cover,
-                                  fadeInDuration: Duration.zero,
-                                  fadeOutDuration: Duration.zero,
-                                  placeholderFadeInDuration: Duration.zero,
-                                  memCacheWidth: 180,
-                                  placeholder: (context, url) => Center(
-                                    child: Text(
-                                      widget.recipientName[0].toUpperCase(),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) => Center(
-                                    child: Text(
-                                      widget.recipientName[0].toUpperCase(),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : Center(
-                                  child: Text(
-                                    widget.recipientName[0].toUpperCase(),
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
+                        if (_isOnline)
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              width: 11,
+                              height: 11,
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppColors.white,
+                                  width: 1.5,
                                 ),
-                        ),
-                      ),
-                      if (_isOnline)
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: 11,
-                            height: 11,
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppColors.white,
-                                width: 1.5,
                               ),
                             ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.recipientName,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                    child: GestureDetector(
+                      onTap: _viewStudentProfile,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.recipientName,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 1),
-                        Text(
-                          _isTyping ? 'typing...' : (_isOnline ? 'Online' : 'Offline'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: _isTyping 
-                                ? AppColors.primary
-                                : (_isOnline ? Colors.green : AppColors.textSecondary),
-                            fontStyle: _isTyping ? FontStyle.italic : FontStyle.normal,
+                          const SizedBox(height: 1),
+                          Text(
+                            _isTyping ? 'typing...' : (_isOnline ? 'Online' : 'Offline'),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: _isTyping 
+                                  ? AppColors.primary
+                                  : (_isOnline ? Colors.green : AppColors.textSecondary),
+                              fontStyle: _isTyping ? FontStyle.italic : FontStyle.normal,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   PopupMenuButton<String>(
@@ -914,7 +921,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
                     elevation: 8,
                     itemBuilder: (context) => [
                       const PopupMenuItem<String>(
-                        value: 'info',
+                        value: 'profile',
                         child: Row(
                           children: [
                             FaIcon(
@@ -935,7 +942,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
                       ),
                     ],
                     onSelected: (value) {
-                      // Handle menu actions
+                      if (value == 'profile') {
+                        _viewStudentProfile();
+                      }
                     },
                   ),
                 ],
@@ -1963,6 +1972,98 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to unsend message. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _viewStudentProfile() async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
+
+      // Fetch complete student data
+      final studentData = await _chatService.supabase
+          .from('students')
+          .select('''
+            *,
+            province:province_id (
+              id,
+              name,
+              name_ar
+            )
+          ''')
+          .eq('id', widget.recipientId)
+          .single();
+
+      // Fetch student's languages through subscriptions
+      final subscriptions = await _chatService.supabase
+          .from('student_subscriptions')
+          .select('''
+            language:language_id (
+              id,
+              name,
+              flag_url
+            )
+          ''')
+          .eq('student_id', widget.recipientId)
+          .eq('status', 'active');
+
+      // Transform the data to match expected format
+      final languages = subscriptions
+          .map((sub) {
+            final lang = sub['language'] as Map<String, dynamic>?;
+            if (lang != null) {
+              return {
+                'id': lang['id'],
+                'name': lang['name'],
+                'flag_url': lang['flag_url'],
+              };
+            }
+            return null;
+          })
+          .where((l) => l != null)
+          .cast<Map<String, dynamic>>()
+          .toList();
+
+      final formattedData = {
+        ...studentData,
+        'languages': languages,
+      };
+      
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+
+      // Navigate to profile screen
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StudentPublicProfileScreen(
+              studentId: widget.recipientId,
+              studentData: formattedData,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if still showing
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${AppLocalizations.of(context).error}: $e'),
             backgroundColor: Colors.red,
           ),
         );
