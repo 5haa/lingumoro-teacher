@@ -101,14 +101,12 @@ class TeacherSessionService {
 
   Future<bool> startSession(String sessionId) async {
     try {
-      await _supabase
-          .from('sessions')
-          .update({
-            'status': 'in_progress',
-            'actual_start_time': DateTime.now().toIso8601String(),
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', sessionId);
+      // Call Edge Function so "session started" push is reliably triggered server-side.
+      // The Edge Function updates the session, and DB triggers create + push the notification.
+      await _supabase.functions.invoke(
+        'start-session',
+        body: {'session_id': sessionId},
+      );
 
       return true;
     } catch (e) {

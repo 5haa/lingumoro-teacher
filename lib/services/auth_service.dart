@@ -61,9 +61,9 @@ class AuthService {
       token: token,
     );
 
-    // Create teacher profile after successful verification
+    // Create or update teacher profile after successful verification
     if (response.user != null) {
-      // Check if profile already exists
+      // Check if profile already exists (created by database trigger)
       final existing = await _supabase
           .from('teachers')
           .select()
@@ -71,6 +71,7 @@ class AuthService {
           .maybeSingle();
 
       if (existing == null) {
+        // Create new profile
         await _supabase.from('teachers').insert({
           'id': response.user!.id,
           'email': response.user!.email,
@@ -79,6 +80,15 @@ class AuthService {
           'bio': bio,
           'specialization': specialization,
         });
+      } else {
+        // Update existing profile with correct data (trigger may have created with defaults)
+        await _supabase.from('teachers').update({
+          'full_name': fullName,
+          if (phone != null) 'phone': phone,
+          if (bio != null) 'bio': bio,
+          if (specialization != null) 'specialization': specialization,
+          'updated_at': DateTime.now().toIso8601String(),
+        }).eq('id', response.user!.id);
       }
       
       // Initialize Firebase notifications
