@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/screens/auth/auth_screen.dart';
 import 'package:teacher/screens/main_navigation.dart';
-import 'package:teacher/screens/onboarding_screen.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/services/firebase_notification_service.dart';
 import 'package:teacher/services/preload_service.dart';
@@ -22,7 +20,12 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    _checkAuthStatus();
+    // Run after first frame so InheritedWidgets (e.g. MediaQuery) are available
+    // for any preload work that depends on context.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _checkAuthStatus();
+    });
   }
   
   @override
@@ -37,23 +40,6 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuthStatus() async {
     // Start with minimum splash duration and preloading in parallel
     final minimumSplashDuration = Future.delayed(const Duration(seconds: 3));
-    
-    // Check if onboarding has been completed
-    final prefs = await SharedPreferences.getInstance();
-    final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
-
-    // If onboarding not completed, show onboarding screen
-    if (!onboardingCompleted) {
-      await minimumSplashDuration;
-      if (!mounted) return;
-      
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => const OnboardingScreen(),
-        ),
-      );
-      return;
-    }
 
     // Check authentication status
     final session = Supabase.instance.client.auth.currentSession;
@@ -67,9 +53,11 @@ class _SplashScreenState extends State<SplashScreen> {
       final isSuspended = await authService.checkIfSuspended();
       
       if (isSuspended) {
-        await minimumSplashDuration;
+        // User is suspended, show login screen with message
+        await minimumSplashDuration; // Wait for minimum splash time
         nextScreen = const AuthScreen();
         if (mounted) {
+          // Show suspension message after navigation
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -83,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
           });
         }
       } else {
-        // Preload data and initialize Firebase in parallel
+        // Preload data and initialize Firebase notifications in parallel
         await Future.wait([
           minimumSplashDuration,
           _preloadAppData(isLoggedIn: true),
@@ -93,7 +81,12 @@ class _SplashScreenState extends State<SplashScreen> {
         nextScreen = const MainNavigation();
       }
     } else {
-      await minimumSplashDuration;
+      // Not logged in - preload public data only
+      await Future.wait([
+        minimumSplashDuration,
+        _preloadAppData(isLoggedIn: false),
+      ]);
+      
       nextScreen = const AuthScreen();
     }
 
@@ -115,6 +108,7 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     } catch (e) {
       print('❌ Error preloading data: $e');
+      // Don't block app from loading even if preload fails
     }
   }
 
@@ -132,27 +126,14 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Logo
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: Image.asset(
-                'assets/images/logo.jpg',
-                width: 280,
-                height: 280,
-                fit: BoxFit.contain,
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Loading indicator
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-              strokeWidth: 3,
-            ),
-          ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/splash.jpg'),
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );

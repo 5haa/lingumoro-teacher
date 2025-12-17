@@ -11,6 +11,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../../config/app_colors.dart';
 import '../../l10n/app_localizations.dart';
+import '../../utils/error_helper.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -89,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${AppLocalizations.of(context).errorLoadingData}: $e'),
+            content: Text(ErrorHelper.getUserFriendlyError(e)),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -235,7 +236,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${AppLocalizations.of(context).failedToUpdateMeetingLink}: $e'),
+              content: Text(ErrorHelper.getUserFriendlyError(e)),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -368,7 +369,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${l10n.logoutFailed}: $e'),
+              content: Text(ErrorHelper.getUserFriendlyError(e)),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(

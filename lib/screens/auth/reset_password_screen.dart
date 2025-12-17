@@ -5,6 +5,7 @@ import 'package:teacher/widgets/custom_button.dart';
 import 'package:teacher/widgets/custom_text_field.dart';
 import 'package:teacher/widgets/custom_back_button.dart';
 import 'package:teacher/l10n/app_localizations.dart';
+import 'package:teacher/utils/error_helper.dart';
 import 'auth_screen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -89,10 +90,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       }
     } catch (e) {
       if (mounted) {
-        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${l10n.failedToResetPassword}: ${e.toString()}'),
+            content: Text(ErrorHelper.getUserFriendlyError(e)),
             backgroundColor: AppColors.primary,
           ),
         );

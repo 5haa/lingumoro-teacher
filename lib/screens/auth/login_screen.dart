@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/screens/auth/signup_screen.dart';
 import 'package:teacher/screens/main_navigation.dart';
+import 'package:teacher/utils/error_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -45,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login failed: ${e.toString()}'),
+            content: Text(ErrorHelper.getUserFriendlyError(e)),
             backgroundColor: Colors.red,
           ),
         );

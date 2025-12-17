@@ -5,6 +5,7 @@ import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/widgets/custom_button.dart';
 import 'package:teacher/widgets/custom_back_button.dart';
+import 'package:teacher/utils/error_helper.dart';
 import 'reset_password_screen.dart';
 import '../main_navigation.dart';
 
@@ -100,7 +101,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to resend code: ${e.toString()}'),
+            content: Text(ErrorHelper.getUserFriendlyError(e)),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -161,7 +162,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Verification failed: ${e.toString()}'),
+            content: Text(ErrorHelper.getUserFriendlyError(e)),
             backgroundColor: AppColors.primary,
           ),
         );

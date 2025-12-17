@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../../config/app_colors.dart';
 import '../../widgets/custom_button.dart';
+import '../../utils/error_helper.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_back_button.dart';
 import '../../l10n/app_localizations.dart';
@@ -76,7 +77,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context).errorPickingImage(e.toString())),
+            content: Text(ErrorHelper.getUserFriendlyError(e)),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -263,7 +264,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context).failedToUpdateProfile(e.toString())),
+            content: Text(ErrorHelper.getUserFriendlyError(e)),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(

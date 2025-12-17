@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
 import 'package:teacher/screens/auth/otp_verification_screen.dart';
+import 'package:teacher/utils/error_helper.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -80,7 +81,7 @@ class _SignupScreenState extends State<SignupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Signup failed: ${e.toString()}'),
+            content: Text(ErrorHelper.getUserFriendlyError(e)),
             backgroundColor: Colors.red,
           ),
         );
