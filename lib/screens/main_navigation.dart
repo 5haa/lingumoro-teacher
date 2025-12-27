@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:teacher/config/app_colors.dart';
 import 'package:teacher/widgets/app_drawer.dart';
+import 'package:teacher/widgets/connectivity_banner.dart';
 import 'package:teacher/l10n/app_localizations.dart';
 import 'package:teacher/services/chat_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -150,9 +151,19 @@ class _MainNavigationState extends State<MainNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const AppDrawer(),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: _currentIndex,
+            children: _screens,
+          ),
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: ConnectivityBanner(),
+          ),
+        ],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

@@ -12,6 +12,7 @@ import 'package:teacher/services/locale_service.dart';
 import 'package:teacher/services/notification_badge_controller.dart';
 import 'package:teacher/l10n/app_localizations.dart';
 import 'package:teacher/providers/locale_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +31,11 @@ void main() async {
     anonKey: SupabaseConfig.supabaseAnonKey,
   );
 
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
