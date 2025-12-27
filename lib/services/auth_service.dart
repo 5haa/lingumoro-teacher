@@ -37,6 +37,7 @@ class AuthService {
       email: email,
       password: password,
       emailRedirectTo: null, // Disable email link
+      data: {'role': 'teacher'},
     );
 
     // Note: User data will be passed via the OTP screen
@@ -124,8 +125,8 @@ class AuthService {
       throw Exception('This account is registered as a student. Please use the Student app to login.');
     } else if (userType == 'not_found') {
       throw Exception('No account found with this email. Please sign up first.');
-    } else if (userType == 'no_profile') {
-      throw Exception('Account exists but profile is incomplete. Please contact support.');
+    } else if (userType == 'duplicate' || userType == 'no_profile') {
+      throw Exception('Account exists but has issues (duplicate/incomplete). Please contact support.');
     }
     
     final response = await _supabase.auth.signInWithPassword(

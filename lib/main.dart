@@ -16,8 +16,14 @@ import 'package:teacher/providers/locale_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp();
+  // Initialize Firebase with error handling
+  try {
+    await Firebase.initializeApp();
+    print('✅ Firebase initialized successfully');
+  } catch (e) {
+    print('❌ Firebase initialization error: $e');
+    // Continue anyway - Firebase might already be initialized
+  }
 
   await Supabase.initialize(
     url: SupabaseConfig.supabaseUrl,

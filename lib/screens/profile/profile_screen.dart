@@ -67,6 +67,8 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
   }
 
   Future<void> _loadProfile({bool clearImageCache = false}) async {
+    setState(() => _isLoading = true);
+    
     try {
       // Clear image cache if requested (after profile update)
       if (clearImageCache) {
