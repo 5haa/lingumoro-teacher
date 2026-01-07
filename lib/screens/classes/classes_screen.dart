@@ -76,13 +76,13 @@ class _ClassesScreenState extends State<ClassesScreen>
           final scheduledDate = DateTime.parse(session['scheduled_date']);
           final startTime = session['scheduled_start_time'] ?? '00:00:00';
           final timeParts = startTime.split(':');
-          final scheduledDateTime = DateTime(
+          final scheduledDateTime = DateTime.utc(
             scheduledDate.year,
             scheduledDate.month,
             scheduledDate.day,
             int.parse(timeParts[0]),
             int.parse(timeParts[1]),
-          );
+          ).toLocal();
           
           final status = session['status'] ?? '';
           if (status == 'completed' || status == 'cancelled' || 
@@ -789,28 +789,53 @@ class _ClassesScreenState extends State<ClassesScreen>
     final isMakeup = session['is_makeup'] == true;
     final isTeacherCreated = session['teacher_created'] == true;
 
-    final scheduledDate = DateTime.parse(session['scheduled_date']);
-    final today = DateTime.now();
-    final isToday = scheduledDate.year == today.year && 
-                    scheduledDate.month == today.month && 
-                    scheduledDate.day == today.day;
-    
-    final dateStr = '${_getWeekday(scheduledDate.weekday)}, ${scheduledDate.day}';
-    final monthStr = '${_getMonth(scheduledDate.month)} ${scheduledDate.year}';
-    final startTime = session['scheduled_start_time']?.substring(0, 5) ?? '00:00';
-    final endTime = session['scheduled_end_time']?.substring(0, 5) ?? '00:00';
-    final timeStr = '$startTime - $endTime';
+    final scheduledDateRaw = DateTime.parse(session['scheduled_date']);
+  final startTimeRaw = session['scheduled_start_time'] ?? '00:00:00';
+  final endTimeRaw = session['scheduled_end_time'] ?? '00:00:00';
 
-    // Calculate duration
-    String duration = '45 ${AppLocalizations.of(context).min}';
-    try {
-      final start = DateTime.parse('2000-01-01 ${session['scheduled_start_time']}');
-      final end = DateTime.parse('2000-01-01 ${session['scheduled_end_time']}');
-      final diff = end.difference(start).inMinutes;
-      duration = '$diff ${AppLocalizations.of(context).min}';
-    } catch (e) {
-      // Keep default
-    }
+  final startParts = startTimeRaw.split(':');
+  final startDateTime = DateTime.utc(
+    scheduledDateRaw.year, 
+    scheduledDateRaw.month, 
+    scheduledDateRaw.day,
+    int.parse(startParts[0]),
+    int.parse(startParts[1])
+  ).toLocal();
+
+  final endParts = endTimeRaw.split(':');
+  final endDateTime = DateTime.utc(
+    scheduledDateRaw.year, 
+    scheduledDateRaw.month, 
+    scheduledDateRaw.day,
+    int.parse(endParts[0]),
+    int.parse(endParts[1])
+  ).toLocal();
+
+  final today = DateTime.now();
+  final isToday = startDateTime.year == today.year && 
+                  startDateTime.month == today.month && 
+                  startDateTime.day == today.day;
+  
+  final dateStr = '${_getWeekday(startDateTime.weekday)}, ${startDateTime.day}';
+  final monthStr = '${_getMonth(startDateTime.month)} ${startDateTime.year}';
+  
+  final startHour = startDateTime.hour.toString().padLeft(2, '0');
+  final startMinute = startDateTime.minute.toString().padLeft(2, '0');
+  final endHour = endDateTime.hour.toString().padLeft(2, '0');
+  final endMinute = endDateTime.minute.toString().padLeft(2, '0');
+  
+  final startTime = '$startHour:$startMinute';
+  final endTime = '$endHour:$endMinute';
+  final timeStr = '$startTime - $endTime';
+
+  // Calculate duration
+  String duration = '45 ${AppLocalizations.of(context).min}';
+  try {
+    final diff = endDateTime.difference(startDateTime).inMinutes;
+    duration = '$diff ${AppLocalizations.of(context).min}';
+  } catch (e) {
+    // Keep default
+  }  
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
