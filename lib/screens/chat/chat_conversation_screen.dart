@@ -23,6 +23,9 @@ class ChatConversationScreen extends StatefulWidget {
   final String recipientId;
   final String recipientName;
   final String? recipientAvatar;
+  final String? previewMessage;
+  final String? previewTime;
+  final bool isUnread;
 
   const ChatConversationScreen({
     super.key,
@@ -30,6 +33,9 @@ class ChatConversationScreen extends StatefulWidget {
     required this.recipientId,
     required this.recipientName,
     this.recipientAvatar,
+    this.previewMessage,
+    this.previewTime,
+    this.isUnread = false,
   });
 
   @override
@@ -78,6 +84,28 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
       setState(() {}); // Rebuild to show/hide mic button
     });
     
+    // Check for preview message to show instantly
+    if (widget.previewMessage != null && widget.previewMessage!.isNotEmpty) {
+      final cached = _preloadService.getMessages(widget.conversationId);
+      if (cached == null || cached.isEmpty) {
+        // Create a temporary preview message
+        // For teacher app: if unread, it's from student. If read, assume it's from us or student.
+        // We'll trust unread flag mostly.
+        _messages = [{
+          'id': 'preview_${DateTime.now().millisecondsSinceEpoch}',
+          'conversation_id': widget.conversationId,
+          'sender_id': widget.isUnread ? widget.recipientId : (_currentUserId ?? 'unknown'),
+          'sender_type': widget.isUnread ? 'student' : 'teacher', 
+          'message_text': widget.previewMessage,
+          'created_at': widget.previewTime ?? DateTime.now().toIso8601String(),
+          'has_attachment': widget.previewMessage == '📷 Photo' || widget.previewMessage == '📎 Attachment' || widget.previewMessage == '🎤 Voice Message',
+          'is_read': !widget.isUnread,
+          'is_preview': true, // flag to identify and remove later
+        }];
+        _isLoading = false; // Show content immediately
+      }
+    }
+
     // Add scroll listener for pagination
     _scrollController.addListener(_onScroll);
     
@@ -88,17 +116,23 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
   }
 
   void _loadMessagesFromCache() {
+    // Try to load from cache first for instant UI
     final cached = _preloadService.getMessages(widget.conversationId);
-    if (cached != null) {
+    final hasCache = cached != null && cached.isNotEmpty;
+    
+    // We consider "has cache" if we successfully loaded from cache OR if we have a preview message
+    final hasDataToShow = hasCache || _messages.isNotEmpty;
+    
+    if (hasCache) {
       setState(() {
-        _messages = cached;
+        _messages = List.from(cached); // Use a copy to avoid mutation issues
         _isLoading = false;
       });
       print('✅ Loaded ${cached.length} messages from cache');
-      return;
     }
     
-    _loadMessages();
+    // Fetch latest from API in background (without showing loading if we have data to show)
+    _loadMessages(showLoading: !hasDataToShow);
   }
 
   void _subscribeToOnlineStatus() {
@@ -273,8 +307,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
     }
   }
 
-  Future<void> _loadMessages() async {
-    if (mounted) {
+  Future<void> _loadMessages({bool showLoading = true}) async {
+    // Only show loading if explicitly requested (i.e., no cache available)
+    if (showLoading && mounted) {
       setState(() => _isLoading = true);
     }
     
@@ -289,13 +324,51 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> with Wi
     
     if (mounted) {
       setState(() {
-        _messages = messages;
+        // If we already have messages (from cache or realtime), merge intelligently
+        if (_messages.isNotEmpty && !showLoading) {
+          // Create a map of existing messages by ID for quick lookup
+          final existingIds = <String>{};
+          for (var msg in _messages) {
+            existingIds.add(msg['id'] as String);
+          }
+          
+          // Start with API messages (they're the source of truth for historical data)
+          final mergedMessages = List<Map<String, dynamic>>.from(messages);
+          
+          // Add any messages from _messages that aren't in the API response
+          // (these could be messages received via realtime that haven't synced yet)
+          // BUT skip preview messages as they are replaced by API data
+          for (var msg in _messages) {
+            if (msg['is_preview'] == true) continue; // Skip preview messages
+
+            final msgId = msg['id'] as String;
+            final alreadyExists = mergedMessages.any((m) => m['id'] == msgId);
+            if (!alreadyExists) {
+              // This is a newer message not yet in API response, keep it
+              mergedMessages.add(msg);
+            }
+          }
+          
+          // Sort by created_at to ensure proper order
+          mergedMessages.sort((a, b) {
+            final aTime = DateTime.tryParse(a['created_at'] ?? '') ?? DateTime(1970);
+            final bTime = DateTime.tryParse(b['created_at'] ?? '') ?? DateTime(1970);
+            return aTime.compareTo(bTime);
+          });
+          
+          _messages = mergedMessages;
+        } else {
+          // No existing messages or full reload requested - just use API response
+          _messages = messages;
+        }
+        
         _isLoading = false;
         // Check if there might be more messages
         _hasMoreMessages = messages.length >= _messagesPerPage;
       });
     }
   }
+
 
   Future<void> _refreshMessages() async {
     if (_isLoading) return;

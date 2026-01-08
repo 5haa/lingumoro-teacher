@@ -54,6 +54,15 @@ class _ChatListScreenState extends State<ChatListScreen> with AutomaticKeepAlive
           // Update existing conversation
           setState(() {
             _conversations[index] = {..._conversations[index], ...update};
+            // Re-sort conversations by last_message_at (newest first)
+            _conversations.sort((a, b) {
+              final aTime = a['last_message_at'] as String?;
+              final bTime = b['last_message_at'] as String?;
+              if (aTime == null && bTime == null) return 0;
+              if (aTime == null) return 1;
+              if (bTime == null) return -1;
+              return bTime.compareTo(aTime);
+            });
             _filteredConversations = _conversations;
           });
           
@@ -815,6 +824,9 @@ class _ChatListScreenState extends State<ChatListScreen> with AutomaticKeepAlive
               recipientId: studentId,
               recipientName: name,
               recipientAvatar: avatarUrl,
+              previewMessage: lastMessage,
+              previewTime: lastMessageAt,
+              isUnread: unreadCount > 0,
             ),
           ),
         );
