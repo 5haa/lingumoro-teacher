@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teacher/services/auth_service.dart';
-import 'package:teacher/screens/auth/signup_screen.dart';
+
 import 'package:teacher/screens/main_navigation.dart';
 import 'package:teacher/utils/error_helper.dart';
 
@@ -212,28 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 16),
 
                         // Sign up link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't have an account? ",
-                              style: TextStyle(color: Colors.grey.shade600),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => const SignupScreen(),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                'Sign Up',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
+
                       ],
                     ),
                   ),

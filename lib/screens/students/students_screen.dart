@@ -1275,9 +1275,10 @@ class _StudentsScreenState extends State<StudentsScreen> with AutomaticKeepAlive
     } catch (e) {
       if (mounted) {
         Navigator.pop(context); // Close loading dialog
+        final errorMessage = e.toString().replaceAll(RegExp(r'^Exception: '), '');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(errorMessage),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
