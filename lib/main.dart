@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,13 +18,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase with error handling
+  // Initialize Firebase with explicit options for iOS to prevent [core/no-app] error
   try {
-    await Firebase.initializeApp();
+    FirebaseOptions? options;
+    if (Platform.isIOS) {
+      options = const FirebaseOptions(
+        apiKey: 'AIzaSyBF5PuYvjfBrXHYouOwnkkLzhgcDP-13pY',
+        appId: '1:342869418554:ios:295fa0ac03f2e2fbc6cb03',
+        messagingSenderId: '342869418554',
+        projectId: 'lingumoro-b6065',
+        storageBucket: 'lingumoro-b6065.firebasestorage.app',
+        iosBundleId: 'com.lingumoro.teacher',
+      );
+    }
+
+    await Firebase.initializeApp(options: options);
     print('✅ Firebase initialized successfully');
   } catch (e) {
     print('❌ Firebase initialization error: $e');
-    // Continue anyway - Firebase might already be initialized
   }
 
   // Initialize Supabase with error handling
