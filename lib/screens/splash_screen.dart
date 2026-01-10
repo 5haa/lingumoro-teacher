@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -38,6 +39,26 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthStatus() async {
+    try {
+      // Maximum timeout for entire splash initialization to prevent getting stuck
+      await Future.any([
+        _performAuthCheck(),
+        Future.delayed(const Duration(seconds: 10)).then((_) {
+          throw TimeoutException('Splash screen initialization timed out');
+        }),
+      ]);
+    } catch (e) {
+      print('❌ Splash screen error: $e');
+      // If anything fails, navigate to auth screen as fallback
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const AuthScreen()),
+        );
+      }
+    }
+  }
+
+  Future<void> _performAuthCheck() async {
     // Start with minimum splash duration and preloading in parallel
     final minimumSplashDuration = Future.delayed(const Duration(seconds: 3));
 
@@ -72,10 +93,11 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       } else {
         // Preload data and initialize Firebase notifications in parallel
+        // Add individual timeouts to prevent any single operation from blocking
         await Future.wait([
           minimumSplashDuration,
-          _preloadAppData(isLoggedIn: true),
-          _initializeFirebaseNotifications(),
+          _preloadAppData(isLoggedIn: true).timeout(const Duration(seconds: 5), onTimeout: () {}),
+          _initializeFirebaseNotifications().timeout(const Duration(seconds: 5), onTimeout: () {}),
         ]);
         
         nextScreen = const MainNavigation();
@@ -84,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // Not logged in - preload public data only
       await Future.wait([
         minimumSplashDuration,
-        _preloadAppData(isLoggedIn: false),
+        _preloadAppData(isLoggedIn: false).timeout(const Duration(seconds: 5), onTimeout: () {}),
       ]);
       
       nextScreen = const AuthScreen();

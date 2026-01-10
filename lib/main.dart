@@ -26,10 +26,17 @@ void main() async {
     // Continue anyway - Firebase might already be initialized
   }
 
-  await Supabase.initialize(
-    url: SupabaseConfig.supabaseUrl,
-    anonKey: SupabaseConfig.supabaseAnonKey,
-  );
+  // Initialize Supabase with error handling
+  try {
+    await Supabase.initialize(
+      url: SupabaseConfig.supabaseUrl,
+      anonKey: SupabaseConfig.supabaseAnonKey,
+    );
+    print('✅ Supabase initialized successfully');
+  } catch (e) {
+    print('❌ Supabase initialization error: $e');
+    // Continue anyway - app should at least show UI
+  }
 
   runApp(
     const ProviderScope(
