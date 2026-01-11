@@ -1,36 +1,30 @@
 workflows:
-  ios-simulator:
-    name: iOS Simulator
-    instance_type: mac_mini_m2
+  ios:
+    name: iOS Teacher (TestFlight)
+    max_build_duration: 60
     environment:
-      flutter: 3.27.3
-      xcode: 16.2
-    scripts:
-      - flutter pub get
-      - flutter build ios --simulator
-      - find build/ios/iphonesimulator -name "*.app"
-    artifacts:
-      - build/ios/iphonesimulator/*.app
-
-  ios-testflight:
-    name: iOS TestFlight
-    instance_type: mac_mini_m2
-    integrations:
-      app_store_connect: LinguMoro
-    environment:
-      flutter: 3.27.3
-      xcode: 16.2
+      flutter: stable
+      xcode: latest
+      cocoapods: default
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.lingumoro.teacher
+
     scripts:
-      - flutter pub get
-      - name: Set up provisioning profiles settings on Xcode project
-        script: xcode-project use-profiles
-      - flutter build ipa --release
+      - name: Get packages
+        script: |
+          flutter clean
+          flutter pub get
+
+      - name: Build IPA (Teacher)
+        script: |
+          flutter build ipa --release \
+            --export-options-plist=ios/export_options.plist
+
     artifacts:
       - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
+      - build/ios/archive/*.xcarchive
+
     publishing:
       app_store_connect:
         auth: integration
