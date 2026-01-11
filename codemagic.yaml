@@ -2,13 +2,17 @@ workflows:
   ios:
     name: iOS Teacher (TestFlight)
     max_build_duration: 60
+
     environment:
       flutter: stable
       xcode: latest
       cocoapods: default
+
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.lingumoro.teacher
+        provisioning_profiles:
+          - CodemagicTeacher
+        certificates:
+          - CodemagicCert
 
     scripts:
       - name: Get packages
@@ -16,10 +20,12 @@ workflows:
           flutter clean
           flutter pub get
 
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+
       - name: Build IPA (Teacher)
         script: |
-          flutter build ipa --release \
-            --export-options-plist=ios/export_options.plist
+          flutter build ipa --release --export-options-plist=ios/export_options.plist
 
     artifacts:
       - build/ios/ipa/*.ipa
